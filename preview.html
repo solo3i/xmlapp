@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview & Export - FCP Audio to XML</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #1e40af;
+            --accent-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --surface-color: #334155;
+            --border-color: #475569;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
+            --radius: 12px;
+            --font-primary: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-top: 80px;
+        }
+
+        /* Navigation (same as others) */
+        .navbar {
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-color);
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        .nav-links a.active {
+            color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            background: var(--surface-color);
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .card-header i {
+            color: var(--accent-color);
+            font-size: 1.5rem;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        /* Live Preview */
+        .preview-container {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: none;
+        }
+
+        .video-preview-wrapper {
+            position: relative;
+            width: 100%;
+            background: black;
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .video-preview-wrapper.resolution-1920x1080 {
+            aspect-ratio: 16/9;
+            max-width: 1920px;
+            max-height: 1080px;
+        }
+
+        .video-preview-wrapper.resolution-1280x720 {
+            aspect-ratio: 16/9;
+            max-width: 1280px;
+            max-height: 720px;
+        }
+
+        .video-preview-wrapper.resolution-3840x2160 {
+            aspect-ratio: 16/9;
+            max-width: 1920px; /* Scale down 4K for display */
+            max-height: 1080px;
+        }
+
+        .video-preview-wrapper.resolution-2560x1440 {
+            aspect-ratio: 16/9;
+            max-width: 1280px; /* Scale down 1440p for display */
+            max-height: 720px;
+        }
+
+        .video-preview-wrapper.resolution-1600x900 {
+            aspect-ratio: 16/9;
+            max-width: 1600px;
+            max-height: 900px;
+        }
+
+        .preview-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.2) 100%);
+            pointer-events: none;
+        }
+
+        .subtitle-display {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 1rem;
+            padding: 2rem;
+            pointer-events: none;
+        }
+
+        .subtitle-overlay {
+            background: rgba(0,0,0,0.8);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .arabic-text {
+            font-family: 'Arial', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-align: center;
+            direction: rtl;
+            line-height: 1.4;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .english-text {
+            font-family: 'Arial', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #ffffff;
+            text-align: center;
+            direction: ltr;
+            line-height: 1.3;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        /* Audio Controls */
+        .audio-controls {
+            background: var(--surface-color);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .audio-controls audio {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* XML Preview */
+        .xml-preview {
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .xml-header {
+            background: var(--surface-color);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .xml-content {
+            padding: 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .xml-code {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            white-space: pre;
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        /* Project Info */
+        .project-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-item {
+            background: var(--surface-color);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #34d399);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color), #fbbf24);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--surface-color);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .project-info {
+                grid-template-columns: 1fr;
+            }
+
+            .arabic-text {
+                font-size: 1.5rem;
+            }
+
+            .english-text {
+                font-size: 1.2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            max-width: 400px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, var(--success-color), #34d399);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, var(--error-color), #f87171);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-film"></i> FCP Audio Converter
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="converter.html">Converter</a></li>
+                <li><a href="preview.html" class="active">Preview</a></li>
+                <li><a href="settings.html">Settings</a></li>
+                <li><a href="video-library.html">Video Library</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="page-header">
+            <h1>Preview & Export</h1>
+            <p>Review your project and download the Final Cut Pro XML file</p>
+        </div>
+
+        <!-- Project Info -->
+        <div class="project-info" id="projectInfo">
+            <!-- Will be populated by JavaScript -->
+        </div>
+
+        <!-- Live Preview -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-eye"></i>
+                <h3>Live Preview</h3>
+            </div>
+            <div class="card-body">
+                <div class="audio-controls" id="audioControls" style="display: none;">
+                    <audio controls id="audioPlayer">
+                        Your browser does not support the audio element.
+                    </audio>
+                    <div class="controls-row">
+                        <button class="btn btn-primary" onclick="previewSubtitle()">
+                            <i class="fas fa-play"></i> Preview Subtitle
+                        </button>
+                        <button class="btn btn-secondary" onclick="setCurrentTime()">
+                            <i class="fas fa-crosshairs"></i> Set Current Time
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleBeatSync()">
+                            <i class="fas fa-heartbeat"></i> <span id="beatSyncText">Enable Beat Sync</span>
+                        </button>
+                    </div>
+                    <div class="resolution-info" id="resolutionInfo"></div>
+                </div>
+
+                <div class="preview-container">
+                    <div class="video-preview-wrapper" id="videoPreviewWrapper">
+                        <div class="subtitle-display">
+                            <div class="subtitle-overlay" id="subtitleOverlay" style="display: none;">
+                                <div class="arabic-text" id="arabicDisplay">Arabic text will appear here</div>
+                                <div class="english-text" id="englishDisplay">English text will appear here</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- XML Preview -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-code"></i>
+                <h3>Generated XML Code</h3>
+            </div>
+            <div class="card-body">
+                <div class="xml-preview">
+                    <div class="xml-header">
+                        <span>Final Cut Pro XML</span>
+                        <button class="btn btn-secondary" onclick="copyXML()">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <div class="xml-content">
+                        <pre class="xml-code" id="xmlCode">Loading XML...</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a href="converter.html" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Converter
+            </a>
+            <button class="btn btn-warning" onclick="editProject()">
+                <i class="fas fa-edit"></i> Edit Project
+            </button>
+            <button class="btn btn-success btn-large" onclick="downloadXML()" id="downloadBtn">
+                <i class="fas fa-download"></i> Download XML
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let projectData = null;
+        let generatedXML = '';
+
+        // Initialize page
+        window.addEventListener('load', () => {
+            loadProjectData();
+        });
+
+        let beatSyncEnabled = false;
+        let currentBeatIndex = 0;
+
+        function loadProjectData() {
+            const savedData = localStorage.getItem('fcpProjectData');
+            if (!savedData) {
+                showNotification('No project data found. Redirecting to converter...', 'error');
+                setTimeout(() => {
+                    window.location.href = 'converter.html';
+                }, 2000);
+                return;
+            }
+
+            try {
+                projectData = JSON.parse(savedData);
+                setupResolution();
+                displayProjectInfo();
+                setupAudioPlayer();
+                updatePreview();
+                generateXML();
+            } catch (e) {
+                showNotification('Invalid project data. Redirecting to converter...', 'error');
+                setTimeout(() => {
+                    window.location.href = 'converter.html';
+                }, 2000);
+            }
+        }
+
+        function setupResolution() {
+            const wrapper = document.getElementById('videoPreviewWrapper');
+            const resolution = projectData.previewResolution || '1920x1080';
+            
+            // Remove existing resolution classes
+            wrapper.className = 'video-preview-wrapper';
+            wrapper.classList.add(`resolution-${resolution}`);
+            
+            // Display resolution info
+            const resolutionInfo = document.getElementById('resolutionInfo');
+            const [width, height] = resolution.split('x');
+            resolutionInfo.innerHTML = `
+                <div style="margin-top: 1rem; padding: 0.75rem; background: var(--surface-color); border-radius: 6px; font-size: 0.9rem; color: var(--text-secondary);">
+                    <i class="fas fa-tv"></i> Preview Resolution: ${width} × ${height}px
+                    ${projectData.beatTimestamps ? `• <i class="fas fa-heartbeat"></i> ${projectData.beatTimestamps.length} beats detected` : ''}
+                    ${projectData.voiceSegments ? `• <i class="fas fa-microphone"></i> ${projectData.voiceSegments.length} voice segments` : ''}
+                </div>
+            `;
+        }
+
+        function displayProjectInfo() {
+            const infoContainer = document.getElementById('projectInfo');
+            infoContainer.innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">Audio File</div>
+                    <div class="info-value">${projectData.audioFileName || 'Unknown'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Start Time</div>
+                    <div class="info-value">${projectData.startTime}s</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Duration</div>
+                    <div class="info-value">${projectData.duration}s</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Preview Resolution</div>
+                    <div class="info-value">${projectData.previewResolution || '1920x1080'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Display Mode</div>
+                    <div class="info-value">${formatDisplayMode(projectData.displayMode)}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Audio Sync</div>
+                    <div class="info-value">${formatAudioSync(projectData.audioSync)}</div>
+                </div>
+                ${projectData.beatTimestamps && projectData.beatTimestamps.length > 0 ? `
+                <div class="info-item">
+                    <div class="info-label">Beat Detection</div>
+                    <div class="info-value">${projectData.beatTimestamps.length} beats found</div>
+                </div>
+                ` : ''}
+                ${projectData.detectRepeats ? `
+                <div class="info-item">
+                    <div class="info-label">Repeat Detection</div>
+                    <div class="info-value">Enabled</div>
+                </div>
+                ` : ''}
+            `;
+        }
+
+        function setupAudioPlayer() {
+            if (projectData.audioURL) {
+                const audioPlayer = document.getElementById('audioPlayer');
+                audioPlayer.src = projectData.audioURL;
+                document.getElementById('audioControls').style.display = 'block';
+            }
+        }
+
+        function updatePreview() {
+            document.getElementById('arabicDisplay').textContent = projectData.arabicText || 'Arabic text will appear here';
+            document.getElementById('englishDisplay').textContent = projectData.englishText || 'English text will appear here';
+            
+            // Hide elements based on display mode
+            const arabicDisplay = document.getElementById('arabicDisplay');
+            const englishDisplay = document.getElementById('englishDisplay');
+            
+            switch(projectData.displayMode) {
+                case 'arabic':
+                    englishDisplay.style.display = 'none';
+                    break;
+                case 'english':
+                    arabicDisplay.style.display = 'none';
+                    break;
+                default:
+                    arabicDisplay.style.display = 'block';
+                    englishDisplay.style.display = 'block';
+            }
+        }
+
+        function previewSubtitle() {
+            const audioPlayer = document.getElementById('audioPlayer');
+            const startTime = projectData.startTime;
+            const duration = projectData.duration;
+            
+            audioPlayer.currentTime = startTime;
+            audioPlayer.play();
+            
+            setTimeout(() => {
+                audioPlayer.pause();
+            }, duration * 1000);
+            
+            showNotification(`Previewing from ${startTime}s for ${duration}s`, 'success');
+        }
+
+        function setCurrentTime() {
+            const audioPlayer = document.getElementById('audioPlayer');
+            projectData.startTime = audioPlayer.currentTime;
+            
+            // Update info display
+            displayProjectInfo();
+            
+            showNotification(`Start time set to ${audioPlayer.currentTime.toFixed(1)}s`, 'success');
+        }
+
+        function generateXML() {
+            const resolution = '1920x1080';
+            const frameRate = 25;
+            const [width, height] = resolution.split('x').map(Number);
+
+            let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE fcpxml>
+<fcpxml version="1.10">
+    <resources>
+        <format id="r1" name="FFVideoFormat${height}p${frameRate}" frameDuration="1/${frameRate}s" width="${width}" height="${height}" colorSpace="1-1-1 (Rec. 709)"/>
+        <effect id="e1" name="Basic Title" uid=".../Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"/>
+        <asset id="a1" name="${projectData.audioFileName}" uid="${generateUID()}" start="0/1s" duration="3600/1s" hasVideo="0" hasAudio="1">
+            <media-rep kind="original-media" src="file:///path/to/${projectData.audioFileName}"/>
+        </asset>
+    </resources>
+    <library location="file:///Users/user/Movies/">
+        <event name="Translation Project - ${new Date().toLocaleDateString()}">
+            <project name="Arabic Subtitle Project" uid="${generateUID()}" modDate="${new Date().toISOString()}">
+                <sequence format="r1" duration="${Math.ceil((projectData.startTime + projectData.duration) * frameRate)}/${frameRate}s" tcStart="0/1s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
+                    <spine>
+                        <!-- Audio Track -->
+                        <audio-clip name="${projectData.audioFileName}" offset="0/1s" duration="${Math.ceil((projectData.startTime + projectData.duration) * frameRate)}/${frameRate}s" audioRole="dialogue">
+                            <asset-clip ref="a1" offset="0/1s" duration="${Math.ceil((projectData.startTime + projectData.duration) * frameRate)}/${frameRate}s"/>
+                        </audio-clip>
+                        
+                        <!-- Video Gap for Subtitles -->
+                        <gap name="Gap" offset="0/1s" duration="${Math.ceil((projectData.startTime + projectData.duration) * frameRate)}/${frameRate}s">`;
+
+            // Add subtitle titles based on display mode
+            const startFrame = Math.floor(projectData.startTime * frameRate);
+            const durationFrames = Math.floor(projectData.duration * frameRate);
+
+            if (projectData.displayMode === 'both' || projectData.displayMode === 'arabic') {
+                xml += `
+                            <title name="Arabic Subtitle" offset="${startFrame}/${frameRate}s" duration="${durationFrames}/${frameRate}s" ref="e1">
+                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="-0.5 -${height * 0.3}"/>
+                                <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
+                                <text>
+                                    <text-style ref="ts1">${escapeXML(projectData.arabicText)}</text-style>
+                                </text>
+                                <text-style-def id="ts1">
+                                    <text-style font="Arial" fontSize="48" fontFace="Bold" fontColor="1 1 1 1" alignment="center"/>
+                                </text-style-def>
+                            </title>`;
+            }
+
+            if (projectData.displayMode === 'both' || projectData.displayMode === 'english') {
+                const englishOffset = projectData.displayMode === 'both' ? height * 0.15 : height * 0.3;
+                xml += `
+                            <title name="English Subtitle" offset="${startFrame}/${frameRate}s" duration="${durationFrames}/${frameRate}s" ref="e1">
+                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="-0.5 -${englishOffset}"/>
+                                <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
+                                <text>
+                                    <text-style ref="ts2">${escapeXML(projectData.englishText)}</text-style>
+                                </text>
+                                <text-style-def id="ts2">
+                                    <text-style font="Arial" fontSize="36" fontFace="Bold" fontColor="1 1 1 1" alignment="center"/>
+                                </text-style-def>
+                            </title>`;
+            }
+
+            if (projectData.displayMode === 'sequence') {
+                const halfDuration = Math.floor(durationFrames / 2);
+                xml += `
+                            <title name="Arabic Subtitle" offset="${startFrame}/${frameRate}s" duration="${halfDuration}/${frameRate}s" ref="e1">
+                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="-0.5 -${height * 0.3}"/>
+                                <text>
+                                    <text-style ref="ts1">${escapeXML(projectData.arabicText)}</text-style>
+                                </text>
+                            </title>
+                            <title name="English Subtitle" offset="${startFrame + halfDuration}/${frameRate}s" duration="${halfDuration}/${frameRate}s" ref="e1">
+                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="-0.5 -${height * 0.3}"/>
+                                <text>
+                                    <text-style ref="ts2">${escapeXML(projectData.englishText)}</text-style>
+                                </text>
+                            </title>`;
+            }
+
+            xml += `
+                        </gap>
+                    </spine>
+                </sequence>
+            </project>
+        </event>
+    </library>
+</fcpxml>`;
+
+            generatedXML = xml;
+            document.getElementById('xmlCode').textContent = xml;
+        }
+
+        function editProject() {
+            showNotification('Returning to converter for editing...', 'success');
+            setTimeout(() => {
+                window.location.href = 'converter.html';
+            }, 1000);
+        }
+
+        function copyXML() {
+            navigator.clipboard.writeText(generatedXML).then(() => {
+                showNotification('XML code copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Failed to copy XML code', 'error');
+            });
+        }
+
+        function downloadXML() {
+            if (!generatedXML) {
+                showNotification('No XML to download', 'error');
+                return;
+            }
+
+            const blob = new Blob([generatedXML], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fcp_subtitle_project_${Date.now()}.fcpxml`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showNotification('XML file downloaded successfully!', 'success');
+        }
+
+        // Helper functions
+        function generateUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function escapeXML(text) {
+            return text.replace(/&/g, '&amp;')
+                      .replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;')
+                      .replace(/"/g, '&quot;')
+                      .replace(/'/g, '&#39;');
+        }
+
+        function formatDisplayMode(mode) {
+            const modes = {
+                'both': 'Both Languages',
+                'arabic': 'Arabic Only',
+                'english': 'English Only',
+                'sequence': 'Sequential'
+            };
+            return modes[mode] || mode;
+        }
+
+        function formatAudioSync(sync) {
+            const syncs = {
+                'start': 'Sync to Start',
+                'center': 'Sync to Center',
+                'end': 'Sync to End',
+                'custom': 'Custom Offset'
+            };
+            return syncs[sync] || sync;
+        }
+
+        // Notifications
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Enhanced Preview Functions with Beat Sync
+        function toggleBeatSync() {
+            beatSyncEnabled = !beatSyncEnabled;
+            const button = document.getElementById('beatSyncText');
+            
+            if (beatSyncEnabled) {
+                button.textContent = 'Disable Beat Sync';
+                showNotification('Beat sync enabled - subtitles will follow audio beats', 'success');
+            } else {
+                button.textContent = 'Enable Beat Sync';
+                showNotification('Beat sync disabled - using regular timing', 'warning');
+            }
+        }
+
+        // Override the original previewSubtitle function
+        function previewSubtitle() {
+            const arabicDisplay = document.getElementById('arabicDisplay');
+            const englishDisplay = document.getElementById('englishDisplay');
+            const subtitleOverlay = document.getElementById('subtitleOverlay');
+            const audio = document.getElementById('audioPlayer');
+            
+            // Show subtitle overlay
+            subtitleOverlay.style.display = 'block';
+            
+            if (beatSyncEnabled && projectData.beatTimestamps && projectData.beatTimestamps.length > 0) {
+                // Use beat-synced timing
+                previewWithBeatSync();
+            } else {
+                // Use regular timing
+                previewWithRegularTiming();
+            }
+        }
+
+        function previewWithBeatSync() {
+            const audio = document.getElementById('audioPlayer');
+            
+            if (currentBeatIndex >= projectData.beatTimestamps.length) {
+                currentBeatIndex = 0;
+            }
+            
+            const beatTime = projectData.beatTimestamps[currentBeatIndex];
+            const nextBeatTime = currentBeatIndex + 1 < projectData.beatTimestamps.length ? 
+                projectData.beatTimestamps[currentBeatIndex + 1] : beatTime + projectData.duration;
+            
+            // Seek to beat time
+            audio.currentTime = beatTime;
+            audio.play();
+            
+            // Show subtitles based on display mode
+            showSubtitlesAtBeat(beatTime, nextBeatTime - beatTime);
+            
+            currentBeatIndex++;
+            
+            showNotification(`Synced to beat ${currentBeatIndex} at ${beatTime.toFixed(2)}s`, 'success');
+        }
+
+        function previewWithRegularTiming() {
+            const audio = document.getElementById('audioPlayer');
+            
+            // Seek to start time
+            audio.currentTime = projectData.startTime;
+            audio.play();
+            
+            // Show subtitles based on display mode
+            showSubtitlesAtTime(projectData.startTime, projectData.duration);
+            
+            // Auto-pause after duration
+            setTimeout(() => {
+                audio.pause();
+            }, projectData.duration * 1000);
+        }
+
+        function showSubtitlesAtBeat(startTime, duration) {
+            const arabicDisplay = document.getElementById('arabicDisplay');
+            const englishDisplay = document.getElementById('englishDisplay');
+            
+            // Apply fade and animation settings
+            applySubtitleAnimations(arabicDisplay, englishDisplay, duration);
+            
+            switch (projectData.displayMode) {
+                case 'both':
+                    arabicDisplay.textContent = projectData.arabicText;
+                    englishDisplay.textContent = projectData.englishText;
+                    arabicDisplay.style.display = 'block';
+                    englishDisplay.style.display = 'block';
+                    break;
+                case 'arabic':
+                    arabicDisplay.textContent = projectData.arabicText;
+                    englishDisplay.textContent = '';
+                    arabicDisplay.style.display = 'block';
+                    englishDisplay.style.display = 'none';
+                    break;
+                case 'english':
+                    englishDisplay.textContent = projectData.englishText;
+                    arabicDisplay.textContent = '';
+                    englishDisplay.style.display = 'block';
+                    arabicDisplay.style.display = 'none';
+                    break;
+                case 'sequence':
+                    const halfDuration = duration / 2;
+                    // Show Arabic first
+                    arabicDisplay.textContent = projectData.arabicText;
+                    englishDisplay.textContent = '';
+                    arabicDisplay.style.display = 'block';
+                    englishDisplay.style.display = 'none';
+                    
+                    // Switch to English after half duration
+                    setTimeout(() => {
+                        arabicDisplay.textContent = '';
+                        englishDisplay.textContent = projectData.englishText;
+                        arabicDisplay.style.display = 'none';
+                        englishDisplay.style.display = 'block';
+                    }, halfDuration * 500);
+                    break;
+            }
+        }
+
+        function showSubtitlesAtTime(startTime, duration) {
+            const arabicDisplay = document.getElementById('arabicDisplay');
+            const englishDisplay = document.getElementById('englishDisplay');
+            
+            // Apply fade and animation settings
+            applySubtitleAnimations(arabicDisplay, englishDisplay, duration);
+            
+            switch (projectData.displayMode) {
+                case 'both':
+                    arabicDisplay.textContent = projectData.arabicText;
+                    englishDisplay.textContent = projectData.englishText;
+                    arabicDisplay.style.display = 'block';
+                    englishDisplay.style.display = 'block';
+                    break;
+                case 'arabic':
+                    arabicDisplay.textContent = projectData.arabicText;
+                    englishDisplay.textContent = '';
+                    arabicDisplay.style.display = 'block';
+                    englishDisplay.style.display = 'none';
+                    break;
+                case 'english':
+                    englishDisplay.textContent = projectData.englishText;
+                    arabicDisplay.textContent = '';
+                    englishDisplay.style.display = 'block';
+                    arabicDisplay.style.display = 'none';
+                    break;
+                case 'sequence':
+                    const halfDuration = duration / 2;
+                    // Show Arabic first
+                    arabicDisplay.textContent = projectData.arabicText;
+                    englishDisplay.textContent = '';
+                    arabicDisplay.style.display = 'block';
+                    englishDisplay.style.display = 'none';
+                    
+                    // Switch to English after half duration
+                    setTimeout(() => {
+                        arabicDisplay.textContent = '';
+                        englishDisplay.textContent = projectData.englishText;
+                        arabicDisplay.style.display = 'none';
+                        englishDisplay.style.display = 'block';
+                    }, halfDuration * 1000);
+                    break;
+            }
+        }
+
+        function applySubtitleAnimations(arabicEl, englishEl, duration) {
+            const fadeIn = projectData.fadeInDuration || 0.5;
+            const fadeOut = projectData.fadeOutDuration || 0.5;
+            const animStyle = projectData.animationStyle || 'fade';
+            const fadeType = projectData.fadeType || 'ease-in-out';
+            
+            // Apply animation styles
+            [arabicEl, englishEl].forEach(el => {
+                if (el && el.style.display !== 'none') {
+                    el.style.transition = `all ${fadeIn}s ${fadeType}`;
+                    
+                    // Apply animation based on style
+                    switch (animStyle) {
+                        case 'slide-up':
+                            el.style.transform = 'translateY(20px)';
+                            el.style.opacity = '0';
+                            setTimeout(() => {
+                                el.style.transform = 'translateY(0)';
+                                el.style.opacity = '1';
+                            }, 50);
+                            break;
+                        case 'slide-down':
+                            el.style.transform = 'translateY(-20px)';
+                            el.style.opacity = '0';
+                            setTimeout(() => {
+                                el.style.transform = 'translateY(0)';
+                                el.style.opacity = '1';
+                            }, 50);
+                            break;
+                        case 'zoom-in':
+                            el.style.transform = 'scale(0.8)';
+                            el.style.opacity = '0';
+                            setTimeout(() => {
+                                el.style.transform = 'scale(1)';
+                                el.style.opacity = '1';
+                            }, 50);
+                            break;
+                        case 'typewriter':
+                            const text = el.textContent;
+                            el.textContent = '';
+                            el.style.opacity = '1';
+                            let i = 0;
+                            const typeInterval = setInterval(() => {
+                                el.textContent += text[i];
+                                i++;
+                                if (i >= text.length) {
+                                    clearInterval(typeInterval);
+                                }
+                            }, (fadeIn * 1000) / text.length);
+                            break;
+                        default: // fade
+                            el.style.opacity = '0';
+                            setTimeout(() => {
+                                el.style.opacity = '1';
+                            }, 50);
+                            break;
+                    }
+                    
+                    // Apply fade out
+                    setTimeout(() => {
+                        el.style.transition = `all ${fadeOut}s ${fadeType}`;
+                        el.style.opacity = '0';
+                    }, (duration - fadeOut) * 1000);
+                }
+            });
+        }
+
+        // Override setCurrentTime function
+        function setCurrentTime() {
+            const audio = document.getElementById('audioPlayer');
+            const currentTime = audio.currentTime;
+            
+            if (beatSyncEnabled && projectData.beatTimestamps && projectData.beatTimestamps.length > 0) {
+                // Find closest beat
+                let closestBeat = 0;
+                let minDistance = Math.abs(currentTime - projectData.beatTimestamps[0]);
+                
+                for (let i = 1; i < projectData.beatTimestamps.length; i++) {
+                    const distance = Math.abs(currentTime - projectData.beatTimestamps[i]);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closestBeat = i;
+                    }
+                }
+                
+                currentBeatIndex = closestBeat;
+                showNotification(`Set to beat ${closestBeat + 1} at ${projectData.beatTimestamps[closestBeat].toFixed(2)}s`, 'success');
+            } else {
+                // Update start time in project data
+                projectData.startTime = currentTime;
+                displayProjectInfo(); // Refresh the display
+                showNotification(`Start time set to ${currentTime.toFixed(2)}s`, 'success');
+            }
+        }
+    </script>
+</body>
+</html>

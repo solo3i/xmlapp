@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Converter - FCP Audio to XML</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #1e40af;
+            --accent-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --surface-color: #334155;
+            --border-color: #475569;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
+            --radius: 12px;
+            --font-primary: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-top: 80px;
+        }
+
+        /* Navigation (same as index) */
+        .navbar {
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-color);
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        .nav-links a.active {
+            color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            background: var(--surface-color);
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .card-header i {
+            color: var(--accent-color);
+            font-size: 1.5rem;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            border: 3px dashed var(--border-color);
+            border-radius: var(--radius);
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .upload-zone:hover::before {
+            left: 100%;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--accent-color);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+        }
+
+        .upload-zone.dragover {
+            border-color: var(--success-color);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .upload-zone h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .upload-zone p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* Audio Preview */
+        .audio-preview {
+            background: var(--surface-color);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .audio-preview audio {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .audio-info {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            background: rgba(0,0,0,0.3);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        /* Form Groups */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+        }
+
+        /* Range Inputs */
+        .range-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .range-group input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--surface-color);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .range-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .range-group input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .range-value {
+            min-width: 60px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            background: var(--surface-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+            font-family: var(--font-primary);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #34d399);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            min-height: 60px;
+        }
+
+        .action-buttons {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .upload-zone {
+                padding: 2rem 1rem;
+            }
+
+            .upload-icon {
+                font-size: 3rem;
+            }
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            max-width: 400px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, var(--success-color), #34d399);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, var(--error-color), #f87171);
+        }
+
+        .notification.warning {
+            background: linear-gradient(135deg, var(--warning-color), #fbbf24);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        /* Audio Analysis Styles */
+        .audio-analysis {
+            background: var(--surface-color);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .beat-visualization {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            min-height: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .beat-wave {
+            position: absolute;
+            bottom: 0;
+            width: 2px;
+            background: var(--accent-color);
+            transition: height 0.1s ease;
+            border-radius: 1px;
+        }
+
+        .beat-marker {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--warning-color);
+            border-radius: 1px;
+            opacity: 0.8;
+        }
+
+        .beat-marker::after {
+            content: '♪';
+            position: absolute;
+            top: -20px;
+            left: -5px;
+            color: var(--warning-color);
+            font-size: 12px;
+        }
+
+        .beat-timestamps {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+
+        .timestamp-item {
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid var(--accent-color);
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            text-align: center;
+            color: var(--accent-color);
+        }
+
+        .timestamp-item.beat {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: var(--warning-color);
+            color: var(--warning-color);
+        }
+
+        /* Checkbox Styling */
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-color);
+        }
+
+        /* Video Library Modal */
+        .video-library-modal {
+            backdrop-filter: blur(10px);
+        }
+
+        .video-library-modal h3 {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .video-library-modal .video-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-film"></i> FCP Audio Converter
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="converter.html" class="active">Converter</a></li>
+                <li><a href="preview.html">Preview</a></li>
+                <li><a href="settings.html">Settings</a></li>
+                <li><a href="video-library.html">Video Library</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="page-header">
+            <h1>Audio to XML Converter</h1>
+            <p>Upload your audio file and add subtitles to create Final Cut Pro XML projects</p>
+        </div>
+
+        <!-- Media Upload Section -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-music"></i>
+                <h3>Media File Upload</h3>
+            </div>
+            <div class="card-body">
+                <div class="upload-zone" onclick="document.getElementById('audioInput').click()">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3>Upload Audio/Video File</h3>
+                    <p>Supports: MP3, WAV, M4A, AAC, FLAC, OGG, MP4, MOV, AVI</p>
+                    <p>Drag and drop or click to browse</p>
+                    <input type="file" id="audioInput" class="file-input" accept=".mp3,.wav,.m4a,.aac,.flac,.ogg,.mp4,.mov,.avi" onchange="handleAudioUpload(event)">
+                </div>
+                
+                <div id="audioPreview" class="audio-preview">
+                    <audio controls id="audioPlayer">
+                        Your browser does not support the audio element.
+                    </audio>
+                    <div id="audioInfo" class="audio-info"></div>
+                </div>
+
+                <!-- Video Library Integration -->
+                <div style="margin-top: 1rem; text-align: center;">
+                    <button class="btn btn-primary" onclick="loadFromVideoLibrary()">
+                        <i class="fas fa-video"></i> Load from Video Library
+                    </button>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                        Choose from previously uploaded videos
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Text Content Section -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-keyboard"></i>
+                <h3>Subtitle Content</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Arabic Text:</label>
+                        <textarea id="arabicText" class="form-control" placeholder="Enter Arabic text here..." style="direction: rtl; text-align: right;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">English Text:</label>
+                        <textarea id="englishText" class="form-control" placeholder="Enter English text here..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audio Analysis Section -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-waveform-lines"></i>
+                <h3>Audio Analysis & Sync</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Auto-detect Audio Beats:</label>
+                        <button class="btn btn-primary" onclick="analyzeAudioBeats()" id="analyzeBeatBtn" disabled>
+                            <i class="fas fa-chart-line"></i> Analyze Beats & Pauses
+                        </button>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            Automatically detect beats (لطمات) and pauses for perfect subtitle timing
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Repeat Detection:</label>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                <input type="checkbox" id="detectRepeats" checked>
+                                Detect repeated verses (إعادة المقاطع)
+                            </label>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            When enabled, repeated verses will replay subtitles instead of advancing
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Voice Activity Detection:</label>
+                        <div class="range-group">
+                            <input type="range" id="voiceThreshold" min="0.1" max="1" step="0.05" value="0.3" oninput="updateRangeValue(this, 'voiceThresholdValue')">
+                            <span class="range-value" id="voiceThresholdValue">0.3</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            Sensitivity for detecting voice vs silence (higher = more sensitive)
+                        </p>
+                    </div>
+                </div>
+
+                <div id="beatAnalysis" class="audio-analysis" style="display: none;">
+                    <h4 style="color: var(--text-primary); margin-bottom: 1rem;">
+                        <i class="fas fa-heartbeat"></i> Detected Audio Patterns
+                    </h4>
+                    <div id="beatVisualization" class="beat-visualization"></div>
+                    <div id="beatTimestamps" class="beat-timestamps"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fade & Animation Settings Section -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-magic"></i>
+                <h3>Fade & Animation Settings</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Fade In Duration:</label>
+                        <div class="range-group">
+                            <input type="range" id="fadeInDuration" min="0" max="5" step="0.1" value="0.5" oninput="updateRangeValue(this, 'fadeInValue')">
+                            <span class="range-value" id="fadeInValue">0.5s</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Fade Out Duration:</label>
+                        <div class="range-group">
+                            <input type="range" id="fadeOutDuration" min="0" max="5" step="0.1" value="0.5" oninput="updateRangeValue(this, 'fadeOutValue')">
+                            <span class="range-value" id="fadeOutValue">0.5s</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Fade In Type:</label>
+                        <select id="fadeInType" class="form-control">
+                            <option value="linear">Linear</option>
+                            <option value="ease-in">Ease In</option>
+                            <option value="ease-out">Ease Out</option>
+                            <option value="ease-in-out" selected>Ease In-Out</option>
+                            <option value="bounce">Bounce</option>
+                            <option value="elastic">Elastic</option>
+                            <option value="back">Back</option>
+                            <option value="expo">Exponential</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Fade Out Type:</label>
+                        <select id="fadeOutType" class="form-control">
+                            <option value="linear">Linear</option>
+                            <option value="ease-in">Ease In</option>
+                            <option value="ease-out">Ease Out</option>
+                            <option value="ease-in-out" selected>Ease In-Out</option>
+                            <option value="bounce">Bounce</option>
+                            <option value="elastic">Elastic</option>
+                            <option value="back">Back</option>
+                            <option value="expo">Exponential</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Animation Style:</label>
+                        <select id="animationStyle" class="form-control">
+                            <option value="fade">Fade Only</option>
+                            <option value="slide-up">Slide Up</option>
+                            <option value="slide-down">Slide Down</option>
+                            <option value="slide-left">Slide Left</option>
+                            <option value="slide-right">Slide Right</option>
+                            <option value="zoom-in">Zoom In</option>
+                            <option value="zoom-out">Zoom Out</option>
+                            <option value="typewriter">Typewriter</option>
+                            <option value="glow">Glow Effect</option>
+                            <option value="shake">Shake</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Animation Speed:</label>
+                        <div class="range-group">
+                            <input type="range" id="animationSpeed" min="0.5" max="3" step="0.1" value="1" oninput="updateRangeValue(this, 'animationSpeedValue')">
+                            <span class="range-value" id="animationSpeedValue">1x</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            Animation playback speed multiplier
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Blur Effect:</label>
+                        <div class="range-group">
+                            <input type="range" id="blurAmount" min="0" max="10" step="0.5" value="0" oninput="updateRangeValue(this, 'blurValue')">
+                            <span class="range-value" id="blurValue">0px</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            Blur effect during fade transitions
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Shadow Intensity:</label>
+                        <div class="range-group">
+                            <input type="range" id="shadowIntensity" min="0" max="100" step="5" value="50" oninput="updateRangeValue(this, 'shadowValue')">
+                            <span class="range-value" id="shadowValue">50%</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            Text shadow intensity for better visibility
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timing Settings Section -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-clock"></i>
+                <h3>Timing Settings</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Start Time (seconds):</label>
+                        <input type="number" id="startTime" class="form-control" value="0" min="0" step="0.1">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Duration (seconds):</label>
+                        <input type="number" id="duration" class="form-control" value="5" min="0.1" step="0.1">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Auto-sync to Beats:</label>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                                <input type="checkbox" id="autoSyncBeats" checked>
+                                Sync subtitles to detected beats
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Display Mode:</label>
+                        <select id="displayMode" class="form-control">
+                            <option value="both">Both Arabic & English</option>
+                            <option value="arabic">Arabic Only</option>
+                            <option value="english">English Only</option>
+                            <option value="sequence">Sequential (Arabic then English)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Preview Resolution:</label>
+                        <select id="previewResolution" class="form-control">
+                            <option value="1920x1080">1080p (1920×1080)</option>
+                            <option value="1280x720">720p (1280×720)</option>
+                            <option value="3840x2160">4K (3840×2160)</option>
+                            <option value="2560x1440">1440p (2560×1440)</option>
+                            <option value="1600x900">900p (1600×900)</option>
+                        </select>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            Preview will be shown in full selected resolution
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Audio Sync:</label>
+                        <select id="audioSync" class="form-control">
+                            <option value="start">Sync to Start</option>
+                            <option value="center">Sync to Center</option>
+                            <option value="end">Sync to End</option>
+                            <option value="beats">Sync to Beats (Auto)</option>
+                            <option value="custom">Custom Offset</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-success btn-large" onclick="generateProject()" id="generateProjectBtn" disabled>
+                <i class="fas fa-magic"></i> Generate Final Cut Pro XML
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let audioFile = null;
+        let audioContext = null;
+        let audioBuffer = null;
+        let beatTimestamps = [];
+        let voiceSegments = [];
+        
+        let projectData = {
+            audio: null,
+            arabicText: '',
+            englishText: '',
+            startTime: 0,
+            duration: 5,
+            displayMode: 'both',
+            audioSync: 'start',
+            beatTimestamps: [],
+            voiceSegments: [],
+            previewResolution: '1920x1080'
+        };
+
+        // Drag and drop functionality
+        const uploadZone = document.querySelector('.upload-zone');
+        
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleAudioFile(files[0]);
+            }
+        });
+
+        // Audio upload handling
+        function handleAudioUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            handleAudioFile(file);
+        }
+
+        function handleAudioFile(file) {
+            // Check if file is audio or video
+            const validTypes = ['audio/', 'video/'];
+            if (!validTypes.some(type => file.type.startsWith(type))) {
+                showNotification('Please select an audio or video file', 'error');
+                return;
+            }
+
+            audioFile = file;
+            projectData.audio = file;
+
+            // Create URL for preview
+            const audioURL = URL.createObjectURL(file);
+            
+            // Show audio preview
+            const audioPreview = document.getElementById('audioPreview');
+            const audioPlayer = document.getElementById('audioPlayer');
+            const audioInfo = document.getElementById('audioInfo');
+            
+            audioPlayer.src = audioURL;
+            audioInfo.innerHTML = `
+                <strong>File:</strong> ${file.name}<br>
+                <strong>Size:</strong> ${(file.size / (1024 * 1024)).toFixed(2)} MB<br>
+                <strong>Type:</strong> ${file.type}<br>
+                <strong>Status:</strong> <span style="color: var(--success-color);">Ready for conversion</span>
+            `;
+            
+            audioPreview.style.display = 'block';
+            
+            // Enable generate button and analysis
+            document.getElementById('generateProjectBtn').disabled = false;
+            document.getElementById('analyzeBeatBtn').disabled = false;
+            
+            showNotification('Audio file loaded successfully!', 'success');
+        }
+
+        // Audio Analysis Functions
+        async function analyzeAudioBeats() {
+            if (!audioFile) {
+                showNotification('Please upload an audio file first', 'error');
+                return;
+            }
+
+            const analyzeBtn = document.getElementById('analyzeBeatBtn');
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+
+            try {
+                // Initialize Web Audio API
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Read audio file
+                const arrayBuffer = await audioFile.arrayBuffer();
+                audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                
+                // Analyze audio
+                await performAudioAnalysis();
+                
+                // Display results
+                displayAnalysisResults();
+                
+                showNotification('Audio analysis completed!', 'success');
+                
+            } catch (error) {
+                console.error('Audio analysis failed:', error);
+                showNotification('Audio analysis failed. Please try a different file.', 'error');
+            } finally {
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '<i class="fas fa-chart-line"></i> Analyze Beats & Pauses';
+            }
+        }
+
+        async function performAudioAnalysis() {
+            const channelData = audioBuffer.getChannelData(0); // Get first channel
+            const sampleRate = audioBuffer.sampleRate;
+            const duration = audioBuffer.duration;
+            
+            // Parameters for beat detection
+            const windowSize = Math.floor(sampleRate * 0.1); // 100ms windows
+            const hopSize = Math.floor(windowSize / 2);
+            const voiceThreshold = parseFloat(document.getElementById('voiceThreshold').value);
+            
+            beatTimestamps = [];
+            voiceSegments = [];
+            
+            let energyHistory = [];
+            let previousEnergy = 0;
+            
+            // Analyze audio in windows
+            for (let i = 0; i < channelData.length - windowSize; i += hopSize) {
+                const window = channelData.slice(i, i + windowSize);
+                
+                // Calculate RMS energy
+                let rms = 0;
+                for (let j = 0; j < window.length; j++) {
+                    rms += window[j] * window[j];
+                }
+                rms = Math.sqrt(rms / window.length);
+                
+                // Calculate spectral centroid (brightness)
+                let spectralCentroid = 0;
+                let magnitude = 0;
+                for (let j = 0; j < window.length; j++) {
+                    const freq = (j * sampleRate) / window.length;
+                    const mag = Math.abs(window[j]);
+                    spectralCentroid += freq * mag;
+                    magnitude += mag;
+                }
+                spectralCentroid = magnitude > 0 ? spectralCentroid / magnitude : 0;
+                
+                const currentTime = i / sampleRate;
+                
+                // Voice activity detection
+                if (rms > voiceThreshold) {
+                    if (voiceSegments.length === 0 || currentTime - voiceSegments[voiceSegments.length - 1].end > 0.5) {
+                        voiceSegments.push({ start: currentTime, end: currentTime, rms: rms });
+                    } else {
+                        voiceSegments[voiceSegments.length - 1].end = currentTime;
+                        voiceSegments[voiceSegments.length - 1].rms = Math.max(voiceSegments[voiceSegments.length - 1].rms, rms);
+                    }
+                }
+                
+                // Beat detection (sudden energy increase)
+                energyHistory.push(rms);
+                if (energyHistory.length > 10) {
+                    energyHistory.shift();
+                }
+                
+                const avgEnergy = energyHistory.reduce((a, b) => a + b, 0) / energyHistory.length;
+                const energyRatio = rms / (avgEnergy + 0.001);
+                
+                // Detect beats (energy spikes with rhythmic characteristics)
+                if (energyRatio > 1.5 && rms > voiceThreshold * 0.5) {
+                    const timeSinceLastBeat = beatTimestamps.length > 0 ? 
+                        currentTime - beatTimestamps[beatTimestamps.length - 1] : 1;
+                    
+                    // Avoid detecting beats too close together
+                    if (timeSinceLastBeat > 0.2) {
+                        beatTimestamps.push(currentTime);
+                    }
+                }
+                
+                previousEnergy = rms;
+            }
+            
+            // Filter and refine beat timestamps
+            beatTimestamps = refineBeatDetection(beatTimestamps);
+            
+            console.log('Voice segments:', voiceSegments);
+            console.log('Beat timestamps:', beatTimestamps);
+        }
+
+        function refineBeatDetection(beats) {
+            if (beats.length < 2) return beats;
+            
+            // Calculate tempo
+            const intervals = [];
+            for (let i = 1; i < beats.length; i++) {
+                intervals.push(beats[i] - beats[i-1]);
+            }
+            
+            // Find most common interval (tempo)
+            intervals.sort((a, b) => a - b);
+            const medianInterval = intervals[Math.floor(intervals.length / 2)];
+            
+            // Filter beats that don't match the tempo pattern
+            const refinedBeats = [beats[0]];
+            let expectedNextBeat = beats[0] + medianInterval;
+            
+            for (let i = 1; i < beats.length; i++) {
+                const deviation = Math.abs(beats[i] - expectedNextBeat);
+                
+                if (deviation < medianInterval * 0.3) { // Within 30% of expected interval
+                    refinedBeats.push(beats[i]);
+                    expectedNextBeat = beats[i] + medianInterval;
+                } else {
+                    expectedNextBeat += medianInterval;
+                }
+            }
+            
+            return refinedBeats;
+        }
+
+        function displayAnalysisResults() {
+            const analysisDiv = document.getElementById('beatAnalysis');
+            const visualizationDiv = document.getElementById('beatVisualization');
+            const timestampsDiv = document.getElementById('beatTimestamps');
+            
+            analysisDiv.style.display = 'block';
+            
+            // Create waveform visualization
+            visualizationDiv.innerHTML = '';
+            const width = visualizationDiv.offsetWidth || 800;
+            const duration = audioBuffer.duration;
+            
+            // Draw simplified waveform
+            const channelData = audioBuffer.getChannelData(0);
+            const downsample = Math.floor(channelData.length / width);
+            
+            for (let i = 0; i < width; i += 2) {
+                const sampleIndex = i * downsample;
+                const sample = Math.abs(channelData[sampleIndex] || 0);
+                const height = Math.floor(sample * 100);
+                
+                const bar = document.createElement('div');
+                bar.className = 'beat-wave';
+                bar.style.left = i + 'px';
+                bar.style.height = height + 'px';
+                visualizationDiv.appendChild(bar);
+            }
+            
+            // Add beat markers
+            beatTimestamps.forEach(timestamp => {
+                const position = (timestamp / duration) * width;
+                const marker = document.createElement('div');
+                marker.className = 'beat-marker';
+                marker.style.left = position + 'px';
+                marker.title = `Beat at ${timestamp.toFixed(2)}s`;
+                visualizationDiv.appendChild(marker);
+            });
+            
+            // Display timestamps
+            timestampsDiv.innerHTML = '';
+            
+            // Voice segments
+            voiceSegments.forEach((segment, index) => {
+                const item = document.createElement('div');
+                item.className = 'timestamp-item';
+                item.textContent = `Voice ${index + 1}: ${segment.start.toFixed(1)}s - ${segment.end.toFixed(1)}s`;
+                timestampsDiv.appendChild(item);
+            });
+            
+            // Beat timestamps
+            beatTimestamps.forEach((timestamp, index) => {
+                const item = document.createElement('div');
+                item.className = 'timestamp-item beat';
+                item.textContent = `Beat ${index + 1}: ${timestamp.toFixed(2)}s`;
+                timestampsDiv.appendChild(item);
+            });
+            
+            // Update project data
+            projectData.beatTimestamps = beatTimestamps;
+            projectData.voiceSegments = voiceSegments;
+        }
+
+        // Generate Final Cut Pro XML
+        function generateProject() {
+            // Get all form values
+            const arabicText = document.getElementById('arabicText').value.trim();
+            const englishText = document.getElementById('englishText').value.trim();
+            const startTime = parseFloat(document.getElementById('startTime').value) || 0;
+            const duration = parseFloat(document.getElementById('duration').value) || 5;
+            const fadeInDuration = parseFloat(document.getElementById('fadeInDuration').value) || 0.5;
+            const fadeOutDuration = parseFloat(document.getElementById('fadeOutDuration').value) || 0.5;
+            const fadeInType = document.getElementById('fadeInType').value;
+            const fadeOutType = document.getElementById('fadeOutType').value;
+            const animationStyle = document.getElementById('animationStyle').value;
+            const animationSpeed = parseFloat(document.getElementById('animationSpeed').value) || 1;
+            const blurAmount = parseFloat(document.getElementById('blurAmount').value) || 0;
+            const shadowIntensity = parseFloat(document.getElementById('shadowIntensity').value) || 50;
+            const displayMode = document.getElementById('displayMode').value;
+            const audioSync = document.getElementById('audioSync').value;
+            const detectRepeats = document.getElementById('detectRepeats').checked;
+            const autoSyncBeats = document.getElementById('autoSyncBeats').checked;
+            const previewResolution = document.getElementById('previewResolution').value;
+            const voiceThreshold = parseFloat(document.getElementById('voiceThreshold').value);
+
+            // Validation
+            if (!audioFile) {
+                showNotification('Please upload an audio file first', 'error');
+                return;
+            }
+
+            if (!arabicText && !englishText) {
+                showNotification('Please enter either Arabic or English text', 'error');
+                return;
+            }
+
+            // Store data and redirect to preview
+            const projectData = {
+                arabicText,
+                englishText,
+                startTime,
+                duration,
+                fadeInDuration,
+                fadeOutDuration,
+                fadeInType,
+                fadeOutType,
+                animationStyle,
+                animationSpeed,
+                blurAmount,
+                shadowIntensity,
+                displayMode,
+                audioSync,
+                detectRepeats,
+                autoSyncBeats,
+                previewResolution,
+                voiceThreshold,
+                beatTimestamps: beatTimestamps,
+                voiceSegments: voiceSegments,
+                audioFileName: audioFile.name,
+                audioURL: URL.createObjectURL(audioFile)
+            };
+
+            localStorage.setItem('fcpProjectData', JSON.stringify(projectData));
+            showNotification('Project data saved. Redirecting to preview...', 'success');
+            
+            setTimeout(() => {
+                window.location.href = 'preview.html';
+            }, 1500);
+        }
+
+        // Range value update function
+        function updateRangeValue(input, displayId) {
+            const value = input.value;
+            let suffix = '';
+            
+            if (input.id.includes('Duration')) {
+                suffix = 's';
+            } else if (input.id.includes('Speed')) {
+                suffix = 'x';
+            } else if (input.id.includes('blur')) {
+                suffix = 'px';
+            } else if (input.id.includes('shadow')) {
+                suffix = '%';
+            }
+            
+            document.getElementById(displayId).textContent = value + suffix;
+        }
+
+        // Load from Video Library
+        function loadFromVideoLibrary() {
+            const videoLibrary = JSON.parse(localStorage.getItem('videoLibrary') || '[]');
+            
+            if (videoLibrary.length === 0) {
+                showNotification('No videos found in library. Please add videos first.', 'warning');
+                return;
+            }
+            
+            // Create a modal to select video
+            const modal = document.createElement('div');
+            modal.className = 'video-library-modal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+            `;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: var(--card-bg);
+                border-radius: var(--radius);
+                padding: 2rem;
+                max-width: 600px;
+                width: 90%;
+                max-height: 80vh;
+                overflow-y: auto;
+            `;
+            
+            modalContent.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3 style="color: var(--text-primary); margin: 0;">Select Video from Library</h3>
+                    <button onclick="this.closest('.video-library-modal').remove()" style="background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer;">×</button>
+                </div>
+                <div id="videoGrid" style="display: grid; gap: 1rem; max-height: 400px; overflow-y: auto;">
+                    ${videoLibrary.map(video => `
+                        <div onclick="selectVideoFromLibrary('${video.id}')" style="
+                            display: flex;
+                            align-items: center;
+                            gap: 1rem;
+                            padding: 1rem;
+                            background: var(--surface-color);
+                            border-radius: 8px;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            border: 1px solid var(--border-color);
+                        " onmouseover="this.style.borderColor='var(--accent-color)'" onmouseout="this.style.borderColor='var(--border-color)'">
+                            <div style="
+                                width: 60px;
+                                height: 40px;
+                                background: var(--border-color);
+                                border-radius: 4px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                color: var(--text-muted);
+                            ">
+                                <i class="fas fa-video"></i>
+                            </div>
+                            <div>
+                                <div style="color: var(--text-primary); font-weight: 600;">${video.name}</div>
+                                <div style="color: var(--text-secondary); font-size: 0.8rem;">
+                                    ${formatFileSize(video.size)} • ${new Date(video.dateAdded).toLocaleDateString()}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        function selectVideoFromLibrary(videoId) {
+            const videoLibrary = JSON.parse(localStorage.getItem('videoLibrary') || '[]');
+            const video = videoLibrary.find(v => v.id === videoId);
+            
+            if (!video) {
+                showNotification('Video not found in library', 'error');
+                return;
+            }
+            
+            // Create a file-like object from the video data
+            fetch(video.url)
+                .then(response => response.blob())
+                .then(blob => {
+                    const file = new File([blob], video.name, { type: video.type });
+                    handleAudioFile(file);
+                    
+                    // Close modal
+                    document.querySelector('.video-library-modal').remove();
+                    
+                    showNotification(`Loaded "${video.name}" from library`, 'success');
+                })
+                .catch(error => {
+                    console.error('Error loading video from library:', error);
+                    showNotification('Error loading video from library', 'error');
+                });
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Notifications
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            // Load existing data if available
+            const savedData = localStorage.getItem('fcpProjectData');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    document.getElementById('arabicText').value = data.arabicText || '';
+                    document.getElementById('englishText').value = data.englishText || '';
+                    document.getElementById('startTime').value = data.startTime || 0;
+                    document.getElementById('duration').value = data.duration || 5;
+                    document.getElementById('displayMode').value = data.displayMode || 'both';
+                    document.getElementById('audioSync').value = data.audioSync || 'start';
+                } catch (e) {
+                    console.error('Error loading saved data:', e);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
