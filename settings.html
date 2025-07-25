@@ -6,6 +6,8 @@
     <title>الإعدادات - FCP Audio to XML</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Default Settings System -->
+    <script src="default-settings.js"></script>
     <style>
         :root {
             --primary-color: #3b82f6;
@@ -764,6 +766,28 @@
             <button class="btn btn-primary" onclick="exportSettings()">
                 <i class="fas fa-download"></i> <span id="export-btn-text">تصدير الإعدادات</span>
             </button>
+            <button class="btn btn-secondary" onclick="showImportDialog()">
+                <i class="fas fa-upload"></i> <span id="import-btn-text">استيراد الإعدادات</span>
+            </button>
+            <button class="btn btn-info" onclick="resetToGlobalDefaults()">
+                <i class="fas fa-cog"></i> <span id="defaults-btn-text">الإعدادات الافتراضية</span>
+            </button>
+        </div>
+
+        <!-- Import Dialog -->
+        <div id="importDialog" style="display: none; margin-top: 2rem;">
+            <div style="background: var(--card-bg); padding: 2rem; border-radius: var(--radius); border: 1px solid var(--border-color);">
+                <h3 id="import-title" style="margin-bottom: 1rem; color: var(--text-primary);">استيراد الإعدادات</h3>
+                <input type="file" id="importFile" accept=".json" style="margin-bottom: 1rem; width: 100%; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-primary);">
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button class="btn btn-secondary" onclick="hideImportDialog()">
+                        <i class="fas fa-times"></i> <span id="cancel-btn-text">إلغاء</span>
+                    </button>
+                    <button class="btn btn-primary" onclick="handleImport()">
+                        <i class="fas fa-check"></i> <span id="confirm-btn-text">تأكيد</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -825,12 +849,22 @@
                 saveBtnText: 'حفظ الإعدادات',
                 resetBtnText: 'إعادة التعيين',
                 exportBtnText: 'تصدير الإعدادات',
+                importBtnText: 'استيراد الإعدادات',
+                defaultsBtnText: 'الإعدادات الافتراضية',
+                importTitle: 'استيراد الإعدادات',
+                cancelBtnText: 'إلغاء',
+                confirmBtnText: 'تأكيد',
                 yesOption: 'نعم',
                 noOption: 'لا',
                 // Notifications
                 settingsSaved: 'تم حفظ الإعدادات بنجاح!',
                 settingsReset: 'تم إعادة تعيين الإعدادات للقيم الافتراضية',
-                settingsExported: 'تم تصدير الإعدادات بنجاح!'
+                settingsExported: 'تم تصدير الإعدادات بنجاح!',
+                settingsImported: 'تم استيراد الإعدادات بنجاح!',
+                defaultsRestored: 'تم استعادة الإعدادات الافتراضية العامة!',
+                importError: 'خطأ في استيراد الإعدادات. تحقق من تنسيق الملف.',
+                confirmReset: 'هل أنت متأكد من إعادة تعيين جميع الإعدادات؟',
+                confirmDefaults: 'هل تريد استعادة جميع الإعدادات الافتراضية العامة؟'
             },
             en: {
                 title: 'Settings - FCP Audio to XML',
@@ -887,12 +921,22 @@
                 saveBtnText: 'Save Settings',
                 resetBtnText: 'Reset Settings',
                 exportBtnText: 'Export Settings',
+                importBtnText: 'Import Settings',
+                defaultsBtnText: 'Default Settings',
+                importTitle: 'Import Settings',
+                cancelBtnText: 'Cancel',
+                confirmBtnText: 'Confirm',
                 yesOption: 'Yes',
                 noOption: 'No',
                 // Notifications
                 settingsSaved: 'Settings saved successfully!',
                 settingsReset: 'Settings reset to defaults',
-                settingsExported: 'Settings exported successfully!'
+                settingsExported: 'Settings exported successfully!',
+                settingsImported: 'Settings imported successfully!',
+                defaultsRestored: 'Global default settings restored!',
+                importError: 'Error importing settings. Please check file format.',
+                confirmReset: 'Are you sure you want to reset all settings?',
+                confirmDefaults: 'Do you want to restore all global default settings?'
             }
         };
 
@@ -986,6 +1030,11 @@
             document.getElementById('save-btn-text').textContent = t.saveBtnText;
             document.getElementById('reset-btn-text').textContent = t.resetBtnText;
             document.getElementById('export-btn-text').textContent = t.exportBtnText;
+            document.getElementById('import-btn-text').textContent = t.importBtnText;
+            document.getElementById('defaults-btn-text').textContent = t.defaultsBtnText;
+            document.getElementById('import-title').textContent = t.importTitle;
+            document.getElementById('cancel-btn-text').textContent = t.cancelBtnText;
+            document.getElementById('confirm-btn-text').textContent = t.confirmBtnText;
         }
 
         function updateSelectOptions(t) {
@@ -1199,7 +1248,187 @@
                     switchLanguage(currentLanguage === 'ar' ? 'en' : 'ar');
                 }
             });
+
+            // Load settings with global defaults integration
+            if (typeof getSetting !== 'undefined') {
+                console.log('🔧 Loading settings with global defaults integration');
+                loadSettingsWithDefaults();
+            } else {
+                console.log('⚠️ Global defaults not available, using local defaults');
+                loadSettings();
+            }
         });
+
+        // Enhanced functions for global defaults integration
+
+        function loadSettingsWithDefaults() {
+            try {
+                const globalDefaults = typeof getConverterSettings !== 'undefined' 
+                    ? getConverterSettings() 
+                    : defaultSettings;
+                
+                const saved = localStorage.getItem('converterSettings');
+                const settings = saved ? { ...globalDefaults, ...JSON.parse(saved) } : globalDefaults;
+                
+                // Apply settings to form
+                applySettingsToForm(settings);
+                
+                // Update range displays
+                setupRangeSliders();
+                
+                console.log('✅ Settings loaded with global defaults');
+            } catch (error) {
+                console.error('Error loading settings with defaults:', error);
+                loadSettings(); // Fallback to local method
+            }
+        }
+
+        function applySettingsToForm(settings) {
+            // Animation settings
+            document.getElementById('fadeInDuration').value = settings.fadeInDuration || 0.5;
+            document.getElementById('fadeOutDuration').value = settings.fadeOutDuration || 0.5;
+            document.getElementById('fadeInType').value = settings.fadeInType || 'ease-in-out';
+            document.getElementById('fadeOutType').value = settings.fadeOutType || 'ease-in-out';
+            document.getElementById('animationStyle').value = settings.animationStyle || 'fade';
+            document.getElementById('animationSpeed').value = settings.animationSpeed || 1;
+            document.getElementById('blurAmount').value = settings.blurAmount || 0;
+            document.getElementById('shadowIntensity').value = settings.shadowIntensity || 50;
+            
+            // Timing settings
+            document.getElementById('startTime').value = settings.startTime || 0;
+            document.getElementById('duration').value = settings.duration || 5;
+            document.getElementById('displayMode').value = settings.displayMode || 'arabic';
+            document.getElementById('previewResolution').value = settings.previewResolution || '1920x1080';
+            document.getElementById('audioSync').value = settings.audioSync || 'start';
+            document.getElementById('autoTiming').checked = settings.autoTiming !== false;
+            document.getElementById('speechSpeed').value = settings.speechSpeed || 'normal';
+            document.getElementById('sentenceDuration').value = settings.sentenceDuration || 4;
+            
+            // Advanced settings
+            document.getElementById('detectRepeats').checked = settings.detectRepeats !== false;
+            document.getElementById('voiceThreshold').value = settings.voiceThreshold || 0.3;
+            document.getElementById('autoSyncBeats').checked = settings.autoSyncBeats !== false;
+            
+            // Update value displays
+            updateRangeDisplays();
+        }
+
+        function updateRangeDisplays() {
+            document.getElementById('fadeInDurationValue').textContent = document.getElementById('fadeInDuration').value;
+            document.getElementById('fadeOutDurationValue').textContent = document.getElementById('fadeOutDuration').value;
+            document.getElementById('animationSpeedValue').textContent = document.getElementById('animationSpeed').value;
+            document.getElementById('blurAmountValue').textContent = document.getElementById('blurAmount').value;
+            document.getElementById('shadowIntensityValue').textContent = document.getElementById('shadowIntensity').value;
+            document.getElementById('startTimeValue').textContent = document.getElementById('startTime').value;
+            document.getElementById('durationValue').textContent = document.getElementById('duration').value;
+            document.getElementById('sentenceDurationValue').textContent = document.getElementById('sentenceDuration').value;
+            document.getElementById('voiceThresholdValue').textContent = document.getElementById('voiceThreshold').value;
+        }
+
+        function showImportDialog() {
+            document.getElementById('importDialog').style.display = 'block';
+        }
+
+        function hideImportDialog() {
+            document.getElementById('importDialog').style.display = 'none';
+            document.getElementById('importFile').value = '';
+        }
+
+        function handleImport() {
+            const fileInput = document.getElementById('importFile');
+            if (fileInput.files.length === 0) {
+                showNotification('Please select a file to import', 'error');
+                return;
+            }
+
+            if (typeof importSettings !== 'undefined') {
+                importSettings(fileInput);
+                hideImportDialog();
+            } else {
+                // Fallback local import
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const settings = JSON.parse(e.target.result);
+                        
+                        // Save imported settings
+                        localStorage.setItem('converterSettings', JSON.stringify(settings));
+                        
+                        showNotification(translations[currentLanguage].settingsImported, 'success');
+                        
+                        // Reload settings
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    } catch (error) {
+                        showNotification(translations[currentLanguage].importError, 'error');
+                    }
+                };
+                reader.readAsText(file);
+                hideImportDialog();
+            }
+        }
+
+        function resetToGlobalDefaults() {
+            const t = translations[currentLanguage];
+            
+            if (confirm(t.confirmDefaults)) {
+                if (typeof resetToDefaults !== 'undefined') {
+                    resetToDefaults();
+                } else {
+                    // Fallback local reset
+                    localStorage.removeItem('converterSettings');
+                    showNotification(t.defaultsRestored, 'success');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                }
+            }
+        }
+
+        // Enhanced reset function
+        function resetSettings() {
+            const t = translations[currentLanguage];
+            
+            if (confirm(t.confirmReset)) {
+                if (typeof getConverterSettings !== 'undefined') {
+                    const globalDefaults = getConverterSettings();
+                    localStorage.setItem('converterSettings', JSON.stringify(globalDefaults));
+                } else {
+                    localStorage.removeItem('converterSettings');
+                }
+                
+                showNotification(t.settingsReset, 'success');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
+        }
+
+        // Enhanced export function
+        function exportSettings() {
+            const t = translations[currentLanguage];
+            
+            if (typeof exportSettings !== 'undefined' && exportSettings !== arguments.callee) {
+                // Use global export function
+                window.exportSettings();
+            } else {
+                // Fallback local export
+                const settings = getCurrentSettings();
+                const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `fcp-converter-settings-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+            
+            showNotification(t.settingsExported, 'success');
+        }
     </script>
 </body>
 </html>
