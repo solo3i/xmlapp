@@ -745,6 +745,23 @@
                             النص الذي سيتم تكراره في المقطع (مثل: يا حسين، لبيك يا حسين، إلخ)
                         </p>
                     </div>
+
+                    <!-- Poetry Processing Settings -->
+                    <div class="form-group" style="background: rgba(59, 130, 246, 0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <i class="fas fa-filter" style="color: var(--primary-color);"></i>
+                            <label class="form-label" style="margin: 0;" id="poetry-filter-label">تنقية نصوص القصائد:</label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                                <input type="checkbox" id="skipPoetryIntros" checked style="margin: 0;">
+                                <span id="skip-intros-text">تجاهل المستهلات</span>
+                            </label>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);" id="poetry-filter-description">
+                                سيتم تجاهل العبارات الافتتاحية والختامية في القصائد
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -814,6 +831,9 @@
                 repetitiveTextLabel: 'المستهل (النص المتكرر):',
                 repetitiveTextPlaceholder: 'أدخل النص المتكرر هنا...',
                 repetitiveTextDescription: 'النص الذي سيتم تكراره في المقطع (مثل: يا حسين، لبيك يا حسين، إلخ)',
+                poetryFilterLabel: 'تنقية نصوص القصائد:',
+                skipIntrosText: 'تجاهل المستهلات',
+                poetryFilterDescription: 'سيتم تجاهل العبارات الافتتاحية والختامية في القصائد',
                 generateBtnText: 'توليد ملف XML',
                 settingsLinkText: 'يمكنك تخصيص الإعدادات المتقدمة من صفحة',
                 settingsLink: 'الإعدادات',
@@ -862,6 +882,9 @@
                 repetitiveTextLabel: 'Repetitive Text:',
                 repetitiveTextPlaceholder: 'Enter repetitive text here...',
                 repetitiveTextDescription: 'Text that will be repeated in the clip (e.g., Ya Hussein, Labbaik Ya Hussein, etc.)',
+                poetryFilterLabel: 'Poetry Text Filtering:',
+                skipIntrosText: 'Skip Introductory Phrases',
+                poetryFilterDescription: 'Will ignore introductory and concluding phrases in poems',
                 generateBtnText: 'Generate XML File',
                 settingsLinkText: 'You can customize advanced settings from the',
                 settingsLink: 'Settings',
@@ -930,6 +953,9 @@
             document.getElementById('arabic-text-description').textContent = t.arabicTextDescription;
             document.getElementById('repetitive-text-label').textContent = t.repetitiveTextLabel;
             document.getElementById('repetitive-text-description').textContent = t.repetitiveTextDescription;
+            document.getElementById('poetry-filter-label').textContent = t.poetryFilterLabel;
+            document.getElementById('skip-intros-text').textContent = t.skipIntrosText;
+            document.getElementById('poetry-filter-description').textContent = t.poetryFilterDescription;
             document.getElementById('generate-btn-text').textContent = t.generateBtnText;
             document.getElementById('settings-link-text').innerHTML = t.settingsLinkText + ' <a href="settings.html" style="color: var(--accent-color);" id="settings-link">' + t.settingsLink + '</a>';
             
@@ -1071,17 +1097,59 @@
         // Generate Final Cut Pro XML with enhanced UX
         let generatedXML = '';
 
+        // Text processing function to handle poetry intro filtering
+        function processPoetryText(text, settings) {
+            if (!text || !settings.skipPoetryIntros) {
+                return text;
+            }
+
+            // Split text into lines for processing
+            let lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+            
+            // Default patterns to skip
+            const skipPatterns = [
+                ...(settings.poetryIntroPatterns || []),
+                ...(settings.customSkipPatterns || [])
+            ];
+
+            // Function to check if a line should be skipped
+            function shouldSkipLine(line) {
+                return skipPatterns.some(pattern => {
+                    return line.includes(pattern) || 
+                           line.startsWith(pattern) || 
+                           line.endsWith(pattern);
+                });
+            }
+
+            // Filter beginning intros if enabled
+            if (settings.skipBeginningIntros) {
+                while (lines.length > 0 && shouldSkipLine(lines[0])) {
+                    lines.shift();
+                }
+            }
+
+            // Filter ending intros if enabled  
+            if (settings.skipEndingIntros) {
+                while (lines.length > 0 && shouldSkipLine(lines[lines.length - 1])) {
+                    lines.pop();
+                }
+            }
+
+            // Return processed text
+            return lines.join('\n');
+        }
+
         function generateXML() {
             // Get text values
-            const arabicText = document.getElementById('arabicText').value.trim();
-            const repetitiveText = document.getElementById('repetitiveText').value.trim();
+            const arabicTextRaw = document.getElementById('arabicText').value.trim();
+            const repetitiveTextRaw = document.getElementById('repetitiveText').value.trim();
             
             if (!audioFile) {
                 showNotification('noAudioFile', 'error');
                 return;
             }
             
-            if (!arabicText && !repetitiveText) {
+            if (!arabicTextRaw && !repetitiveTextRaw) {
                 showNotification('noTextContent', 'error');
                 return;
             }
@@ -1092,6 +1160,13 @@
 
             // Load settings from settings page (localStorage)
             const settings = loadSettings();
+            
+            // Override poetry filtering setting with current checkbox state
+            settings.skipPoetryIntros = document.getElementById('skipPoetryIntros').checked;
+            
+            // Process texts to remove poetry intros if enabled
+            const arabicText = processPoetryText(arabicTextRaw, settings);
+            const repetitiveText = processPoetryText(repetitiveTextRaw, settings);
             
             // Get default settings for fonts and positions
             const globalSettings = typeof getConverterSettings !== 'undefined' ? getConverterSettings() : {};
@@ -1125,11 +1200,11 @@
 
             let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE fcpxml>
-<fcpxml version="1.11">
+<fcpxml version="1.10">
     <resources>
         <format id="r1" name="FFVideoFormat${height}p${frameRate}" frameDuration="1/${frameRate}s" width="${width}" height="${height}" colorSpace="1-1-1 (Rec. 709)"/>
+        <effect id="e1" name="Basic Title" uid=".../Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"/>
         <asset id="a1" name="${escapeXML(projectData.audioFileName)}" uid="${generateUID()}" start="0/1s" duration="${totalDurationFrames}/${frameRate}s" hasVideo="0" hasAudio="1">
-            <!-- يجب تحديث مسار الملف الصوتي ليطابق الموقع الفعلي -->
             <media-rep kind="original-media" src="file:///${escapeXML(projectData.audioFileName)}"/>
         </asset>
     </resources>
@@ -1139,37 +1214,38 @@
                 <sequence format="r1" duration="${totalDurationFrames}/${frameRate}s" tcStart="0/1s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
                     <spine>
                         <!-- Audio Track -->
-                        <asset-clip name="${escapeXML(projectData.audioFileName)}" ref="a1" offset="0/1s" duration="${totalDurationFrames}/${frameRate}s" tcFormat="NDF" audioRole="dialogue"/>`;
+                        <asset-clip name="${escapeXML(projectData.audioFileName)}" ref="a1" offset="0/1s" duration="${totalDurationFrames}/${frameRate}s" tcFormat="NDF" audioRole="dialogue"/>
+                        
+                        <!-- Gap for subtitle tracks -->
+                        <gap name="Gap" offset="0/1s" duration="${totalDurationFrames}/${frameRate}s">`;
 
             // Add subtitle titles based on display mode
             if (projectData.displayMode === 'both' || projectData.displayMode === 'arabic') {
                 xml += `
-                        <!-- Arabic Subtitle -->
-                        <title name="Arabic Text" offset="${startFrames}/${frameRate}s" duration="${totalDurationFrames - startFrames}/${frameRate}s" start="3600/1s">
-                            <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${arabicPositionY}"/>
-                            <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
-                            <text>
-                                <text-style ref="ts1">${escapeXML(projectData.arabicText)}</text-style>
-                            </text>
-                            <text-style-def id="ts1">
-                                <text-style font="${arabicFont}" fontSize="${arabicFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
-                            </text-style-def>
-                        </title>`;
+                            <title name="Arabic Text" offset="${startFrames}/${frameRate}s" duration="${totalDurationFrames - startFrames}/${frameRate}s" start="3600/1s">
+                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${arabicPositionY}"/>
+                                <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
+                                <text>
+                                    <text-style ref="ts1">${escapeXML(projectData.arabicText)}</text-style>
+                                </text>
+                                <text-style-def id="ts1">
+                                    <text-style font="${arabicFont}" fontSize="${arabicFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
+                                </text-style-def>
+                            </title>`;
             }
 
             if (projectData.displayMode === 'both' || projectData.displayMode === 'repetitive') {
                 xml += `
-                        <!-- English Subtitle -->
-                        <title name="English Text" offset="${startFrames}/${frameRate}s" duration="${totalDurationFrames - startFrames}/${frameRate}s" start="3600/1s">
-                            <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${englishPositionY}"/>
-                            <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
-                            <text>
-                                <text-style ref="ts2">${escapeXML(projectData.englishText)}</text-style>
-                            </text>
-                            <text-style-def id="ts2">
-                                <text-style font="${englishFont}" fontSize="${englishFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
-                            </text-style-def>
-                        </title>`;
+                            <title name="English Text" offset="${startFrames}/${frameRate}s" duration="${totalDurationFrames - startFrames}/${frameRate}s" start="3600/1s">
+                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${englishPositionY}"/>
+                                <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
+                                <text>
+                                    <text-style ref="ts2">${escapeXML(projectData.englishText)}</text-style>
+                                </text>
+                                <text-style-def id="ts2">
+                                    <text-style font="${englishFont}" fontSize="${englishFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
+                                </text-style-def>
+                            </title>`;
             }
             
             // Handle alternating mode (Arabic first, then English)
@@ -1178,31 +1254,30 @@
                 const secondHalfStart = startFrames + halfDuration;
                 
                 xml += `
-                        <!-- Arabic Subtitle (First Half) -->
-                        <title name="Arabic Text" offset="${startFrames}/${frameRate}s" duration="${halfDuration}/${frameRate}s" start="3600/1s">
-                            <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${arabicPositionY}"/>
-                            <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
-                            <text>
-                                <text-style ref="ts1">${escapeXML(projectData.arabicText)}</text-style>
-                            </text>
-                            <text-style-def id="ts1">
-                                <text-style font="${arabicFont}" fontSize="${arabicFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
-                            </text-style-def>
-                        </title>
-                        <!-- English Subtitle (Second Half) -->
-                        <title name="English Text" offset="${secondHalfStart}/${frameRate}s" duration="${totalDurationFrames - secondHalfStart}/${frameRate}s" start="3600/1s">
-                            <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${englishPositionY}"/>
-                            <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
-                            <text>
-                                <text-style ref="ts2">${escapeXML(projectData.englishText)}</text-style>
-                            </text>
-                            <text-style-def id="ts2">
-                                <text-style font="${englishFont}" fontSize="${englishFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
-                            </text-style-def>
-                        </title>`;
+                            <title name="Arabic Text" offset="${startFrames}/${frameRate}s" duration="${halfDuration}/${frameRate}s" start="3600/1s">
+                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${arabicPositionY}"/>
+                                <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
+                                <text>
+                                    <text-style ref="ts1">${escapeXML(projectData.arabicText)}</text-style>
+                                </text>
+                                <text-style-def id="ts1">
+                                    <text-style font="${arabicFont}" fontSize="${arabicFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
+                                </text-style-def>
+                            </title>
+                            <title name="English Text" offset="${secondHalfStart}/${frameRate}s" duration="${totalDurationFrames - secondHalfStart}/${frameRate}s" start="3600/1s">
+                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${englishPositionY}"/>
+                                <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
+                                <text>
+                                    <text-style ref="ts2">${escapeXML(projectData.englishText)}</text-style>
+                                </text>
+                                <text-style-def id="ts2">
+                                    <text-style font="${englishFont}" fontSize="${englishFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
+                                </text-style-def>
+                            </title>`;
             }
 
             xml += `
+                        </gap>
                     </spine>
                 </sequence>
             </project>
@@ -1315,7 +1390,13 @@ Instructions for use:
                 sentenceDuration: 4,
                 detectRepeats: true,
                 voiceThreshold: 0.3,
-                autoSyncBeats: true
+                autoSyncBeats: true,
+                // Translation settings
+                skipPoetryIntros: true,
+                poetryIntroPatterns: ['مستهل', 'يا حسين', 'لبيك يا حسين', 'السلام عليك', 'صلى الله عليه وآله'],
+                skipBeginningIntros: true,
+                skipEndingIntros: true,
+                customSkipPatterns: []
             };
             
             try {
@@ -1327,7 +1408,45 @@ Instructions for use:
         }
 
         // Notification system
-        function showNotification(message, type = 'success') {
+        function showNotification(messageKey, type = 'success') {
+            const t = translations[currentLanguage];
+            const messages = {
+                poetryFilterEnabled: {
+                    ar: 'تم تفعيل تنقية نصوص القصائد - سيتم تجاهل المستهلات',
+                    en: 'Poetry text filtering enabled - introductory phrases will be ignored'
+                },
+                poetryFilterDisabled: {
+                    ar: 'تم إلغاء تنقية نصوص القصائد - سيتم إدراج جميع النصوص',
+                    en: 'Poetry text filtering disabled - all text will be included'
+                },
+                noAudioFile: {
+                    ar: 'يرجى رفع ملف صوتي أولاً',
+                    en: 'Please upload an audio file first'
+                },
+                noTextContent: {
+                    ar: 'يرجى إدخال النص العربي أو النص المتكرر',
+                    en: 'Please enter Arabic text or repetitive text'
+                },
+                xmlGenerated: {
+                    ar: 'تم توليد ملف XML بنجاح!',
+                    en: 'XML file generated successfully!'
+                },
+                xmlCopied: {
+                    ar: 'تم نسخ XML إلى الحافظة',
+                    en: 'XML copied to clipboard'
+                },
+                xmlDownloaded: {
+                    ar: 'تم تحميل ملف XML',
+                    en: 'XML file downloaded'
+                },
+                fileUploadSuccess: {
+                    ar: 'تم رفع الملف بنجاح',
+                    en: 'File uploaded successfully'
+                }
+            };
+            
+            const message = messages[messageKey] ? messages[messageKey][currentLanguage] : messageKey;
+            
             const notification = document.createElement('div');
             notification.className = `notification ${type} show`;
             notification.textContent = message;
@@ -1377,6 +1496,24 @@ Instructions for use:
             document.getElementById('repetitiveText').addEventListener('input', function() {
                 autoSave('savedRepetitiveText', this.value);
             });
+            
+            // Handle poetry filtering checkbox
+            document.getElementById('skipPoetryIntros').addEventListener('change', function() {
+                localStorage.setItem('skipPoetryIntros', this.checked);
+                
+                // Show preview of filtering effect
+                if (this.checked) {
+                    showNotification('poetryFilterEnabled', 'info');
+                } else {
+                    showNotification('poetryFilterDisabled', 'warning');
+                }
+            });
+            
+            // Load saved poetry filter setting
+            const savedSkipIntros = localStorage.getItem('skipPoetryIntros');
+            if (savedSkipIntros !== null) {
+                document.getElementById('skipPoetryIntros').checked = savedSkipIntros === 'true';
+            }
             
             // Add smooth scroll behavior
             document.documentElement.style.scrollBehavior = 'smooth';
