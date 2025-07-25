@@ -669,7 +669,6 @@
             <ul class="nav-links">
                 <li><a href="index.html" id="nav-home">الرئيسية</a></li>
                 <li><a href="converter.html" class="active" id="nav-converter">المحول</a></li>
-                <li><a href="preview.html" id="nav-preview">المعاينة</a></li>
                 <li><a href="settings.html" id="nav-settings">الإعدادات</a></li>
                 <li><a href="video-library.html" id="nav-library">مكتبة الفيديو</a></li>
             </ul>
@@ -750,10 +749,31 @@
             </div>
         </div>
 
+        <!-- XML Output Section -->
+        <div class="card animate-slide-in" style="animation-delay: 0.3s; display: none;" id="xmlSection">
+            <div class="card-header">
+                <i class="fas fa-code"></i>
+                <h3 id="xml-title">كود XML المُولد</h3>
+            </div>
+            <div class="card-body">
+                <div class="xml-actions" style="margin-bottom: 1rem; text-align: center;">
+                    <button class="btn btn-secondary" onclick="copyXML()" id="copyBtn">
+                        <i class="fas fa-copy"></i> <span id="copy-btn-text">نسخ</span>
+                    </button>
+                    <button class="btn btn-primary" onclick="downloadXML()" id="downloadBtn">
+                        <i class="fas fa-download"></i> <span id="download-btn-text">تحميل XML</span>
+                    </button>
+                </div>
+                <div class="xml-code" id="xmlCode" style="background: var(--surface-color); padding: 1rem; border-radius: 8px; font-family: var(--font-mono); font-size: 0.85rem; white-space: pre-wrap; max-height: 400px; overflow-y: auto; border: 1px solid var(--border-color);">
+                    <!-- XML code will be populated here -->
+                </div>
+            </div>
+        </div>
+
         <!-- Action Buttons -->
         <div class="action-buttons animate-fade-up" style="animation-delay: 0.4s;">
-            <button class="btn btn-success btn-large" onclick="generateProject()" id="generateProjectBtn" disabled>
-                <i class="fas fa-magic"></i> <span id="generate-btn-text">إنشاء مشروع Final Cut Pro</span>
+            <button class="btn btn-success btn-large" onclick="generateXML()" id="generateProjectBtn" disabled>
+                <i class="fas fa-magic"></i> <span id="generate-btn-text">توليد ملف XML</span>
             </button>
             <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 1rem;" id="settings-link-text">
                 يمكنك تخصيص الإعدادات المتقدمة من صفحة <a href="settings.html" style="color: var(--accent-color);" id="settings-link">الإعدادات</a>
@@ -794,15 +814,22 @@
                 repetitiveTextLabel: 'المستهل (النص المتكرر):',
                 repetitiveTextPlaceholder: 'أدخل النص المتكرر هنا...',
                 repetitiveTextDescription: 'النص الذي سيتم تكراره في المقطع (مثل: يا حسين، لبيك يا حسين، إلخ)',
-                generateBtnText: 'إنشاء مشروع Final Cut Pro',
+                generateBtnText: 'توليد ملف XML',
                 settingsLinkText: 'يمكنك تخصيص الإعدادات المتقدمة من صفحة',
                 settingsLink: 'الإعدادات',
+                xmlTitle: 'كود XML المُولد',
+                copyBtnText: 'نسخ',
+                downloadBtnText: 'تحميل XML',
                 // Notifications
                 fileUploadSuccess: 'تم تحميل الملف الصوتي بنجاح!',
                 invalidFileType: 'يرجى اختيار ملف صوتي أو فيديو',
                 noAudioFile: 'يرجى رفع ملف صوتي أولاً',
                 noTextContent: 'يرجى إدخال نص عربي أو نص متكرر',
-                projectSuccess: 'تم إنشاء المشروع بنجاح!',
+                xmlGenerated: 'تم توليد ملف XML بنجاح!',
+                xmlCopied: 'تم نسخ كود XML!',
+                xmlCopyFailed: 'فشل في نسخ كود XML',
+                xmlDownloaded: 'تم تحميل ملف XML بنجاح!',
+                noXmlToDownload: 'لا يوجد كود XML للتحميل',
                 libraryComingSoon: 'ميزة مكتبة الفيديو ستكون متاحة قريباً',
                 // Audio info
                 fileLabel: 'الملف:',
@@ -835,15 +862,22 @@
                 repetitiveTextLabel: 'Repetitive Text:',
                 repetitiveTextPlaceholder: 'Enter repetitive text here...',
                 repetitiveTextDescription: 'Text that will be repeated in the clip (e.g., Ya Hussein, Labbaik Ya Hussein, etc.)',
-                generateBtnText: 'Generate Final Cut Pro Project',
+                generateBtnText: 'Generate XML File',
                 settingsLinkText: 'You can customize advanced settings from the',
                 settingsLink: 'Settings',
+                xmlTitle: 'Generated XML Code',
+                copyBtnText: 'Copy',
+                downloadBtnText: 'Download XML',
                 // Notifications
                 fileUploadSuccess: 'Audio file uploaded successfully!',
                 invalidFileType: 'Please select an audio or video file',
                 noAudioFile: 'Please upload an audio file first',
                 noTextContent: 'Please enter Arabic text or repetitive text',
-                projectSuccess: 'Project created successfully!',
+                xmlGenerated: 'XML file generated successfully!',
+                xmlCopied: 'XML code copied!',
+                xmlCopyFailed: 'Failed to copy XML code',
+                xmlDownloaded: 'XML file downloaded successfully!',
+                noXmlToDownload: 'No XML code to download',
                 libraryComingSoon: 'Video library feature will be available soon',
                 // Audio info
                 fileLabel: 'File:',
@@ -879,7 +913,6 @@
             document.getElementById('logo-text').textContent = t.logoText;
             document.getElementById('nav-home').textContent = t.navHome;
             document.getElementById('nav-converter').textContent = t.navConverter;
-            document.getElementById('nav-preview').textContent = t.navPreview;
             document.getElementById('nav-settings').textContent = t.navSettings;
             document.getElementById('nav-library').textContent = t.navLibrary;
             
@@ -899,6 +932,15 @@
             document.getElementById('repetitive-text-description').textContent = t.repetitiveTextDescription;
             document.getElementById('generate-btn-text').textContent = t.generateBtnText;
             document.getElementById('settings-link-text').innerHTML = t.settingsLinkText + ' <a href="settings.html" style="color: var(--accent-color);" id="settings-link">' + t.settingsLink + '</a>';
+            
+            // Update XML section texts if visible
+            const xmlTitleElement = document.getElementById('xml-title');
+            const copyBtnElement = document.getElementById('copy-btn-text');
+            const downloadBtnElement = document.getElementById('download-btn-text');
+            
+            if (xmlTitleElement) xmlTitleElement.textContent = t.xmlTitle;
+            if (copyBtnElement) copyBtnElement.textContent = t.copyBtnText;
+            if (downloadBtnElement) downloadBtnElement.textContent = t.downloadBtnText;
             
             // Update placeholders
             document.getElementById('arabicText').placeholder = t.arabicTextPlaceholder;
@@ -1027,7 +1069,9 @@
         }
 
         // Generate Final Cut Pro XML with enhanced UX
-        function generateProject() {
+        let generatedXML = '';
+
+        function generateXML() {
             // Get text values
             const arabicText = document.getElementById('arabicText').value.trim();
             const repetitiveText = document.getElementById('repetitiveText').value.trim();
@@ -1049,22 +1093,165 @@
             // Load settings from settings page (localStorage)
             const settings = loadSettings();
             
-            // Update project data
-            projectData.arabicText = arabicText;
-            projectData.repetitiveText = repetitiveText;
+            // Get default settings for fonts and positions
+            const globalSettings = typeof getConverterSettings !== 'undefined' ? getConverterSettings() : {};
+            const englishFont = globalSettings.englishFont || 'Sinzano';
+            const englishFontSize = globalSettings.englishFontSize || 25;
+            const englishColor = globalSettings.englishColor || '#ffffff';
+            const englishPositionY = globalSettings.englishPositionY || -420;
             
-            // Store project data for preview
-            localStorage.setItem('projectData', JSON.stringify(projectData));
-            localStorage.setItem('projectSettings', JSON.stringify(settings));
-            localStorage.setItem('currentLanguage', currentLanguage);
+            const arabicFont = globalSettings.arabicFont || 'Neo Sans Arabic';
+            const arabicFontSize = globalSettings.arabicFontSize || 34;
+            const arabicColor = globalSettings.arabicColor || '#ffffff';
+            const arabicPositionY = globalSettings.arabicPositionY || -381;
+
+            // Create project data
+            const projectData = {
+                audio: audioFile,
+                arabicText: arabicText,
+                englishText: repetitiveText, // Using repetitive text as English
+                audioFileName: audioFile.name,
+                startTime: settings.startTime || 0,
+                duration: settings.duration || 5,
+                displayMode: settings.displayMode || 'arabic',
+                previewResolution: settings.previewResolution || '1920x1080',
+                frameRate: 25
+            };
+
+            const resolution = projectData.previewResolution;
+            const frameRate = projectData.frameRate;
+            const [width, height] = resolution.split('x').map(Number);
+
+            let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE fcpxml>
+<fcpxml version="1.10">
+    <resources>
+        <format id="r1" name="FFVideoFormat${height}p${frameRate}" frameDuration="1/${frameRate}s" width="${width}" height="${height}" colorSpace="1-1-1 (Rec. 709)"/>
+        <effect id="e1" name="Basic Title" uid=".../Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"/>
+        <asset id="a1" name="${projectData.audioFileName}" uid="${generateUID()}" start="0/1s" duration="3600/1s" hasVideo="0" hasAudio="1">
+            <media-rep kind="original-media" src="file:///path/to/${projectData.audioFileName}"/>
+        </asset>
+    </resources>
+    <library location="file:///Users/user/Movies/">
+        <event name="Translation Project - ${new Date().toLocaleDateString()}">
+            <project name="Arabic Subtitle Project" uid="${generateUID()}" modDate="${new Date().toISOString()}">
+                <sequence format="r1" duration="${Math.ceil((projectData.startTime + projectData.duration) * frameRate)}/${frameRate}s" tcStart="0/1s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
+                    <spine>
+                        <!-- Audio Track -->
+                        <audio-clip name="${projectData.audioFileName}" offset="0/1s" duration="${Math.ceil((projectData.startTime + projectData.duration) * frameRate)}/${frameRate}s" audioRole="dialogue">
+                            <asset-clip ref="a1" offset="0/1s" duration="${Math.ceil((projectData.startTime + projectData.duration) * frameRate)}/${frameRate}s"/>
+                        </audio-clip>
+                        
+                        <!-- Video Gap for Subtitles -->
+                        <gap name="Gap" offset="0/1s" duration="${Math.ceil((projectData.startTime + projectData.duration) * frameRate)}/${frameRate}s">`;
+
+            // Add subtitle titles based on display mode
+            const startFrame = Math.floor(projectData.startTime * frameRate);
+            const durationFrames = Math.floor(projectData.duration * frameRate);
+
+            if (projectData.displayMode === 'both' || projectData.displayMode === 'arabic') {
+                xml += `
+                            <title name="Arabic Subtitle" offset="${startFrame}/${frameRate}s" duration="${durationFrames}/${frameRate}s" ref="e1">
+                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${arabicPositionY}"/>
+                                <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
+                                <text>
+                                    <text-style ref="ts1">${escapeXML(projectData.arabicText)}</text-style>
+                                </text>
+                                <text-style-def id="ts1">
+                                    <text-style font="${arabicFont}" fontSize="${arabicFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
+                                </text-style-def>
+                            </title>`;
+            }
+
+            if (projectData.displayMode === 'both' || projectData.displayMode === 'repetitive') {
+                xml += `
+                            <title name="English Subtitle" offset="${startFrame}/${frameRate}s" duration="${durationFrames}/${frameRate}s" ref="e1">
+                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${englishPositionY}"/>
+                                <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
+                                <text>
+                                    <text-style ref="ts2">${escapeXML(projectData.englishText)}</text-style>
+                                </text>
+                                <text-style-def id="ts2">
+                                    <text-style font="${englishFont}" fontSize="${englishFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
+                                </text-style-def>
+                            </title>`;
+            }
+
+            xml += `
+                        </gap>
+                    </spine>
+                </sequence>
+            </project>
+        </event>
+    </library>
+</fcpxml>`;
+
+            generatedXML = xml;
+            document.getElementById('xmlCode').textContent = xml;
             
-            // Show success message and redirect to preview
-            showNotification('projectSuccess', 'success');
+            // Show XML section
+            document.getElementById('xmlSection').style.display = 'block';
             
+            // Remove loading state
             setTimeout(() => {
                 generateBtn.classList.remove('loading');
-                window.location.href = 'preview.html';
+                showNotification('xmlGenerated', 'success');
+                
+                // Scroll to XML section
+                document.getElementById('xmlSection').scrollIntoView({ behavior: 'smooth' });
             }, 1000);
+        }
+
+        // Copy XML to clipboard
+        function copyXML() {
+            if (!generatedXML) {
+                showNotification('noXmlToDownload', 'error');
+                return;
+            }
+
+            navigator.clipboard.writeText(generatedXML).then(() => {
+                showNotification('xmlCopied', 'success');
+            }).catch(() => {
+                showNotification('xmlCopyFailed', 'error');
+            });
+        }
+
+        // Download XML file
+        function downloadXML() {
+            if (!generatedXML) {
+                showNotification('noXmlToDownload', 'error');
+                return;
+            }
+
+            const blob = new Blob([generatedXML], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fcp_subtitle_project_${Date.now()}.fcpxml`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showNotification('xmlDownloaded', 'success');
+        }
+
+        // Utility functions
+        function generateUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function escapeXML(text) {
+            return text.replace(/&/g, '&amp;')
+                      .replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;')
+                      .replace(/"/g, '&quot;')
+                      .replace(/'/g, '&#39;');
         }
 
         // Load settings from localStorage
@@ -1162,12 +1349,12 @@
                     switchLanguage(currentLanguage === 'ar' ? 'en' : 'ar');
                 }
                 
-                // Ctrl/Cmd + Enter to generate project
+                // Ctrl/Cmd + Enter to generate XML
                 if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                     e.preventDefault();
                     const generateBtn = document.getElementById('generateProjectBtn');
                     if (!generateBtn.disabled) {
-                        generateProject();
+                        generateXML();
                     }
                 }
             });
