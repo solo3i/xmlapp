@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl" id="html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preview & Export - FCP Audio to XML</title>
+    <title>المعاينة والتصدير - FCP Audio to XML</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #3b82f6;
@@ -25,7 +25,7 @@
             --gradient-secondary: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
             --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
             --radius: 12px;
-            --font-primary: 'Inter', sans-serif;
+            --font-primary: 'Cairo', 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
 
@@ -441,10 +441,23 @@
                 font-size: 1.2rem;
             }
 
-            .action-buttons {
-                flex-direction: column;
-                align-items: center;
+            .control-button {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9rem;
             }
+
+            .preview-container {
+                padding: 0.5rem;
+            }
+        }
+
+        /* RTL Support */
+        [dir="rtl"] .nav-links {
+            direction: ltr;
+        }
+
+        [dir="rtl"] .nav-container {
+            flex-direction: row-reverse;
         }
 
         /* Loading */
@@ -496,14 +509,14 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <i class="fas fa-film"></i> FCP Audio Converter
+                <i class="fas fa-film"></i> محول صوت FCP
             </div>
             <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="converter.html">Converter</a></li>
-                <li><a href="preview.html" class="active">Preview</a></li>
-                <li><a href="settings.html">Settings</a></li>
-                <li><a href="video-library.html">Video Library</a></li>
+                <li><a href="index.html">الرئيسية</a></li>
+                <li><a href="converter.html">المحول</a></li>
+                <li><a href="preview.html" class="active">المعاينة</a></li>
+                <li><a href="settings.html">الإعدادات</a></li>
+                <li><a href="video-library.html">مكتبة الفيديو</a></li>
             </ul>
         </div>
     </nav>
@@ -511,8 +524,8 @@
     <!-- Main Container -->
     <div class="container">
         <div class="page-header">
-            <h1>Preview & Export</h1>
-            <p>Review your project and download the Final Cut Pro XML file</p>
+            <h1>المعاينة والتصدير</h1>
+            <p>راجع مشروعك وحمل ملف XML لبرنامج Final Cut Pro</p>
         </div>
 
         <!-- Project Info -->
