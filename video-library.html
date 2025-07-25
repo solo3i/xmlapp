@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Library - FCP Audio to XML</title>
+    <title>مكتبة الفيديو - FCP Audio to XML</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #3b82f6;
@@ -25,7 +25,7 @@
             --gradient-secondary: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
             --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
             --radius: 12px;
-            --font-primary: 'Inter', sans-serif;
+            --font-primary: 'Cairo', 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
 
@@ -426,6 +426,15 @@
             }
         }
 
+        /* RTL Support */
+        [dir="rtl"] .nav-links {
+            direction: ltr;
+        }
+
+        [dir="rtl"] .nav-container {
+            flex-direction: row-reverse;
+        }
+
         /* Empty State */
         .empty-state {
             text-align: center;
@@ -450,14 +459,14 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <i class="fas fa-film"></i> FCP Audio Converter
+                <i class="fas fa-film"></i> محول صوت FCP
             </div>
             <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="converter.html">Converter</a></li>
-                <li><a href="preview.html">Preview</a></li>
-                <li><a href="settings.html">Settings</a></li>
-                <li><a href="video-library.html" class="active">Video Library</a></li>
+                <li><a href="index.html">الرئيسية</a></li>
+                <li><a href="converter.html">المحول</a></li>
+                <li><a href="preview.html">المعاينة</a></li>
+                <li><a href="settings.html">الإعدادات</a></li>
+                <li><a href="video-library.html" class="active">مكتبة الفيديو</a></li>
             </ul>
         </div>
     </nav>
@@ -465,8 +474,8 @@
     <!-- Main Container -->
     <div class="container">
         <div class="page-header">
-            <h1>Video Library</h1>
-            <p>Manage your video projects and exported files</p>
+            <h1>مكتبة الفيديو</h1>
+            <p>أدر مشاريع الفيديو والملفات المصدرة</p>
         </div>
 
         <!-- Upload Zone -->
