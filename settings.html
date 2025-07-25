@@ -1,1430 +1,395 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl" id="html-root">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الإعدادات - FCP Audio to XML</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Default Settings System -->
-    <script src="default-settings.js"></script>
-    <style>
-        :root {
-            --primary-color: #3b82f6;
-            --secondary-color: #1e40af;
-            --accent-color: #06b6d4;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --error-color: #ef4444;
-            --dark-bg: #0f172a;
-            --card-bg: #1e293b;
-            --surface-color: #334155;
-            --border-color: #475569;
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --text-muted: #94a3b8;
-            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-            --gradient-secondary: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
-            --radius: 12px;
-            --font-primary: 'Cairo', 'Inter', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: var(--font-primary);
-            background: var(--dark-bg);
-            color: var(--text-primary);
-            line-height: 1.6;
-            padding-top: 80px;
-        }
-
-        /* Navigation */
-        .navbar {
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-color);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            padding: 1rem 0;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-        }
-
-        .nav-links a:hover {
-            color: var(--accent-color);
-            background: rgba(6, 182, 212, 0.1);
-        }
-
-        .nav-links a.active {
-            color: var(--primary-color);
-            background: rgba(59, 130, 246, 0.1);
-        }
-
-        /* Language Toggle */
-        .language-toggle {
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--surface-color);
-            border-radius: 50px;
-            padding: 0.3rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .lang-btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            font-weight: 600;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-            font-family: var(--font-primary);
-        }
-
-        .lang-btn.active {
-            background: var(--gradient-primary);
-            color: white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-
-        .lang-btn:hover:not(.active) {
-            color: var(--accent-color);
-            background: rgba(6, 182, 212, 0.1);
-        }
-
-        /* Container */
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .page-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .page-header h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .page-header p {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-        }
-
-        /* Cards */
-        .card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            margin-bottom: 2rem;
-            position: relative;
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 2px;
-            background: var(--gradient-primary);
-            transition: left 0.3s ease;
-        }
-
-        .card:hover::before {
-            left: 0;
-        }
-
-        .card-header {
-            background: var(--surface-color);
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .card-header h3 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .card-header i {
-            color: var(--accent-color);
-            font-size: 1.5rem;
-        }
-
-        .card-body {
-            padding: 2rem;
-        }
-
-        /* Form Elements */
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-            font-size: 0.95rem;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            font-family: var(--font-primary);
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
-        }
-
-        /* Range Slider */
-        .range-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .range-input {
-            flex: 1;
-            -webkit-appearance: none;
-            appearance: none;
-            height: 6px;
-            background: var(--surface-color);
-            border-radius: 3px;
-            outline: none;
-        }
-
-        .range-input::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            background: var(--gradient-primary);
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .range-input::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            background: var(--gradient-primary);
-            border-radius: 50%;
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .range-value {
-            min-width: 60px;
-            text-align: center;
-            font-weight: 600;
-            color: var(--accent-color);
-            background: var(--surface-color);
-            padding: 0.5rem;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            font-size: 1rem;
-            font-family: var(--font-primary);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary {
-            background: var(--gradient-primary);
-            color: white;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.3);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, var(--success-color), #34d399);
-            color: white;
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, var(--warning-color), #fbbf24);
-            color: white;
-        }
-
-        .btn-warning:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(245, 158, 11, 0.3);
-        }
-
-        .action-buttons {
-            text-align: center;
-            margin-top: 3rem;
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        /* Notifications */
-        .notification {
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            padding: 1rem 1.5rem;
-            border-radius: var(--radius);
-            color: white;
-            font-weight: 600;
-            z-index: 10000;
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-            max-width: 400px;
-            box-shadow: var(--shadow-lg);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .notification.success {
-            background: linear-gradient(135deg, var(--success-color), #34d399);
-        }
-
-        .notification.error {
-            background: linear-gradient(135deg, var(--error-color), #f87171);
-        }
-
-        .notification.warning {
-            background: linear-gradient(135deg, var(--warning-color), #fbbf24);
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .notification::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: rgba(255,255,255,0.3);
-            animation: progress 3s linear;
-        }
-
-        @keyframes progress {
-            from { width: 100%; }
-            to { width: 0%; }
-        }
-
-        /* Language Transition */
-        .transitioning {
-            transition: all 0.5s ease-in-out;
-        }
-
-        /* Enhanced Animations */
-        @keyframes fadeInUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .animate-fade-up {
-            animation: fadeInUp 0.8s ease-out;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            
-            .language-toggle {
-                margin-left: auto;
-            }
-
-            .container {
-                padding: 1rem;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .page-header h1 {
-                font-size: 2rem;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .lang-btn {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.8rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .nav-container {
-                padding: 0 1rem;
-            }
-            
-            .language-toggle {
-                padding: 0.2rem;
-            }
-            
-            .lang-btn {
-                padding: 0.3rem 0.6rem;
-                font-size: 0.75rem;
-            }
-            
-            .page-header h1 {
-                font-size: 1.75rem;
-            }
-        }
-
-        /* RTL Support */
-        [dir="rtl"] .nav-links {
-            direction: ltr;
-        }
-
-        [dir="rtl"] .nav-container {
-            flex-direction: row-reverse;
-        }
-    </style>
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <i class="fas fa-cog"></i> <span id="logo-text">إعدادات FCP</span>
-            </div>
-            <ul class="nav-links">
-                <li><a href="index.html" id="nav-home">الرئيسية</a></li>
-                <li><a href="converter.html" id="nav-converter">المحول</a></li>
-                <li><a href="settings.html" class="active" id="nav-settings">الإعدادات</a></li>
-                <li><a href="video-library.html" id="nav-library">مكتبة الفيديو</a></li>
-            </ul>
-            <div class="language-toggle">
-                <button class="lang-btn active" onclick="switchLanguage('ar')" id="btn-arabic">العربية</button>
-                <button class="lang-btn" onclick="switchLanguage('en')" id="btn-english">English</button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Container -->
-    <div class="container">
-        <div class="page-header animate-fade-up">
-            <h1 id="main-title">إعدادات المحول</h1>
-            <p id="main-subtitle">تخصيص إعدادات التحويل والمؤثرات البصرية</p>
-        </div>
-
-        <!-- Fade Effects Settings -->
-        <div class="card animate-fade-up" style="animation-delay: 0.1s;">
-            <div class="card-header">
-                <i class="fas fa-adjust"></i>
-                <h3 id="fade-title">إعدادات التلاشي</h3>
-            </div>
-            <div class="card-body">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" id="fade-in-duration-label">مدة التلاشي للداخل (ثانية):</label>
-                        <div class="range-container">
-                            <input type="range" id="fadeInDuration" class="range-input" min="0" max="3" step="0.1" value="0.5">
-                            <span class="range-value" id="fadeInDurationValue">0.5</span>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" id="fade-out-duration-label">مدة التلاشي للخارج (ثانية):</label>
-                        <div class="range-container">
-                            <input type="range" id="fadeOutDuration" class="range-input" min="0" max="3" step="0.1" value="0.5">
-                            <span class="range-value" id="fadeOutDurationValue">0.5</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" id="fade-in-type-label">نوع التلاشي للداخل:</label>
-                        <select id="fadeInType" class="form-control">
-                            <option value="ease-in-out" id="ease-in-out-option">سلس</option>
-                            <option value="ease-in" id="ease-in-option">بطيء في البداية</option>
-                            <option value="ease-out" id="ease-out-option">بطيء في النهاية</option>
-                            <option value="linear" id="linear-option">خطي</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" id="fade-out-type-label">نوع التلاشي للخارج:</label>
-                        <select id="fadeOutType" class="form-control">
-                            <option value="ease-in-out" id="ease-in-out-option2">سلس</option>
-                            <option value="ease-in" id="ease-in-option2">بطيء في البداية</option>
-                            <option value="ease-out" id="ease-out-option2">بطيء في النهاية</option>
-                            <option value="linear" id="linear-option2">خطي</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Animation Settings -->
-        <div class="card animate-fade-up" style="animation-delay: 0.2s;">
-            <div class="card-header">
-                <i class="fas fa-magic"></i>
-                <h3 id="animation-title">إعدادات الحركة</h3>
-            </div>
-            <div class="card-body">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" id="animation-style-label">نمط الحركة:</label>
-                        <select id="animationStyle" class="form-control">
-                            <option value="fade" id="fade-option">تلاشي</option>
-                            <option value="slide" id="slide-option">انزلاق</option>
-                            <option value="scale" id="scale-option">تكبير/تصغير</option>
-                            <option value="bounce" id="bounce-option">ارتداد</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" id="animation-speed-label">سرعة الحركة:</label>
-                        <div class="range-container">
-                            <input type="range" id="animationSpeed" class="range-input" min="0.5" max="3" step="0.1" value="1">
-                            <span class="range-value" id="animationSpeedValue">1</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" id="blur-amount-label">مستوى الضبابية:</label>
-                        <div class="range-container">
-                            <input type="range" id="blurAmount" class="range-input" min="0" max="10" step="0.5" value="0">
-                            <span class="range-value" id="blurAmountValue">0</span>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" id="shadow-intensity-label">شدة الظل:</label>
-                        <div class="range-container">
-                            <input type="range" id="shadowIntensity" class="range-input" min="0" max="100" step="5" value="50">
-                            <span class="range-value" id="shadowIntensityValue">50</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Timing Settings -->
-        <div class="card animate-fade-up" style="animation-delay: 0.3s;">
-            <div class="card-header">
-                <i class="fas fa-clock"></i>
-                <h3 id="timing-title">إعدادات التوقيت</h3>
-            </div>
-            <div class="card-body">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" id="start-time-label">وقت البداية (ثانية):</label>
-                        <input type="number" id="startTime" class="form-control" min="0" step="0.1" value="0">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" id="duration-label">المدة الافتراضية (ثانية):</label>
-                        <input type="number" id="duration" class="form-control" min="1" step="0.1" value="5">
-                    </div>
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" id="display-mode-label">وضع العرض:</label>
-                        <select id="displayMode" class="form-control">
-                            <option value="arabic" id="arabic-only-option">العربي فقط</option>
-                            <option value="repetitive" id="repetitive-only-option">المتكرر فقط</option>
-                            <option value="both" id="both-option">كلاهما</option>
-                            <option value="alternating" id="alternating-option">متناوب</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" id="preview-resolution-label">دقة المعاينة:</label>
-                        <select id="previewResolution" class="form-control">
-                            <option value="1920x1080" id="resolution-1080p">1920x1080 (1080p)</option>
-                            <option value="1280x720" id="resolution-720p">1280x720 (720p)</option>
-                            <option value="3840x2160" id="resolution-4k">3840x2160 (4K)</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Audio Settings -->
-        <div class="card animate-fade-up" style="animation-delay: 0.4s;">
-            <div class="card-header">
-                <i class="fas fa-volume-up"></i>
-                <h3 id="audio-title">إعدادات الصوت</h3>
-            </div>
-            <div class="card-body">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" id="audio-sync-label">مزامنة الصوت:</label>
-                        <select id="audioSync" class="form-control">
-                            <option value="start" id="sync-start-option">بداية المقطع</option>
-                            <option value="center" id="sync-center-option">وسط المقطع</option>
-                            <option value="end" id="sync-end-option">نهاية المقطع</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" id="auto-timing-label">التوقيت التلقائي:</label>
-                        <select id="autoTiming" class="form-control">
-                            <option value="true" id="auto-timing-yes">نعم</option>
-                            <option value="false" id="auto-timing-no">لا</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" id="speech-speed-label">سرعة الكلام:</label>
-                        <select id="speechSpeed" class="form-control">
-                            <option value="slow" id="speech-slow">بطيء</option>
-                            <option value="normal" id="speech-normal">عادي</option>
-                            <option value="fast" id="speech-fast">سريع</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" id="sentence-duration-label">مدة الجملة (ثانية):</label>
-                        <div class="range-container">
-                            <input type="range" id="sentenceDuration" class="range-input" min="2" max="10" step="0.5" value="4">
-                            <span class="range-value" id="sentenceDurationValue">4</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Advanced Settings -->
-        <div class="card animate-fade-up" style="animation-delay: 0.5s;">
-            <div class="card-header">
-                <i class="fas fa-sliders-h"></i>
-                <h3 id="advanced-title">إعدادات متقدمة</h3>
-            </div>
-            <div class="card-body">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" id="detect-repeats-label">اكتشاف التكرارات:</label>
-                        <select id="detectRepeats" class="form-control">
-                            <option value="true" id="detect-repeats-yes">نعم</option>
-                            <option value="false" id="detect-repeats-no">لا</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" id="voice-threshold-label">حساسية الصوت:</label>
-                        <div class="range-container">
-                            <input type="range" id="voiceThreshold" class="range-input" min="0.1" max="1" step="0.1" value="0.3">
-                            <span class="range-value" id="voiceThresholdValue">0.3</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" id="auto-sync-beats-label">مزامنة تلقائية مع الإيقاع:</label>
-                    <select id="autoSyncBeats" class="form-control">
-                        <option value="true" id="auto-sync-yes">نعم</option>
-                        <option value="false" id="auto-sync-no">لا</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="action-buttons animate-fade-up" style="animation-delay: 0.6s;">
-            <button class="btn btn-success" onclick="saveSettings()">
-                <i class="fas fa-save"></i> <span id="save-btn-text">حفظ الإعدادات</span>
-            </button>
-            <button class="btn btn-warning" onclick="resetSettings()">
-                <i class="fas fa-undo"></i> <span id="reset-btn-text">إعادة التعيين</span>
-            </button>
-            <button class="btn btn-primary" onclick="exportSettings()">
-                <i class="fas fa-download"></i> <span id="export-btn-text">تصدير الإعدادات</span>
-            </button>
-            <button class="btn btn-secondary" onclick="showImportDialog()">
-                <i class="fas fa-upload"></i> <span id="import-btn-text">استيراد الإعدادات</span>
-            </button>
-            <button class="btn btn-info" onclick="resetToGlobalDefaults()">
-                <i class="fas fa-cog"></i> <span id="defaults-btn-text">الإعدادات الافتراضية</span>
-            </button>
-        </div>
-
-        <!-- Import Dialog -->
-        <div id="importDialog" style="display: none; margin-top: 2rem;">
-            <div style="background: var(--card-bg); padding: 2rem; border-radius: var(--radius); border: 1px solid var(--border-color);">
-                <h3 id="import-title" style="margin-bottom: 1rem; color: var(--text-primary);">استيراد الإعدادات</h3>
-                <input type="file" id="importFile" accept=".json" style="margin-bottom: 1rem; width: 100%; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-primary);">
-                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                    <button class="btn btn-secondary" onclick="hideImportDialog()">
-                        <i class="fas fa-times"></i> <span id="cancel-btn-text">إلغاء</span>
-                    </button>
-                    <button class="btn btn-primary" onclick="handleImport()">
-                        <i class="fas fa-check"></i> <span id="confirm-btn-text">تأكيد</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Language system
-        const translations = {
-            ar: {
-                title: 'الإعدادات - FCP Audio to XML',
-                logoText: 'إعدادات FCP',
-                navHome: 'الرئيسية',
-                navConverter: 'المحول',
-                navSettings: 'الإعدادات',
-                navLibrary: 'مكتبة الفيديو',
-                mainTitle: 'إعدادات المحول',
-                mainSubtitle: 'تخصيص إعدادات التحويل والمؤثرات البصرية',
-                fadeTitle: 'إعدادات التلاشي',
-                fadeInDurationLabel: 'مدة التلاشي للداخل (ثانية):',
-                fadeOutDurationLabel: 'مدة التلاشي للخارج (ثانية):',
-                fadeInTypeLabel: 'نوع التلاشي للداخل:',
-                fadeOutTypeLabel: 'نوع التلاشي للخارج:',
-                easeInOutOption: 'سلس',
-                easeInOption: 'بطيء في البداية',
-                easeOutOption: 'بطيء في النهاية',
-                linearOption: 'خطي',
-                animationTitle: 'إعدادات الحركة',
-                animationStyleLabel: 'نمط الحركة:',
-                fadeOption: 'تلاشي',
-                slideOption: 'انزلاق',
-                scaleOption: 'تكبير/تصغير',
-                bounceOption: 'ارتداد',
-                animationSpeedLabel: 'سرعة الحركة:',
-                blurAmountLabel: 'مستوى الضبابية:',
-                shadowIntensityLabel: 'شدة الظل:',
-                timingTitle: 'إعدادات التوقيت',
-                startTimeLabel: 'وقت البداية (ثانية):',
-                durationLabel: 'المدة الافتراضية (ثانية):',
-                displayModeLabel: 'وضع العرض:',
-                arabicOnlyOption: 'العربي فقط',
-                repetitiveOnlyOption: 'المتكرر فقط',
-                bothOption: 'كلاهما',
-                alternatingOption: 'متناوب',
-                previewResolutionLabel: 'دقة المعاينة:',
-                audioTitle: 'إعدادات الصوت',
-                audioSyncLabel: 'مزامنة الصوت:',
-                syncStartOption: 'بداية المقطع',
-                syncCenterOption: 'وسط المقطع',
-                syncEndOption: 'نهاية المقطع',
-                autoTimingLabel: 'التوقيت التلقائي:',
-                speechSpeedLabel: 'سرعة الكلام:',
-                speechSlow: 'بطيء',
-                speechNormal: 'عادي',
-                speechFast: 'سريع',
-                sentenceDurationLabel: 'مدة الجملة (ثانية):',
-                advancedTitle: 'إعدادات متقدمة',
-                detectRepeatsLabel: 'اكتشاف التكرارات:',
-                voiceThresholdLabel: 'حساسية الصوت:',
-                autoSyncBeatsLabel: 'مزامنة تلقائية مع الإيقاع:',
-                saveBtnText: 'حفظ الإعدادات',
-                resetBtnText: 'إعادة التعيين',
-                exportBtnText: 'تصدير الإعدادات',
-                importBtnText: 'استيراد الإعدادات',
-                defaultsBtnText: 'الإعدادات الافتراضية',
-                importTitle: 'استيراد الإعدادات',
-                cancelBtnText: 'إلغاء',
-                confirmBtnText: 'تأكيد',
-                yesOption: 'نعم',
-                noOption: 'لا',
-                // Notifications
-                settingsSaved: 'تم حفظ الإعدادات بنجاح!',
-                settingsReset: 'تم إعادة تعيين الإعدادات للقيم الافتراضية',
-                settingsExported: 'تم تصدير الإعدادات بنجاح!',
-                settingsImported: 'تم استيراد الإعدادات بنجاح!',
-                defaultsRestored: 'تم استعادة الإعدادات الافتراضية العامة!',
-                importError: 'خطأ في استيراد الإعدادات. تحقق من تنسيق الملف.',
-                confirmReset: 'هل أنت متأكد من إعادة تعيين جميع الإعدادات؟',
-                confirmDefaults: 'هل تريد استعادة جميع الإعدادات الافتراضية العامة؟'
-            },
-            en: {
-                title: 'Settings - FCP Audio to XML',
-                logoText: 'FCP Settings',
-                navHome: 'Home',
-                navConverter: 'Converter',
-                navSettings: 'Settings',
-                navLibrary: 'Video Library',
-                mainTitle: 'Converter Settings',
-                mainSubtitle: 'Customize conversion settings and visual effects',
-                fadeTitle: 'Fade Effects Settings',
-                fadeInDurationLabel: 'Fade In Duration (seconds):',
-                fadeOutDurationLabel: 'Fade Out Duration (seconds):',
-                fadeInTypeLabel: 'Fade In Type:',
-                fadeOutTypeLabel: 'Fade Out Type:',
-                easeInOutOption: 'Smooth',
-                easeInOption: 'Slow Start',
-                easeOutOption: 'Slow End',
-                linearOption: 'Linear',
-                animationTitle: 'Animation Settings',
-                animationStyleLabel: 'Animation Style:',
-                fadeOption: 'Fade',
-                slideOption: 'Slide',
-                scaleOption: 'Scale',
-                bounceOption: 'Bounce',
-                animationSpeedLabel: 'Animation Speed:',
-                blurAmountLabel: 'Blur Amount:',
-                shadowIntensityLabel: 'Shadow Intensity:',
-                timingTitle: 'Timing Settings',
-                startTimeLabel: 'Start Time (seconds):',
-                durationLabel: 'Default Duration (seconds):',
-                displayModeLabel: 'Display Mode:',
-                arabicOnlyOption: 'Arabic Only',
-                repetitiveOnlyOption: 'Repetitive Only',
-                bothOption: 'Both',
-                alternatingOption: 'Alternating',
-                previewResolutionLabel: 'Preview Resolution:',
-                audioTitle: 'Audio Settings',
-                audioSyncLabel: 'Audio Sync:',
-                syncStartOption: 'Clip Start',
-                syncCenterOption: 'Clip Center',
-                syncEndOption: 'Clip End',
-                autoTimingLabel: 'Auto Timing:',
-                speechSpeedLabel: 'Speech Speed:',
-                speechSlow: 'Slow',
-                speechNormal: 'Normal',
-                speechFast: 'Fast',
-                sentenceDurationLabel: 'Sentence Duration (seconds):',
-                advancedTitle: 'Advanced Settings',
-                detectRepeatsLabel: 'Detect Repetitions:',
-                voiceThresholdLabel: 'Voice Sensitivity:',
-                autoSyncBeatsLabel: 'Auto Sync with Beats:',
-                saveBtnText: 'Save Settings',
-                resetBtnText: 'Reset Settings',
-                exportBtnText: 'Export Settings',
-                importBtnText: 'Import Settings',
-                defaultsBtnText: 'Default Settings',
-                importTitle: 'Import Settings',
-                cancelBtnText: 'Cancel',
-                confirmBtnText: 'Confirm',
-                yesOption: 'Yes',
-                noOption: 'No',
-                // Notifications
-                settingsSaved: 'Settings saved successfully!',
-                settingsReset: 'Settings reset to defaults',
-                settingsExported: 'Settings exported successfully!',
-                settingsImported: 'Settings imported successfully!',
-                defaultsRestored: 'Global default settings restored!',
-                importError: 'Error importing settings. Please check file format.',
-                confirmReset: 'Are you sure you want to reset all settings?',
-                confirmDefaults: 'Do you want to restore all global default settings?'
-            }
-        };
-
-        let currentLanguage = 'ar';
-
-        // Language switching function
-        function switchLanguage(lang) {
-            if (lang === currentLanguage) return;
-            
-            currentLanguage = lang;
-            const htmlRoot = document.getElementById('html-root');
-            const t = translations[lang];
-            
-            // Add transition effect
-            document.body.classList.add('transitioning');
-            
-            // Update HTML attributes
-            htmlRoot.lang = lang;
-            htmlRoot.dir = lang === 'ar' ? 'rtl' : 'ltr';
-            
-            // Update document title
-            document.title = t.title;
-            
-            // Update all text content
-            updateAllTexts(t);
-            
-            // Update language toggle buttons
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(lang === 'ar' ? 'btn-arabic' : 'btn-english').classList.add('active');
-            
-            // Save language preference
-            localStorage.setItem('preferredLanguage', lang);
-            
-            // Remove transition effect
-            setTimeout(() => {
-                document.body.classList.remove('transitioning');
-            }, 500);
-        }
-
-        function updateAllTexts(t) {
-            // Navigation
-            document.getElementById('logo-text').textContent = t.logoText;
-            document.getElementById('nav-home').textContent = t.navHome;
-            document.getElementById('nav-converter').textContent = t.navConverter;
-            document.getElementById('nav-settings').textContent = t.navSettings;
-            document.getElementById('nav-library').textContent = t.navLibrary;
-            
-            // Main content
-            document.getElementById('main-title').textContent = t.mainTitle;
-            document.getElementById('main-subtitle').textContent = t.mainSubtitle;
-            
-            // Fade settings
-            document.getElementById('fade-title').textContent = t.fadeTitle;
-            document.getElementById('fade-in-duration-label').textContent = t.fadeInDurationLabel;
-            document.getElementById('fade-out-duration-label').textContent = t.fadeOutDurationLabel;
-            document.getElementById('fade-in-type-label').textContent = t.fadeInTypeLabel;
-            document.getElementById('fade-out-type-label').textContent = t.fadeOutTypeLabel;
-            
-            // Update select options
-            updateSelectOptions(t);
-            
-            // Animation settings
-            document.getElementById('animation-title').textContent = t.animationTitle;
-            document.getElementById('animation-style-label').textContent = t.animationStyleLabel;
-            document.getElementById('animation-speed-label').textContent = t.animationSpeedLabel;
-            document.getElementById('blur-amount-label').textContent = t.blurAmountLabel;
-            document.getElementById('shadow-intensity-label').textContent = t.shadowIntensityLabel;
-            
-            // Timing settings
-            document.getElementById('timing-title').textContent = t.timingTitle;
-            document.getElementById('start-time-label').textContent = t.startTimeLabel;
-            document.getElementById('duration-label').textContent = t.durationLabel;
-            document.getElementById('display-mode-label').textContent = t.displayModeLabel;
-            document.getElementById('preview-resolution-label').textContent = t.previewResolutionLabel;
-            
-            // Audio settings
-            document.getElementById('audio-title').textContent = t.audioTitle;
-            document.getElementById('audio-sync-label').textContent = t.audioSyncLabel;
-            document.getElementById('auto-timing-label').textContent = t.autoTimingLabel;
-            document.getElementById('speech-speed-label').textContent = t.speechSpeedLabel;
-            document.getElementById('sentence-duration-label').textContent = t.sentenceDurationLabel;
-            
-            // Advanced settings
-            document.getElementById('advanced-title').textContent = t.advancedTitle;
-            document.getElementById('detect-repeats-label').textContent = t.detectRepeatsLabel;
-            document.getElementById('voice-threshold-label').textContent = t.voiceThresholdLabel;
-            document.getElementById('auto-sync-beats-label').textContent = t.autoSyncBeatsLabel;
-            
-            // Buttons
-            document.getElementById('save-btn-text').textContent = t.saveBtnText;
-            document.getElementById('reset-btn-text').textContent = t.resetBtnText;
-            document.getElementById('export-btn-text').textContent = t.exportBtnText;
-            document.getElementById('import-btn-text').textContent = t.importBtnText;
-            document.getElementById('defaults-btn-text').textContent = t.defaultsBtnText;
-            document.getElementById('import-title').textContent = t.importTitle;
-            document.getElementById('cancel-btn-text').textContent = t.cancelBtnText;
-            document.getElementById('confirm-btn-text').textContent = t.confirmBtnText;
-        }
-
-        function updateSelectOptions(t) {
-            // Fade type options
-            document.getElementById('ease-in-out-option').textContent = t.easeInOutOption;
-            document.getElementById('ease-in-option').textContent = t.easeInOption;
-            document.getElementById('ease-out-option').textContent = t.easeOutOption;
-            document.getElementById('linear-option').textContent = t.linearOption;
-            
-            document.getElementById('ease-in-out-option2').textContent = t.easeInOutOption;
-            document.getElementById('ease-in-option2').textContent = t.easeInOption;
-            document.getElementById('ease-out-option2').textContent = t.easeOutOption;
-            document.getElementById('linear-option2').textContent = t.linearOption;
-            
-            // Animation options
-            document.getElementById('fade-option').textContent = t.fadeOption;
-            document.getElementById('slide-option').textContent = t.slideOption;
-            document.getElementById('scale-option').textContent = t.scaleOption;
-            document.getElementById('bounce-option').textContent = t.bounceOption;
-            
-            // Display mode options
-            document.getElementById('arabic-only-option').textContent = t.arabicOnlyOption;
-            document.getElementById('repetitive-only-option').textContent = t.repetitiveOnlyOption;
-            document.getElementById('both-option').textContent = t.bothOption;
-            document.getElementById('alternating-option').textContent = t.alternatingOption;
-            
-            // Audio sync options
-            document.getElementById('sync-start-option').textContent = t.syncStartOption;
-            document.getElementById('sync-center-option').textContent = t.syncCenterOption;
-            document.getElementById('sync-end-option').textContent = t.syncEndOption;
-            
-            // Speech speed options
-            document.getElementById('speech-slow').textContent = t.speechSlow;
-            document.getElementById('speech-normal').textContent = t.speechNormal;
-            document.getElementById('speech-fast').textContent = t.speechFast;
-            
-            // Yes/No options
-            document.getElementById('auto-timing-yes').textContent = t.yesOption;
-            document.getElementById('auto-timing-no').textContent = t.noOption;
-            document.getElementById('detect-repeats-yes').textContent = t.yesOption;
-            document.getElementById('detect-repeats-no').textContent = t.noOption;
-            document.getElementById('auto-sync-yes').textContent = t.yesOption;
-            document.getElementById('auto-sync-no').textContent = t.noOption;
-        }
-
-        // Default settings
-        const defaultSettings = {
-            fadeInDuration: 0.5,
-            fadeOutDuration: 0.5,
-            fadeInType: 'ease-in-out',
-            fadeOutType: 'ease-in-out',
-            animationStyle: 'fade',
-            animationSpeed: 1,
-            blurAmount: 0,
-            shadowIntensity: 50,
-            startTime: 0,
-            duration: 5,
-            displayMode: 'arabic',
-            previewResolution: '1920x1080',
-            audioSync: 'start',
-            autoTiming: true,
-            speechSpeed: 'normal',
-            sentenceDuration: 4,
-            detectRepeats: true,
-            voiceThreshold: 0.3,
-            autoSyncBeats: true
-        };
-
-        // Range value update functions
-        function setupRangeSliders() {
-            const rangeInputs = document.querySelectorAll('.range-input');
-            rangeInputs.forEach(input => {
-                const valueSpan = document.getElementById(input.id + 'Value');
-                
-                input.addEventListener('input', function() {
-                    valueSpan.textContent = this.value;
-                    autoSaveSettings();
-                });
-            });
-        }
-
-        // Auto-save settings when values change
-        function autoSaveSettings() {
-            const settings = getCurrentSettings();
-            localStorage.setItem('converterSettings', JSON.stringify(settings));
-        }
-
-        // Get current settings from form
-        function getCurrentSettings() {
-            return {
-                fadeInDuration: parseFloat(document.getElementById('fadeInDuration').value),
-                fadeOutDuration: parseFloat(document.getElementById('fadeOutDuration').value),
-                fadeInType: document.getElementById('fadeInType').value,
-                fadeOutType: document.getElementById('fadeOutType').value,
-                animationStyle: document.getElementById('animationStyle').value,
-                animationSpeed: parseFloat(document.getElementById('animationSpeed').value),
-                blurAmount: parseFloat(document.getElementById('blurAmount').value),
-                shadowIntensity: parseInt(document.getElementById('shadowIntensity').value),
-                startTime: parseFloat(document.getElementById('startTime').value),
-                duration: parseFloat(document.getElementById('duration').value),
-                displayMode: document.getElementById('displayMode').value,
-                previewResolution: document.getElementById('previewResolution').value,
-                audioSync: document.getElementById('audioSync').value,
-                autoTiming: document.getElementById('autoTiming').value === 'true',
-                speechSpeed: document.getElementById('speechSpeed').value,
-                sentenceDuration: parseFloat(document.getElementById('sentenceDuration').value),
-                detectRepeats: document.getElementById('detectRepeats').value === 'true',
-                voiceThreshold: parseFloat(document.getElementById('voiceThreshold').value),
-                autoSyncBeats: document.getElementById('autoSyncBeats').value === 'true'
-            };
-        }
-
-        // Load settings
-        function loadSettings() {
-            try {
-                const saved = localStorage.getItem('converterSettings');
-                const settings = saved ? { ...defaultSettings, ...JSON.parse(saved) } : defaultSettings;
-                
-                // Apply settings to form
-                Object.keys(settings).forEach(key => {
-                    const element = document.getElementById(key);
-                    if (element) {
-                        if (element.type === 'range' || element.type === 'number') {
-                            element.value = settings[key];
-                            const valueSpan = document.getElementById(key + 'Value');
-                            if (valueSpan) valueSpan.textContent = settings[key];
-                        } else if (element.tagName === 'SELECT') {
-                            element.value = settings[key];
-                        }
-                    }
-                });
-            } catch (error) {
-                console.warn('Error loading settings:', error);
-            }
-        }
-
-        // Save settings
-        function saveSettings() {
-            const settings = getCurrentSettings();
-            localStorage.setItem('converterSettings', JSON.stringify(settings));
-            showNotification('settingsSaved', 'success');
-        }
-
-        // Reset settings
-        function resetSettings() {
-            localStorage.removeItem('converterSettings');
-            loadSettings();
-            showNotification('settingsReset', 'warning');
-        }
-
-        // Export settings
-        function exportSettings() {
-            const settings = getCurrentSettings();
-            const dataStr = JSON.stringify(settings, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(dataBlob);
-            link.download = 'fcp-converter-settings.json';
-            link.click();
-            
-            showNotification('settingsExported', 'success');
-        }
-
-        // Enhanced notification system
-        function showNotification(messageKey, type = 'success') {
-            const message = translations[currentLanguage][messageKey] || messageKey;
-            const notification = document.createElement('div');
-            notification.className = `notification ${type} show`;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load saved language preference
-            const savedLanguage = localStorage.getItem('preferredLanguage') || 'ar';
-            if (savedLanguage !== 'ar') {
-                switchLanguage(savedLanguage);
-            }
-            
-            // Setup range sliders
-            setupRangeSliders();
-            
-            // Load settings
-            loadSettings();
-            
-            // Setup auto-save for all form elements
-            const formElements = document.querySelectorAll('input, select');
-            formElements.forEach(element => {
-                element.addEventListener('change', autoSaveSettings);
-            });
-            
-            // Add keyboard shortcuts
-            document.addEventListener('keydown', function(e) {
-                // Ctrl/Cmd + S to save settings
-                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                    e.preventDefault();
-                    saveSettings();
-                }
-                
-                // Ctrl/Cmd + L to switch language
-                if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
-                    e.preventDefault();
-                    switchLanguage(currentLanguage === 'ar' ? 'en' : 'ar');
-                }
-            });
-
-            // Load settings with global defaults integration
-            if (typeof getSetting !== 'undefined') {
-                console.log('🔧 Loading settings with global defaults integration');
-                loadSettingsWithDefaults();
-            } else {
-                console.log('⚠️ Global defaults not available, using local defaults');
-                loadSettings();
+// Default Settings System for FCP Audio to XML Website
+// This file provides global default settings and initialization
+
+// Default settings configuration
+const GLOBAL_DEFAULT_SETTINGS = {
+    // Language Settings
+    preferredLanguage: 'en',
+    
+    // Animation Settings
+    fadeInDuration: 0.5,
+    fadeOutDuration: 0.5,
+    fadeInType: 'ease-in-out',
+    fadeOutType: 'ease-in-out',
+    animationStyle: 'fade',
+    animationSpeed: 1,
+    blurAmount: 0,
+    shadowIntensity: 50,
+    
+    // Timing Settings
+    startTime: 0,
+    duration: 5,
+    displayMode: 'both',
+    previewResolution: '1920x1080',
+    frameRate: 25,
+    audioSync: 'start',
+    autoTiming: true,
+    speechSpeed: 'normal',
+    sentenceDuration: 4,
+    
+    // Font and Typography Settings
+    englishFont: 'Sinzano',
+    englishFontSize: 25,
+    englishColor: '#ffffff',
+    englishPositionX: 0,
+    englishPositionY: -420,
+    
+    arabicFont: 'Neo Sans Arabic',
+    arabicFontSize: 34,
+    arabicColor: '#ffffff',
+    arabicPositionX: 0,
+    arabicPositionY: -381,
+    
+    // Detection Settings
+    detectRepeats: true,
+    voiceThreshold: 0.3,
+    autoSyncBeats: true,
+    beatSensitivity: 0.5,
+    
+    // UI Settings
+    showTutorial: true,
+    autoSaveProjects: true,
+    confirmBeforeDelete: true,
+    showAdvancedOptions: false,
+    darkMode: true,
+    
+    // Audio Settings
+    audioQuality: 'high',
+    noiseReduction: true,
+    volumeNormalization: true,
+    
+    // Export Settings
+    xmlFormat: 'fcpx',
+    includeMetadata: true,
+    compressOutput: false,
+    
+    // Library Settings
+    maxLibraryFiles: 50,
+    autoDeleteOldFiles: false,
+    
+    // Performance Settings
+    enableGPUAcceleration: true,
+    maxPreviewQuality: '1080p',
+    
+    // First time setup
+    isFirstTime: true,
+    setupCompleted: false
+};
+
+// Initialize default settings on first visit or reset
+function initializeDefaultSettings() {
+    console.log('🔧 Initializing default settings...');
+    
+    // Check if this is the first time visiting the site
+    const hasVisitedBefore = localStorage.getItem('hasVisitedBefore');
+    
+    if (!hasVisitedBefore) {
+        console.log('👋 Welcome! Setting up default configuration...');
+        
+        // Set all default settings
+        Object.keys(GLOBAL_DEFAULT_SETTINGS).forEach(key => {
+            const storageKey = getStorageKey(key);
+            if (!localStorage.getItem(storageKey)) {
+                localStorage.setItem(storageKey, JSON.stringify(GLOBAL_DEFAULT_SETTINGS[key]));
             }
         });
+        
+        // Set combined settings objects
+        localStorage.setItem('converterSettings', JSON.stringify(getConverterSettings()));
+        localStorage.setItem('preferredLanguage', GLOBAL_DEFAULT_SETTINGS.preferredLanguage);
+        
+        // Mark as visited
+        localStorage.setItem('hasVisitedBefore', 'true');
+        localStorage.setItem('defaultsInitialized', 'true');
+        localStorage.setItem('initializationDate', new Date().toISOString());
+        
+        console.log('✅ Default settings initialized successfully!');
+        return true; // First time visit
+    }
+    
+    // Check if defaults need to be updated (version check)
+    const defaultsVersion = localStorage.getItem('defaultsVersion');
+    const currentVersion = '1.0.0';
+    
+    if (defaultsVersion !== currentVersion) {
+        console.log('🔄 Updating default settings to version', currentVersion);
+        updateDefaultSettings();
+        localStorage.setItem('defaultsVersion', currentVersion);
+    }
+    
+    return false; // Not first time
+}
 
-        // Enhanced functions for global defaults integration
+// Get storage key for a setting
+function getStorageKey(settingKey) {
+    const keyMap = {
+        preferredLanguage: 'preferredLanguage',
+        fadeInDuration: 'converterSettings',
+        fadeOutDuration: 'converterSettings',
+        // Add more mappings as needed
+    };
+    
+    return keyMap[settingKey] || 'converterSettings';
+}
 
-        function loadSettingsWithDefaults() {
-            try {
-                const globalDefaults = typeof getConverterSettings !== 'undefined' 
-                    ? getConverterSettings() 
-                    : defaultSettings;
-                
-                const saved = localStorage.getItem('converterSettings');
-                const settings = saved ? { ...globalDefaults, ...JSON.parse(saved) } : globalDefaults;
-                
-                // Apply settings to form
-                applySettingsToForm(settings);
-                
-                // Update range displays
-                setupRangeSliders();
-                
-                console.log('✅ Settings loaded with global defaults');
-            } catch (error) {
-                console.error('Error loading settings with defaults:', error);
-                loadSettings(); // Fallback to local method
+// Get converter-specific default settings
+function getConverterSettings() {
+    return {
+        fadeInDuration: GLOBAL_DEFAULT_SETTINGS.fadeInDuration,
+        fadeOutDuration: GLOBAL_DEFAULT_SETTINGS.fadeOutDuration,
+        fadeInType: GLOBAL_DEFAULT_SETTINGS.fadeInType,
+        fadeOutType: GLOBAL_DEFAULT_SETTINGS.fadeOutType,
+        animationStyle: GLOBAL_DEFAULT_SETTINGS.animationStyle,
+        animationSpeed: GLOBAL_DEFAULT_SETTINGS.animationSpeed,
+        blurAmount: GLOBAL_DEFAULT_SETTINGS.blurAmount,
+        shadowIntensity: GLOBAL_DEFAULT_SETTINGS.shadowIntensity,
+        startTime: GLOBAL_DEFAULT_SETTINGS.startTime,
+        duration: GLOBAL_DEFAULT_SETTINGS.duration,
+        displayMode: GLOBAL_DEFAULT_SETTINGS.displayMode,
+        previewResolution: GLOBAL_DEFAULT_SETTINGS.previewResolution,
+        frameRate: GLOBAL_DEFAULT_SETTINGS.frameRate,
+        audioSync: GLOBAL_DEFAULT_SETTINGS.audioSync,
+        autoTiming: GLOBAL_DEFAULT_SETTINGS.autoTiming,
+        speechSpeed: GLOBAL_DEFAULT_SETTINGS.speechSpeed,
+        sentenceDuration: GLOBAL_DEFAULT_SETTINGS.sentenceDuration,
+        detectRepeats: GLOBAL_DEFAULT_SETTINGS.detectRepeats,
+        voiceThreshold: GLOBAL_DEFAULT_SETTINGS.voiceThreshold,
+        autoSyncBeats: GLOBAL_DEFAULT_SETTINGS.autoSyncBeats,
+        beatSensitivity: GLOBAL_DEFAULT_SETTINGS.beatSensitivity,
+        audioQuality: GLOBAL_DEFAULT_SETTINGS.audioQuality,
+        noiseReduction: GLOBAL_DEFAULT_SETTINGS.noiseReduction,
+        volumeNormalization: GLOBAL_DEFAULT_SETTINGS.volumeNormalization,
+        
+        // Font and Typography Settings
+        englishFont: GLOBAL_DEFAULT_SETTINGS.englishFont,
+        englishFontSize: GLOBAL_DEFAULT_SETTINGS.englishFontSize,
+        englishColor: GLOBAL_DEFAULT_SETTINGS.englishColor,
+        englishPositionX: GLOBAL_DEFAULT_SETTINGS.englishPositionX,
+        englishPositionY: GLOBAL_DEFAULT_SETTINGS.englishPositionY,
+        
+        arabicFont: GLOBAL_DEFAULT_SETTINGS.arabicFont,
+        arabicFontSize: GLOBAL_DEFAULT_SETTINGS.arabicFontSize,
+        arabicColor: GLOBAL_DEFAULT_SETTINGS.arabicColor,
+        arabicPositionX: GLOBAL_DEFAULT_SETTINGS.arabicPositionX,
+        arabicPositionY: GLOBAL_DEFAULT_SETTINGS.arabicPositionY
+    };
+}
+
+// Update settings when new defaults are available
+function updateDefaultSettings() {
+    const existingSettings = JSON.parse(localStorage.getItem('converterSettings') || '{}');
+    const updatedSettings = { ...getConverterSettings(), ...existingSettings };
+    localStorage.setItem('converterSettings', JSON.stringify(updatedSettings));
+}
+
+// Get a setting value with fallback to default
+function getSetting(key, defaultValue = null) {
+    try {
+        const value = localStorage.getItem(key);
+        if (value === null) {
+            return defaultValue !== null ? defaultValue : GLOBAL_DEFAULT_SETTINGS[key];
+        }
+        return JSON.parse(value);
+    } catch (error) {
+        console.warn(`Error getting setting ${key}:`, error);
+        return defaultValue !== null ? defaultValue : GLOBAL_DEFAULT_SETTINGS[key];
+    }
+}
+
+// Set a setting value
+function setSetting(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+        console.log(`Setting ${key} updated:`, value);
+    } catch (error) {
+        console.error(`Error setting ${key}:`, error);
+    }
+}
+
+// Reset all settings to defaults
+function resetToDefaults() {
+    console.log('🔄 Resetting all settings to defaults...');
+    
+    // Clear all existing settings
+    const keysToKeep = ['hasVisitedBefore', 'defaultsInitialized', 'initializationDate'];
+    Object.keys(localStorage).forEach(key => {
+        if (!keysToKeep.includes(key)) {
+            localStorage.removeItem(key);
+        }
+    });
+    
+    // Reinitialize defaults
+    initializeDefaultSettings();
+    
+    console.log('✅ All settings reset to defaults');
+    
+    // Reload page to apply changes
+    if (typeof window !== 'undefined') {
+        window.location.reload();
+    }
+}
+
+// Export settings for backup
+function exportSettings() {
+    const allSettings = {};
+    Object.keys(localStorage).forEach(key => {
+        try {
+            allSettings[key] = JSON.parse(localStorage.getItem(key));
+        } catch {
+            allSettings[key] = localStorage.getItem(key);
+        }
+    });
+    
+    const blob = new Blob([JSON.stringify(allSettings, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `fcp-converter-settings-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    console.log('📁 Settings exported successfully');
+}
+
+// Import settings from backup
+function importSettings(fileInput) {
+    const file = fileInput.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const settings = JSON.parse(e.target.result);
+            
+            // Validate and import settings
+            Object.keys(settings).forEach(key => {
+                localStorage.setItem(key, typeof settings[key] === 'string' ? settings[key] : JSON.stringify(settings[key]));
+            });
+            
+            console.log('📥 Settings imported successfully');
+            
+            // Reload page to apply changes
+            if (typeof window !== 'undefined') {
+                alert('Settings imported successfully! The page will reload to apply changes.');
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error('Error importing settings:', error);
+            if (typeof window !== 'undefined') {
+                alert('Error importing settings. Please check the file format.');
             }
         }
+    };
+    reader.readAsText(file);
+}
 
-        function applySettingsToForm(settings) {
-            // Animation settings
-            document.getElementById('fadeInDuration').value = settings.fadeInDuration || 0.5;
-            document.getElementById('fadeOutDuration').value = settings.fadeOutDuration || 0.5;
-            document.getElementById('fadeInType').value = settings.fadeInType || 'ease-in-out';
-            document.getElementById('fadeOutType').value = settings.fadeOutType || 'ease-in-out';
-            document.getElementById('animationStyle').value = settings.animationStyle || 'fade';
-            document.getElementById('animationSpeed').value = settings.animationSpeed || 1;
-            document.getElementById('blurAmount').value = settings.blurAmount || 0;
-            document.getElementById('shadowIntensity').value = settings.shadowIntensity || 50;
+// Show first-time welcome message
+function showWelcomeMessage() {
+    if (getSetting('isFirstTime', true)) {
+        console.log('👋 Welcome to FCP Audio to XML Converter!');
+        
+        // Only show alert if in browser environment
+        if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+            const isArabic = getSetting('preferredLanguage') === 'ar';
+            const message = isArabic 
+                ? 'مرحباً بك في محول الصوت إلى XML!\n\nتم تطبيق الإعدادات الافتراضية المحسنة:\n• اللغة الافتراضية: الإنجليزية\n• خط الإنجليزية: Sinzano (حجم 25)\n• خط العربية: Neo Sans Arabic (حجم 34)\n• المواضع والألوان محسّنة\n\nيمكنك تغيير هذه الإعدادات من صفحة الإعدادات.'
+                : 'Welcome to FCP Audio to XML Converter!\n\nOptimized default settings have been applied:\n• Default Language: English\n• English Font: Sinzano (Size 25)\n• Arabic Font: Neo Sans Arabic (Size 34)\n• Positions and colors optimized\n\nYou can change these settings from the Settings page.';
             
-            // Timing settings
-            document.getElementById('startTime').value = settings.startTime || 0;
-            document.getElementById('duration').value = settings.duration || 5;
-            document.getElementById('displayMode').value = settings.displayMode || 'arabic';
-            document.getElementById('previewResolution').value = settings.previewResolution || '1920x1080';
-            document.getElementById('audioSync').value = settings.audioSync || 'start';
-            document.getElementById('autoTiming').checked = settings.autoTiming !== false;
-            document.getElementById('speechSpeed').value = settings.speechSpeed || 'normal';
-            document.getElementById('sentenceDuration').value = settings.sentenceDuration || 4;
-            
-            // Advanced settings
-            document.getElementById('detectRepeats').checked = settings.detectRepeats !== false;
-            document.getElementById('voiceThreshold').value = settings.voiceThreshold || 0.3;
-            document.getElementById('autoSyncBeats').checked = settings.autoSyncBeats !== false;
-            
-            // Update value displays
-            updateRangeDisplays();
+            // Show a subtle notification instead of alert
+            setTimeout(() => {
+                showNotification(message, 'success', 7000);
+            }, 1000);
         }
+        
+        // Mark as no longer first time
+        setSetting('isFirstTime', false);
+    }
+}
 
-        function updateRangeDisplays() {
-            document.getElementById('fadeInDurationValue').textContent = document.getElementById('fadeInDuration').value;
-            document.getElementById('fadeOutDurationValue').textContent = document.getElementById('fadeOutDuration').value;
-            document.getElementById('animationSpeedValue').textContent = document.getElementById('animationSpeed').value;
-            document.getElementById('blurAmountValue').textContent = document.getElementById('blurAmount').value;
-            document.getElementById('shadowIntensityValue').textContent = document.getElementById('shadowIntensity').value;
-            document.getElementById('startTimeValue').textContent = document.getElementById('startTime').value;
-            document.getElementById('durationValue').textContent = document.getElementById('duration').value;
-            document.getElementById('sentenceDurationValue').textContent = document.getElementById('sentenceDuration').value;
-            document.getElementById('voiceThresholdValue').textContent = document.getElementById('voiceThreshold').value;
-        }
+// Notification system (if not already available)
+function showNotification(message, type = 'success', duration = 3000) {
+    if (typeof document === 'undefined') return;
+    
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.global-notification');
+    existingNotifications.forEach(notif => notif.remove());
+    
+    const notification = document.createElement('div');
+    notification.className = `global-notification notification ${type} show`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        color: white;
+        font-weight: 600;
+        z-index: 10000;
+        max-width: 400px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        font-family: 'Cairo', 'Inter', sans-serif;
+        line-height: 1.4;
+        white-space: pre-line;
+    `;
+    
+    // Set background color based on type
+    const colors = {
+        success: 'linear-gradient(135deg, #10b981, #34d399)',
+        error: 'linear-gradient(135deg, #ef4444, #f87171)',
+        warning: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
+        info: 'linear-gradient(135deg, #3b82f6, #06b6d4)'
+    };
+    notification.style.background = colors[type] || colors.info;
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Animate out and remove
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => notification.remove(), 300);
+    }, duration);
+}
 
-        function showImportDialog() {
-            document.getElementById('importDialog').style.display = 'block';
-        }
-
-        function hideImportDialog() {
-            document.getElementById('importDialog').style.display = 'none';
-            document.getElementById('importFile').value = '';
-        }
-
-        function handleImport() {
-            const fileInput = document.getElementById('importFile');
-            if (fileInput.files.length === 0) {
-                showNotification('Please select a file to import', 'error');
-                return;
+// Auto-initialize when script loads
+if (typeof document !== 'undefined') {
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            const isFirstTime = initializeDefaultSettings();
+            if (isFirstTime) {
+                setTimeout(showWelcomeMessage, 2000);
             }
-
-            if (typeof importSettings !== 'undefined') {
-                importSettings(fileInput);
-                hideImportDialog();
-            } else {
-                // Fallback local import
-                const file = fileInput.files[0];
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const settings = JSON.parse(e.target.result);
-                        
-                        // Save imported settings
-                        localStorage.setItem('converterSettings', JSON.stringify(settings));
-                        
-                        showNotification(translations[currentLanguage].settingsImported, 'success');
-                        
-                        // Reload settings
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000);
-                    } catch (error) {
-                        showNotification(translations[currentLanguage].importError, 'error');
-                    }
-                };
-                reader.readAsText(file);
-                hideImportDialog();
-            }
+        });
+    } else {
+        // DOM is already ready
+        const isFirstTime = initializeDefaultSettings();
+        if (isFirstTime) {
+            setTimeout(showWelcomeMessage, 2000);
         }
+    }
+}
 
-        function resetToGlobalDefaults() {
-            const t = translations[currentLanguage];
-            
-            if (confirm(t.confirmDefaults)) {
-                if (typeof resetToDefaults !== 'undefined') {
-                    resetToDefaults();
-                } else {
-                    // Fallback local reset
-                    localStorage.removeItem('converterSettings');
-                    showNotification(t.defaultsRestored, 'success');
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
-                }
-            }
-        }
-
-        // Enhanced reset function
-        function resetSettings() {
-            const t = translations[currentLanguage];
-            
-            if (confirm(t.confirmReset)) {
-                if (typeof getConverterSettings !== 'undefined') {
-                    const globalDefaults = getConverterSettings();
-                    localStorage.setItem('converterSettings', JSON.stringify(globalDefaults));
-                } else {
-                    localStorage.removeItem('converterSettings');
-                }
-                
-                showNotification(t.settingsReset, 'success');
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-            }
-        }
-
-        // Enhanced export function
-        function exportSettings() {
-            const t = translations[currentLanguage];
-            
-            if (typeof exportSettings !== 'undefined' && exportSettings !== arguments.callee) {
-                // Use global export function
-                window.exportSettings();
-            } else {
-                // Fallback local export
-                const settings = getCurrentSettings();
-                const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `fcp-converter-settings-${new Date().toISOString().split('T')[0]}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }
-            
-            showNotification(t.settingsExported, 'success');
-        }
-    </script>
-</body>
-</html>
+// Make functions globally available
+if (typeof window !== 'undefined') {
+    window.GLOBAL_DEFAULT_SETTINGS = GLOBAL_DEFAULT_SETTINGS;
+    window.initializeDefaultSettings = initializeDefaultSettings;
+    window.getSetting = getSetting;
+    window.setSetting = setSetting;
+    window.resetToDefaults = resetToDefaults;
+    window.exportSettings = exportSettings;
+    window.importSettings = importSettings;
+    window.showWelcomeMessage = showWelcomeMessage;
+    window.getConverterSettings = getConverterSettings;
+    
+    console.log('🌐 Global settings system loaded successfully');
+}
