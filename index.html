@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" id="html-root">
+<html lang="en" dir="ltr" id="html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محول صوت FCP إلى XML</title>
+    <title>FCP Audio to XML Converter</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Default Settings System -->
+    <script src="default-settings.js"></script>
     <style>
         :root {
             --primary-color: #3b82f6;
@@ -96,6 +98,42 @@
         .nav-links a.active {
             color: var(--primary-color);
             background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* Language Toggle */
+        .language-toggle {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--surface-color);
+            border-radius: 50px;
+            padding: 0.3rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-family: var(--font-primary);
+        }
+
+        .lang-btn.active {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .lang-btn:hover:not(.active) {
+            color: var(--accent-color);
+            background: rgba(6, 182, 212, 0.1);
         }
 
         /* Hero Section */
@@ -284,87 +322,235 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <i class="fas fa-film"></i> محول صوت FCP
+                <i class="fas fa-film"></i> <span id="logo-text">FCP Audio Converter</span>
             </div>
             <ul class="nav-links">
-                <li><a href="index.html" class="active">الرئيسية</a></li>
-                <li><a href="converter.html">المحول</a></li>
-                <li><a href="preview.html">المعاينة</a></li>
-                <li><a href="settings.html">الإعدادات</a></li>
-                <li><a href="video-library.html">مكتبة الفيديو</a></li>
+                <li><a href="index.html" class="active" id="nav-home">Home</a></li>
+                <li><a href="converter.html" id="nav-converter">Converter</a></li>
+                <li><a href="preview.html" id="nav-preview">Preview</a></li>
+                <li><a href="settings.html" id="nav-settings">Settings</a></li>
+                <li><a href="video-library.html" id="nav-library">Video Library</a></li>
             </ul>
+            <div class="language-toggle">
+                <button class="lang-btn" onclick="switchLanguage('ar')" id="btn-arabic">العربية</button>
+                <button class="lang-btn active" onclick="switchLanguage('en')" id="btn-english">English</button>
+            </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <h1>محول الصوت إلى XML لبرنامج Final Cut Pro</h1>
-            <p>حول ملفاتك الصوتية إلى مشاريع ترجمة احترافية مع كشف الإيقاع المتقدم والحركات القابلة للتخصيص</p>
+            <h1 id="hero-title">Audio to XML Converter for Final Cut Pro</h1>
+            <p id="hero-subtitle">Convert your audio files to professional subtitle projects with advanced beat detection and customizable animations</p>
             <a href="converter.html" class="cta-button">
                 <i class="fas fa-play"></i>
-                ابدأ التحويل
+                <span id="cta-text">Start Converting</span>
             </a>
         </div>
     </section>
 
     <!-- Features Section -->
     <section class="features">
-        <h2>لماذا تختار محولنا؟</h2>
+        <h2 id="features-title">Why Choose Our Converter?</h2>
         <div class="features-grid">
             <div class="feature-card">
                 <div class="feature-icon">
                     <i class="fas fa-waveform-lines"></i>
                 </div>
-                <h3>كشف الإيقاع</h3>
-                <p>كشف تلقائي لإيقاع الصوت ومزامنة مثالية للترجمة مع الإيقاع</p>
+                <h3 id="feature1-title">Beat Detection</h3>
+                <p id="feature1-desc">Automatic audio beat detection and perfect subtitle synchronization with rhythm</p>
             </div>
 
             <div class="feature-card">
                 <div class="feature-icon">
                     <i class="fas fa-magic"></i>
                 </div>
-                <h3>حركات متقدمة</h3>
-                <p>اختر من أنواع متعددة من الانتقالات وأنماط الحركة للحصول على نتائج احترافية</p>
+                <h3 id="feature2-title">Advanced Animations</h3>
+                <p id="feature2-desc">Choose from multiple transition types and motion styles for professional results</p>
             </div>
 
             <div class="feature-card">
                 <div class="feature-icon">
                     <i class="fas fa-eye"></i>
                 </div>
-                <h3>معاينة بدقة كاملة</h3>
-                <p>اعرض ترجمتك بدقة كاملة لترى بالضبط كيف ستظهر</p>
+                <h3 id="feature3-title">Full Resolution Preview</h3>
+                <p id="feature3-desc">Preview your subtitles in full resolution to see exactly how they will appear</p>
             </div>
 
             <div class="feature-card">
                 <div class="feature-icon">
                     <i class="fas fa-video"></i>
                 </div>
-                <h3>مكتبة الفيديو</h3>
-                <p>أدر وأعد استخدام ملفات الفيديو الخاصة بك مع نظام مكتبة متكامل</p>
+                <h3 id="feature4-title">Video Library</h3>
+                <p id="feature4-desc">Manage and reuse your video files with an integrated library system</p>
             </div>
 
             <div class="feature-card">
                 <div class="feature-icon">
                     <i class="fas fa-language"></i>
                 </div>
-                <h3>دعم اللغتين</h3>
-                <p>أنشئ ترجمات باللغة العربية والإنجليزية مع تموضع مخصص</p>
+                <h3 id="feature5-title">Dual Language Support</h3>
+                <p id="feature5-desc">Create subtitles in Arabic and English with custom positioning</p>
             </div>
 
             <div class="feature-card">
                 <div class="feature-icon">
                     <i class="fas fa-download"></i>
                 </div>
-                <h3>تصدير احترافي</h3>
-                <p>صدر مباشرة إلى تنسيق XML لبرنامج Final Cut Pro مع جميع إعداداتك المخصصة</p>
+                <h3 id="feature6-title">Professional Export</h3>
+                <p id="feature6-desc">Export directly to Final Cut Pro XML format with all your custom settings</p>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
-        <p>&copy; 2025 محول صوت FCP. مصمم للمونتاج الاحترافي.</p>
+        <p id="footer-text">&copy; 2025 FCP Audio Converter. Designed for professional editing.</p>
     </footer>
+
+    <script>
+        // Language system
+        const translations = {
+            ar: {
+                title: 'محول صوت FCP إلى XML',
+                logoText: 'محول صوت FCP',
+                navHome: 'الرئيسية',
+                navConverter: 'المحول',
+                navPreview: 'المعاينة',
+                navSettings: 'الإعدادات',
+                navLibrary: 'مكتبة الفيديو',
+                heroTitle: 'محول الصوت إلى XML لبرنامج Final Cut Pro',
+                heroSubtitle: 'حول ملفاتك الصوتية إلى مشاريع ترجمة احترافية مع كشف الإيقاع المتقدم والحركات القابلة للتخصيص',
+                ctaText: 'ابدأ التحويل',
+                featuresTitle: 'لماذا تختار محولنا؟',
+                feature1Title: 'كشف الإيقاع',
+                feature1Desc: 'كشف تلقائي لإيقاع الصوت ومزامنة مثالية للترجمة مع الإيقاع',
+                feature2Title: 'حركات متقدمة',
+                feature2Desc: 'اختر من أنواع متعددة من الانتقالات وأنماط الحركة للحصول على نتائج احترافية',
+                feature3Title: 'معاينة بدقة كاملة',
+                feature3Desc: 'اعرض ترجمتك بدقة كاملة لترى بالضبط كيف ستظهر',
+                feature4Title: 'مكتبة الفيديو',
+                feature4Desc: 'أدر وأعد استخدام ملفات الفيديو الخاصة بك مع نظام مكتبة متكامل',
+                feature5Title: 'دعم اللغتين',
+                feature5Desc: 'أنشئ ترجمات باللغة العربية والإنجليزية مع تموضع مخصص',
+                feature6Title: 'تصدير احترافي',
+                feature6Desc: 'صدر مباشرة إلى تنسيق XML لبرنامج Final Cut Pro مع جميع إعداداتك المخصصة',
+                footerText: '© 2025 محول صوت FCP. مصمم للمونتاج الاحترافي.'
+            },
+            en: {
+                title: 'FCP Audio to XML Converter',
+                logoText: 'FCP Audio Converter',
+                navHome: 'Home',
+                navConverter: 'Converter',
+                navPreview: 'Preview',
+                navSettings: 'Settings',
+                navLibrary: 'Video Library',
+                heroTitle: 'Audio to XML Converter for Final Cut Pro',
+                heroSubtitle: 'Convert your audio files to professional subtitle projects with advanced beat detection and customizable animations',
+                ctaText: 'Start Converting',
+                featuresTitle: 'Why Choose Our Converter?',
+                feature1Title: 'Beat Detection',
+                feature1Desc: 'Automatic audio beat detection and perfect subtitle synchronization with rhythm',
+                feature2Title: 'Advanced Animations',
+                feature2Desc: 'Choose from multiple transition types and motion styles for professional results',
+                feature3Title: 'Full Resolution Preview',
+                feature3Desc: 'Preview your subtitles in full resolution to see exactly how they will appear',
+                feature4Title: 'Video Library',
+                feature4Desc: 'Manage and reuse your video files with an integrated library system',
+                feature5Title: 'Dual Language Support',
+                feature5Desc: 'Create subtitles in Arabic and English with custom positioning',
+                feature6Title: 'Professional Export',
+                feature6Desc: 'Export directly to Final Cut Pro XML format with all your custom settings',
+                footerText: '© 2025 FCP Audio Converter. Designed for professional editing.'
+            }
+        };
+
+        let currentLanguage = 'en';
+
+        // Language switching function
+        function switchLanguage(lang) {
+            if (lang === currentLanguage) return;
+            
+            currentLanguage = lang;
+            const htmlRoot = document.getElementById('html-root');
+            const t = translations[lang];
+            
+            // Add transition effect
+            document.body.classList.add('transitioning');
+            
+            // Update HTML attributes
+            htmlRoot.lang = lang;
+            htmlRoot.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            
+            // Update document title
+            document.title = t.title;
+            
+            // Update all text content
+            document.getElementById('logo-text').textContent = t.logoText;
+            document.getElementById('nav-home').textContent = t.navHome;
+            document.getElementById('nav-converter').textContent = t.navConverter;
+            document.getElementById('nav-preview').textContent = t.navPreview;
+            document.getElementById('nav-settings').textContent = t.navSettings;
+            document.getElementById('nav-library').textContent = t.navLibrary;
+            document.getElementById('hero-title').textContent = t.heroTitle;
+            document.getElementById('hero-subtitle').textContent = t.heroSubtitle;
+            document.getElementById('cta-text').textContent = t.ctaText;
+            document.getElementById('features-title').textContent = t.featuresTitle;
+            document.getElementById('feature1-title').textContent = t.feature1Title;
+            document.getElementById('feature1-desc').textContent = t.feature1Desc;
+            document.getElementById('feature2-title').textContent = t.feature2Title;
+            document.getElementById('feature2-desc').textContent = t.feature2Desc;
+            document.getElementById('feature3-title').textContent = t.feature3Title;
+            document.getElementById('feature3-desc').textContent = t.feature3Desc;
+            document.getElementById('feature4-title').textContent = t.feature4Title;
+            document.getElementById('feature4-desc').textContent = t.feature4Desc;
+            document.getElementById('feature5-title').textContent = t.feature5Title;
+            document.getElementById('feature5-desc').textContent = t.feature5Desc;
+            document.getElementById('feature6-title').textContent = t.feature6Title;
+            document.getElementById('feature6-desc').textContent = t.feature6Desc;
+            document.getElementById('footer-text').textContent = t.footerText;
+            
+            // Update language toggle buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(lang === 'ar' ? 'btn-arabic' : 'btn-english').classList.add('active');
+            
+            // Save language preference using global settings
+            if (typeof setSetting !== 'undefined') {
+                setSetting('preferredLanguage', lang);
+            } else {
+                localStorage.setItem('preferredLanguage', lang);
+            }
+            
+            // Remove transition effect
+            setTimeout(() => {
+                document.body.classList.remove('transitioning');
+            }, 500);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved language preference
+            let savedLanguage = 'en';
+            if (typeof getSetting !== 'undefined') {
+                savedLanguage = getSetting('preferredLanguage', 'en');
+            } else {
+                savedLanguage = localStorage.getItem('preferredLanguage') || 'en';
+            }
+            
+            if (savedLanguage !== 'en') {
+                switchLanguage(savedLanguage);
+            }
+            
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Ctrl/Cmd + L to switch language
+                if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
+                    e.preventDefault();
+                    switchLanguage(currentLanguage === 'ar' ? 'en' : 'ar');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
