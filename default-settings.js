@@ -63,6 +63,13 @@ const GLOBAL_DEFAULT_SETTINGS = {
     includeMetadata: true,
     compressOutput: false,
     
+    // Translation Settings
+    skipPoetryIntros: true,
+    poetryIntroPatterns: ['مستهل', 'يا حسين', 'لبيك يا حسين', 'السلام عليك', 'صلى الله عليه وآله'],
+    skipBeginningIntros: true,
+    skipEndingIntros: true,
+    customSkipPatterns: [],
+    
     // Library Settings
     maxLibraryFiles: 50,
     autoDeleteOldFiles: false,
@@ -171,7 +178,14 @@ function getConverterSettings() {
         arabicFontSize: GLOBAL_DEFAULT_SETTINGS.arabicFontSize,
         arabicColor: GLOBAL_DEFAULT_SETTINGS.arabicColor,
         arabicPositionX: GLOBAL_DEFAULT_SETTINGS.arabicPositionX,
-        arabicPositionY: GLOBAL_DEFAULT_SETTINGS.arabicPositionY
+        arabicPositionY: GLOBAL_DEFAULT_SETTINGS.arabicPositionY,
+        
+        // Translation Settings
+        skipPoetryIntros: GLOBAL_DEFAULT_SETTINGS.skipPoetryIntros,
+        poetryIntroPatterns: GLOBAL_DEFAULT_SETTINGS.poetryIntroPatterns,
+        skipBeginningIntros: GLOBAL_DEFAULT_SETTINGS.skipBeginningIntros,
+        skipEndingIntros: GLOBAL_DEFAULT_SETTINGS.skipEndingIntros,
+        customSkipPatterns: GLOBAL_DEFAULT_SETTINGS.customSkipPatterns
     };
 }
 
