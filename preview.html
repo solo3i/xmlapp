@@ -6,6 +6,8 @@
     <title>المعاينة والتصدير - FCP Audio to XML</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Default Settings System -->
+    <script src="default-settings.js"></script>
     <style>
         :root {
             --primary-color: #3b82f6;
@@ -43,7 +45,7 @@
             padding-top: 80px;
         }
 
-        /* Navigation (same as others) */
+        /* Navigation */
         .navbar {
             background: rgba(30, 41, 59, 0.95);
             backdrop-filter: blur(20px);
@@ -99,7 +101,43 @@
             background: rgba(59, 130, 246, 0.1);
         }
 
-        /* Main Container */
+        /* Language Toggle */
+        .language-toggle {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--surface-color);
+            border-radius: 50px;
+            padding: 0.3rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-family: var(--font-primary);
+        }
+
+        .lang-btn.active {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .lang-btn:hover:not(.active) {
+            color: var(--accent-color);
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        /* Container */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -126,209 +164,19 @@
             font-size: 1.1rem;
         }
 
-        /* Cards */
-        .card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            margin-bottom: 2rem;
-        }
-
-        .card-header {
-            background: var(--surface-color);
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .card-header h3 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .card-header i {
-            color: var(--accent-color);
-            font-size: 1.5rem;
-        }
-
-        .card-body {
-            padding: 2rem;
-        }
-
-        /* Live Preview */
-        .preview-container {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border-radius: var(--radius);
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-lg);
-            border: 2px solid var(--border-color);
-            position: relative;
-            overflow: hidden;
-            width: 100%;
-            max-width: none;
-        }
-
-        .video-preview-wrapper {
-            position: relative;
-            width: 100%;
-            background: black;
-            border-radius: var(--radius);
-            overflow: hidden;
-        }
-
-        .video-preview-wrapper.resolution-1920x1080 {
-            aspect-ratio: 16/9;
-            max-width: 1920px;
-            max-height: 1080px;
-        }
-
-        .video-preview-wrapper.resolution-1280x720 {
-            aspect-ratio: 16/9;
-            max-width: 1280px;
-            max-height: 720px;
-        }
-
-        .video-preview-wrapper.resolution-3840x2160 {
-            aspect-ratio: 16/9;
-            max-width: 1920px; /* Scale down 4K for display */
-            max-height: 1080px;
-        }
-
-        .video-preview-wrapper.resolution-2560x1440 {
-            aspect-ratio: 16/9;
-            max-width: 1280px; /* Scale down 1440p for display */
-            max-height: 720px;
-        }
-
-        .video-preview-wrapper.resolution-1600x900 {
-            aspect-ratio: 16/9;
-            max-width: 1600px;
-            max-height: 900px;
-        }
-
-        .preview-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.2) 100%);
-            pointer-events: none;
-        }
-
-        .subtitle-display {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 1rem;
-            padding: 2rem;
-            pointer-events: none;
-        }
-
-        .subtitle-overlay {
-            background: rgba(0,0,0,0.8);
-            border-radius: 8px;
-            padding: 1rem 2rem;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .arabic-text {
-            font-family: 'Arial', sans-serif;
-            font-size: 2rem;
-            font-weight: 700;
-            color: #ffffff;
-            text-align: center;
-            direction: rtl;
-            line-height: 1.4;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-        }
-
-        .english-text {
-            font-family: 'Arial', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #ffffff;
-            text-align: center;
-            direction: ltr;
-            line-height: 1.3;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-        }
-
-        /* Audio Controls */
-        .audio-controls {
-            background: var(--surface-color);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .audio-controls audio {
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-
-        .controls-row {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        /* XML Preview */
-        .xml-preview {
-            background: var(--dark-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .xml-header {
-            background: var(--surface-color);
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: between;
-            align-items: center;
-        }
-
-        .xml-content {
-            padding: 0;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .xml-code {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            padding: 1.5rem;
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            line-height: 1.5;
-            white-space: pre;
-            margin: 0;
-            overflow-x: auto;
-        }
-
         /* Project Info */
         .project-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 2rem;
             margin-bottom: 2rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
         }
 
         .info-item {
@@ -338,22 +186,178 @@
             border: 1px solid var(--border-color);
         }
 
-        .info-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 0.25rem;
-        }
-
-        .info-value {
+        .info-item label {
+            display: block;
             font-weight: 600;
-            color: var(--text-primary);
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
         }
 
-        /* Buttons */
-        .btn {
-            padding: 0.75rem 1.5rem;
+        .info-item .value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Preview Section */
+        .preview-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .preview-wrapper {
+            background: #000;
+            border-radius: var(--radius);
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 1.5rem;
+            aspect-ratio: 16/9;
+            max-height: 400px;
+        }
+
+        .subtitle-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .arabic-subtitle {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            font-family: var(--font-primary);
+        }
+
+        .english-subtitle {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Audio Player */
+        .audio-player {
+            background: var(--surface-color);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
             border: none;
+            background: var(--gradient-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .time-display {
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-weight: 600;
+        }
+
+        .progress-bar-container {
+            flex: 1;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--gradient-primary);
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+
+        /* XML Preview */
+        .xml-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .xml-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .xml-header h3 {
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .xml-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .xml-code {
+            background: #1a1a1a;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
+            padding: 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+            color: #e5e5e5;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: var(--radius);
             font-weight: 600;
             text-decoration: none;
             display: inline-flex;
@@ -362,17 +366,24 @@
             transition: all 0.3s ease;
             cursor: pointer;
             font-size: 1rem;
+            font-family: var(--font-primary);
+            min-width: 150px;
+            justify-content: center;
+        }
+
+        .btn-large {
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
         }
 
         .btn-primary {
             background: var(--gradient-primary);
             color: white;
-            box-shadow: var(--shadow-lg);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
         }
 
         .btn-success {
@@ -382,97 +393,17 @@
 
         .btn-success:hover {
             transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, var(--warning-color), #fbbf24);
-            color: white;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
         }
 
         .btn-secondary {
             background: var(--surface-color);
-            color: var(--text-secondary);
+            color: var(--text-primary);
             border: 1px solid var(--border-color);
         }
 
         .btn-secondary:hover {
             background: var(--border-color);
-            color: var(--text-primary);
-        }
-
-        .btn-large {
-            padding: 1rem 2rem;
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-top: 2rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .container {
-                padding: 1rem;
-            }
-
-            .page-header h1 {
-                font-size: 2rem;
-            }
-
-            .project-info {
-                grid-template-columns: 1fr;
-            }
-
-            .arabic-text {
-                font-size: 1.5rem;
-            }
-
-            .english-text {
-                font-size: 1.2rem;
-            }
-
-            .control-button {
-                padding: 0.75rem 1.5rem;
-                font-size: 0.9rem;
-            }
-
-            .preview-container {
-                padding: 0.5rem;
-            }
-        }
-
-        /* RTL Support */
-        [dir="rtl"] .nav-links {
-            direction: ltr;
-        }
-
-        [dir="rtl"] .nav-container {
-            flex-direction: row-reverse;
-        }
-
-        /* Loading */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
 
         /* Notifications */
@@ -502,6 +433,81 @@
         .notification.show {
             transform: translateX(0);
         }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .loading i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Language Transition */
+        .transitioning {
+            transition: all 0.5s ease-in-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                min-width: 200px;
+            }
+
+            .player-controls {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .xml-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .xml-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+
+        /* RTL Support */
+        [dir="rtl"] .nav-links {
+            direction: ltr;
+        }
+
+        [dir="rtl"] .nav-container {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .xml-header {
+            direction: rtl;
+        }
     </style>
 </head>
 <body>
@@ -509,260 +515,399 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <i class="fas fa-film"></i> محول صوت FCP
+                <i class="fas fa-play-circle"></i> <span id="logo-text">معاينة المشروع FCP</span>
             </div>
             <ul class="nav-links">
-                <li><a href="index.html">الرئيسية</a></li>
-                <li><a href="converter.html">المحول</a></li>
-                <li><a href="preview.html" class="active">المعاينة</a></li>
-                <li><a href="settings.html">الإعدادات</a></li>
-                <li><a href="video-library.html">مكتبة الفيديو</a></li>
+                <li><a href="index.html" id="nav-home">الرئيسية</a></li>
+                <li><a href="converter.html" id="nav-converter">المحول</a></li>
+                <li><a href="preview.html" class="active" id="nav-preview">المعاينة</a></li>
+                <li><a href="settings.html" id="nav-settings">الإعدادات</a></li>
+                <li><a href="video-library.html" id="nav-library">مكتبة الفيديو</a></li>
             </ul>
+            <div class="language-toggle">
+                <button class="lang-btn active" onclick="switchLanguage('ar')" id="btn-arabic">العربية</button>
+                <button class="lang-btn" onclick="switchLanguage('en')" id="btn-english">English</button>
+            </div>
         </div>
     </nav>
 
     <!-- Main Container -->
     <div class="container">
         <div class="page-header">
-            <h1>المعاينة والتصدير</h1>
-            <p>راجع مشروعك وحمل ملف XML لبرنامج Final Cut Pro</p>
+            <h1 id="main-title">معاينة المشروع وتصديره</h1>
+            <p id="main-subtitle">راجع مشروعك وصدّر ملف Final Cut Pro XML</p>
         </div>
 
-        <!-- Project Info -->
-        <div class="project-info" id="projectInfo">
-            <!-- Will be populated by JavaScript -->
+        <!-- Loading State -->
+        <div class="loading" id="loadingState">
+            <i class="fas fa-spinner"></i>
+            <h3 id="loading-title">جاري تحميل بيانات المشروع...</h3>
         </div>
 
-        <!-- Live Preview -->
-        <div class="card">
-            <div class="card-header">
-                <i class="fas fa-eye"></i>
-                <h3>Live Preview</h3>
+        <!-- Project Content -->
+        <div id="projectContent" style="display: none;">
+            <!-- Project Info -->
+            <div class="project-info">
+                <h3 id="project-info-title" style="margin-bottom: 1.5rem; color: var(--text-primary);">معلومات المشروع</h3>
+                <div class="info-grid" id="infoGrid">
+                    <!-- Project info will be populated here -->
+                </div>
             </div>
-            <div class="card-body">
-                <div class="audio-controls" id="audioControls" style="display: none;">
-                    <audio controls id="audioPlayer">
-                        Your browser does not support the audio element.
-                    </audio>
-                    <div class="controls-row">
-                        <button class="btn btn-primary" onclick="previewSubtitle()">
-                            <i class="fas fa-play"></i> Preview Subtitle
-                        </button>
-                        <button class="btn btn-secondary" onclick="setCurrentTime()">
-                            <i class="fas fa-crosshairs"></i> Set Current Time
-                        </button>
-                        <button class="btn btn-secondary" onclick="toggleBeatSync()">
-                            <i class="fas fa-heartbeat"></i> <span id="beatSyncText">Enable Beat Sync</span>
-                        </button>
+
+            <!-- Preview Section -->
+            <div class="preview-section">
+                <h3 id="preview-title" style="margin-bottom: 1.5rem; color: var(--text-primary);">معاينة الترجمة</h3>
+                <div class="preview-wrapper" id="previewWrapper">
+                    <div class="subtitle-overlay">
+                        <div class="arabic-subtitle" id="arabicPreview">النص العربي سيظهر هنا</div>
+                        <div class="english-subtitle" id="englishPreview">English text will appear here</div>
                     </div>
-                    <div class="resolution-info" id="resolutionInfo"></div>
                 </div>
 
-                <div class="preview-container">
-                    <div class="video-preview-wrapper" id="videoPreviewWrapper">
-                        <div class="subtitle-display">
-                            <div class="subtitle-overlay" id="subtitleOverlay" style="display: none;">
-                                <div class="arabic-text" id="arabicDisplay">Arabic text will appear here</div>
-                                <div class="english-text" id="englishDisplay">English text will appear here</div>
-                            </div>
+                <!-- Audio Player -->
+                <div class="audio-player">
+                    <div class="player-controls">
+                        <button class="play-btn" id="playBtn" onclick="toggleAudio()">
+                            <i class="fas fa-play" id="playIcon"></i>
+                        </button>
+                        <div class="time-display">
+                            <span id="currentTime">00:00</span> / <span id="totalTime">00:00</span>
+                        </div>
+                        <div class="progress-bar-container" onclick="seekAudio(event)">
+                            <div class="progress-bar" id="progressBar"></div>
                         </div>
                     </div>
+                    <audio id="audioPlayer" style="display: none;"></audio>
                 </div>
             </div>
-        </div>
 
-        <!-- XML Preview -->
-        <div class="card">
-            <div class="card-header">
-                <i class="fas fa-code"></i>
-                <h3>Generated XML Code</h3>
-            </div>
-            <div class="card-body">
-                <div class="xml-preview">
-                    <div class="xml-header">
-                        <span>Final Cut Pro XML</span>
-                        <button class="btn btn-secondary" onclick="copyXML()">
-                            <i class="fas fa-copy"></i> Copy
+            <!-- XML Preview -->
+            <div class="xml-section">
+                <div class="xml-header">
+                    <h3 id="xml-title">كود XML المُولد</h3>
+                    <div class="xml-actions">
+                        <button class="btn btn-secondary" onclick="copyXML()" id="copyBtn">
+                            <i class="fas fa-copy"></i> <span id="copy-text">نسخ</span>
                         </button>
                     </div>
-                    <div class="xml-content">
-                        <pre class="xml-code" id="xmlCode">Loading XML...</pre>
-                    </div>
+                </div>
+                <div class="xml-code" id="xmlCode">
+                    <!-- XML code will be populated here -->
                 </div>
             </div>
-        </div>
 
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-            <a href="converter.html" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Converter
-            </a>
-            <button class="btn btn-warning" onclick="editProject()">
-                <i class="fas fa-edit"></i> Edit Project
-            </button>
-            <button class="btn btn-success btn-large" onclick="downloadXML()" id="downloadBtn">
-                <i class="fas fa-download"></i> Download XML
-            </button>
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-secondary btn-large" onclick="editProject()" id="editBtn">
+                    <i class="fas fa-edit"></i> <span id="edit-text">تعديل المشروع</span>
+                </button>
+                <button class="btn btn-success btn-large" onclick="downloadXML()" id="downloadBtn">
+                    <i class="fas fa-download"></i> <span id="download-text">تحميل XML</span>
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
+        // Language system
+        const translations = {
+            ar: {
+                title: 'معاينة المشروع وتصديره - FCP Audio to XML',
+                logoText: 'معاينة المشروع FCP',
+                navHome: 'الرئيسية',
+                navConverter: 'المحول',
+                navPreview: 'المعاينة',
+                navSettings: 'الإعدادات',
+                navLibrary: 'مكتبة الفيديو',
+                mainTitle: 'معاينة المشروع وتصديره',
+                mainSubtitle: 'راجع مشروعك وصدّر ملف Final Cut Pro XML',
+                loadingTitle: 'جاري تحميل بيانات المشروع...',
+                projectInfoTitle: 'معلومات المشروع',
+                previewTitle: 'معاينة الترجمة',
+                xmlTitle: 'كود XML المُولد',
+                copyText: 'نسخ',
+                editText: 'تعديل المشروع',
+                downloadText: 'تحميل XML',
+                audioFile: 'الملف الصوتي:',
+                arabicText: 'النص العربي:',
+                englishText: 'النص الإنجليزي:',
+                startTime: 'وقت البداية:',
+                duration: 'المدة:',
+                displayMode: 'نمط العرض:',
+                resolution: 'الدقة:',
+                frameRate: 'معدل الإطارات:',
+                both: 'العربية والإنجليزية معاً',
+                arabic: 'العربية فقط',
+                english: 'الإنجليزية فقط',
+                sequence: 'متتالي',
+                noProjectData: 'لا توجد بيانات مشروع. سيتم توجيهك للمحول...',
+                invalidProjectData: 'بيانات مشروع غير صالحة. سيتم توجيهك للمحول...',
+                xmlCopied: 'تم نسخ كود XML!',
+                xmlCopyFailed: 'فشل في نسخ كود XML',
+                xmlDownloaded: 'تم تحميل ملف XML بنجاح!',
+                noXmlToDownload: 'لا يوجد XML للتحميل',
+                editingProject: 'العودة للمحول للتعديل...'
+            },
+            en: {
+                title: 'Project Preview & Export - FCP Audio to XML',
+                logoText: 'FCP Project Preview',
+                navHome: 'Home',
+                navConverter: 'Converter',
+                navPreview: 'Preview',
+                navSettings: 'Settings',
+                navLibrary: 'Video Library',
+                mainTitle: 'Project Preview & Export',
+                mainSubtitle: 'Review your project and export Final Cut Pro XML file',
+                loadingTitle: 'Loading project data...',
+                projectInfoTitle: 'Project Information',
+                previewTitle: 'Subtitle Preview',
+                xmlTitle: 'Generated XML Code',
+                copyText: 'Copy',
+                editText: 'Edit Project',
+                downloadText: 'Download XML',
+                audioFile: 'Audio File:',
+                arabicText: 'Arabic Text:',
+                englishText: 'English Text:',
+                startTime: 'Start Time:',
+                duration: 'Duration:',
+                displayMode: 'Display Mode:',
+                resolution: 'Resolution:',
+                frameRate: 'Frame Rate:',
+                both: 'Arabic and English Together',
+                arabic: 'Arabic Only',
+                english: 'English Only',
+                sequence: 'Sequential',
+                noProjectData: 'No project data found. Redirecting to converter...',
+                invalidProjectData: 'Invalid project data. Redirecting to converter...',
+                xmlCopied: 'XML code copied to clipboard!',
+                xmlCopyFailed: 'Failed to copy XML code',
+                xmlDownloaded: 'XML file downloaded successfully!',
+                noXmlToDownload: 'No XML to download',
+                editingProject: 'Returning to converter for editing...'
+            }
+        };
+
+        let currentLanguage = 'ar';
         let projectData = null;
         let generatedXML = '';
+        let audioPlayer = null;
 
-        // Initialize page
-        window.addEventListener('load', () => {
-            loadProjectData();
-        });
+        // Language switching function
+        function switchLanguage(lang) {
+            if (lang === currentLanguage) return;
+            
+            currentLanguage = lang;
+            const htmlRoot = document.getElementById('html-root');
+            const t = translations[lang];
+            
+            // Add transition effect
+            document.body.classList.add('transitioning');
+            
+            // Update HTML attributes
+            htmlRoot.lang = lang;
+            htmlRoot.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            
+            // Update document title
+            document.title = t.title;
+            
+            // Update all text content
+            updateAllTexts(t);
+            
+            // Update language toggle buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(lang === 'ar' ? 'btn-arabic' : 'btn-english').classList.add('active');
+            
+            // Save language preference
+            localStorage.setItem('preferredLanguage', lang);
+            
+            // Remove transition effect
+            setTimeout(() => {
+                document.body.classList.remove('transitioning');
+            }, 500);
+        }
 
-        let beatSyncEnabled = false;
-        let currentBeatIndex = 0;
+        function updateAllTexts(t) {
+            document.getElementById('logo-text').textContent = t.logoText;
+            document.getElementById('nav-home').textContent = t.navHome;
+            document.getElementById('nav-converter').textContent = t.navConverter;
+            document.getElementById('nav-preview').textContent = t.navPreview;
+            document.getElementById('nav-settings').textContent = t.navSettings;
+            document.getElementById('nav-library').textContent = t.navLibrary;
+            document.getElementById('main-title').textContent = t.mainTitle;
+            document.getElementById('main-subtitle').textContent = t.mainSubtitle;
+            document.getElementById('loading-title').textContent = t.loadingTitle;
+            
+            if (projectData) {
+                document.getElementById('project-info-title').textContent = t.projectInfoTitle;
+                document.getElementById('preview-title').textContent = t.previewTitle;
+                document.getElementById('xml-title').textContent = t.xmlTitle;
+                document.getElementById('copy-text').textContent = t.copyText;
+                document.getElementById('edit-text').textContent = t.editText;
+                document.getElementById('download-text').textContent = t.downloadText;
+                
+                displayProjectInfo();
+            }
+        }
 
         function loadProjectData() {
             const savedData = localStorage.getItem('fcpProjectData');
             if (!savedData) {
-                showNotification('No project data found. Redirecting to converter...', 'error');
+                showNotification('noProjectData', 'error');
                 setTimeout(() => {
                     window.location.href = 'converter.html';
-                }, 2000);
+                }, 3000);
                 return;
             }
 
             try {
                 projectData = JSON.parse(savedData);
-                setupResolution();
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('projectContent').style.display = 'block';
+                
                 displayProjectInfo();
+                setupPreview();
                 setupAudioPlayer();
-                updatePreview();
                 generateXML();
             } catch (e) {
-                showNotification('Invalid project data. Redirecting to converter...', 'error');
+                showNotification('invalidProjectData', 'error');
                 setTimeout(() => {
                     window.location.href = 'converter.html';
-                }, 2000);
+                }, 3000);
             }
-        }
-
-        function setupResolution() {
-            const wrapper = document.getElementById('videoPreviewWrapper');
-            const resolution = projectData.previewResolution || '1920x1080';
-            
-            // Remove existing resolution classes
-            wrapper.className = 'video-preview-wrapper';
-            wrapper.classList.add(`resolution-${resolution}`);
-            
-            // Display resolution info
-            const resolutionInfo = document.getElementById('resolutionInfo');
-            const [width, height] = resolution.split('x');
-            resolutionInfo.innerHTML = `
-                <div style="margin-top: 1rem; padding: 0.75rem; background: var(--surface-color); border-radius: 6px; font-size: 0.9rem; color: var(--text-secondary);">
-                    <i class="fas fa-tv"></i> Preview Resolution: ${width} × ${height}px
-                    ${projectData.beatTimestamps ? `• <i class="fas fa-heartbeat"></i> ${projectData.beatTimestamps.length} beats detected` : ''}
-                    ${projectData.voiceSegments ? `• <i class="fas fa-microphone"></i> ${projectData.voiceSegments.length} voice segments` : ''}
-                </div>
-            `;
         }
 
         function displayProjectInfo() {
-            const infoContainer = document.getElementById('projectInfo');
-            infoContainer.innerHTML = `
+            const t = translations[currentLanguage];
+            const infoGrid = document.getElementById('infoGrid');
+            
+            const displayModeText = {
+                'both': t.both,
+                'arabic': t.arabic,
+                'english': t.english,
+                'sequence': t.sequence
+            };
+            
+            infoGrid.innerHTML = `
                 <div class="info-item">
-                    <div class="info-label">Audio File</div>
-                    <div class="info-value">${projectData.audioFileName || 'Unknown'}</div>
+                    <label>${t.audioFile}</label>
+                    <div class="value">${projectData.audioFileName || 'غير محدد'}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Start Time</div>
-                    <div class="info-value">${projectData.startTime}s</div>
+                    <label>${t.arabicText}</label>
+                    <div class="value">${projectData.arabicText || 'غير محدد'}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Duration</div>
-                    <div class="info-value">${projectData.duration}s</div>
+                    <label>${t.englishText}</label>
+                    <div class="value">${projectData.englishText || 'غير محدد'}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Preview Resolution</div>
-                    <div class="info-value">${projectData.previewResolution || '1920x1080'}</div>
+                    <label>${t.startTime}</label>
+                    <div class="value">${formatTime(projectData.startTime || 0)}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Display Mode</div>
-                    <div class="info-value">${formatDisplayMode(projectData.displayMode)}</div>
+                    <label>${t.duration}</label>
+                    <div class="value">${formatTime(projectData.duration || 0)}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Audio Sync</div>
-                    <div class="info-value">${formatAudioSync(projectData.audioSync)}</div>
+                    <label>${t.displayMode}</label>
+                    <div class="value">${displayModeText[projectData.displayMode] || projectData.displayMode}</div>
                 </div>
-                ${projectData.beatTimestamps && projectData.beatTimestamps.length > 0 ? `
                 <div class="info-item">
-                    <div class="info-label">Beat Detection</div>
-                    <div class="info-value">${projectData.beatTimestamps.length} beats found</div>
+                    <label>${t.resolution}</label>
+                    <div class="value">${projectData.previewResolution || '1920x1080'}</div>
                 </div>
-                ` : ''}
-                ${projectData.detectRepeats ? `
                 <div class="info-item">
-                    <div class="info-label">Repeat Detection</div>
-                    <div class="info-value">Enabled</div>
+                    <label>${t.frameRate}</label>
+                    <div class="value">${projectData.frameRate || 25} fps</div>
                 </div>
-                ` : ''}
             `;
         }
 
+        function setupPreview() {
+            const arabicPreview = document.getElementById('arabicPreview');
+            const englishPreview = document.getElementById('englishPreview');
+            
+            arabicPreview.textContent = projectData.arabicText || 'النص العربي';
+            englishPreview.textContent = projectData.englishText || 'English text';
+            
+            // Adjust display based on mode
+            if (projectData.displayMode === 'arabic') {
+                englishPreview.style.display = 'none';
+            } else if (projectData.displayMode === 'english') {
+                arabicPreview.style.display = 'none';
+            }
+        }
+
         function setupAudioPlayer() {
-            if (projectData.audioURL) {
-                const audioPlayer = document.getElementById('audioPlayer');
-                audioPlayer.src = projectData.audioURL;
-                document.getElementById('audioControls').style.display = 'block';
+            audioPlayer = document.getElementById('audioPlayer');
+            
+            if (projectData.audioData) {
+                audioPlayer.src = projectData.audioData;
+                audioPlayer.addEventListener('loadedmetadata', () => {
+                    document.getElementById('totalTime').textContent = formatTime(audioPlayer.duration);
+                });
+                
+                audioPlayer.addEventListener('timeupdate', updateProgress);
+                audioPlayer.addEventListener('ended', () => {
+                    document.getElementById('playIcon').className = 'fas fa-play';
+                });
             }
         }
 
-        function updatePreview() {
-            document.getElementById('arabicDisplay').textContent = projectData.arabicText || 'Arabic text will appear here';
-            document.getElementById('englishDisplay').textContent = projectData.englishText || 'English text will appear here';
+        function toggleAudio() {
+            if (!audioPlayer) return;
             
-            // Hide elements based on display mode
-            const arabicDisplay = document.getElementById('arabicDisplay');
-            const englishDisplay = document.getElementById('englishDisplay');
+            const playIcon = document.getElementById('playIcon');
             
-            switch(projectData.displayMode) {
-                case 'arabic':
-                    englishDisplay.style.display = 'none';
-                    break;
-                case 'english':
-                    arabicDisplay.style.display = 'none';
-                    break;
-                default:
-                    arabicDisplay.style.display = 'block';
-                    englishDisplay.style.display = 'block';
-            }
-        }
-
-        function previewSubtitle() {
-            const audioPlayer = document.getElementById('audioPlayer');
-            const startTime = projectData.startTime;
-            const duration = projectData.duration;
-            
-            audioPlayer.currentTime = startTime;
-            audioPlayer.play();
-            
-            setTimeout(() => {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                playIcon.className = 'fas fa-pause';
+            } else {
                 audioPlayer.pause();
-            }, duration * 1000);
-            
-            showNotification(`Previewing from ${startTime}s for ${duration}s`, 'success');
+                playIcon.className = 'fas fa-play';
+            }
         }
 
-        function setCurrentTime() {
-            const audioPlayer = document.getElementById('audioPlayer');
-            projectData.startTime = audioPlayer.currentTime;
+        function updateProgress() {
+            if (!audioPlayer) return;
             
-            // Update info display
-            displayProjectInfo();
+            const current = audioPlayer.currentTime;
+            const total = audioPlayer.duration;
+            const progress = (current / total) * 100;
             
-            showNotification(`Start time set to ${audioPlayer.currentTime.toFixed(1)}s`, 'success');
+            document.getElementById('currentTime').textContent = formatTime(current);
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function seekAudio(event) {
+            if (!audioPlayer) return;
+            
+            const container = event.currentTarget;
+            const rect = container.getBoundingClientRect();
+            const percent = (event.clientX - rect.left) / rect.width;
+            const time = percent * audioPlayer.duration;
+            
+            audioPlayer.currentTime = time;
         }
 
         function generateXML() {
-            const resolution = '1920x1080';
-            const frameRate = 25;
+            if (!projectData) return;
+            
+            const resolution = projectData.previewResolution || '1920x1080';
+            const frameRate = projectData.frameRate || 25;
             const [width, height] = resolution.split('x').map(Number);
+
+            // Get default settings for fonts and positions
+            const settings = typeof getConverterSettings !== 'undefined' ? getConverterSettings() : {};
+            const englishFont = settings.englishFont || 'Sinzano';
+            const englishFontSize = settings.englishFontSize || 25;
+            const englishColor = settings.englishColor || '#ffffff';
+            const englishPositionY = settings.englishPositionY || -420;
+            
+            const arabicFont = settings.arabicFont || 'Neo Sans Arabic';
+            const arabicFontSize = settings.arabicFontSize || 34;
+            const arabicColor = settings.arabicColor || '#ffffff';
+            const arabicPositionY = settings.arabicPositionY || -381;
 
             let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE fcpxml>
@@ -770,8 +915,8 @@
     <resources>
         <format id="r1" name="FFVideoFormat${height}p${frameRate}" frameDuration="1/${frameRate}s" width="${width}" height="${height}" colorSpace="1-1-1 (Rec. 709)"/>
         <effect id="e1" name="Basic Title" uid=".../Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"/>
-        <asset id="a1" name="${projectData.audioFileName}" uid="${generateUID()}" start="0/1s" duration="3600/1s" hasVideo="0" hasAudio="1">
-            <media-rep kind="original-media" src="file:///path/to/${projectData.audioFileName}"/>
+        <asset id="a1" name="${projectData.audioFileName || 'audio.mp3'}" uid="${generateUID()}" start="0/1s" duration="3600/1s" hasVideo="0" hasAudio="1">
+            <media-rep kind="original-media" src="file:///path/to/${projectData.audioFileName || 'audio.mp3'}"/>
         </asset>
     </resources>
     <library location="file:///Users/user/Movies/">
@@ -780,7 +925,7 @@
                 <sequence format="r1" duration="${Math.ceil((projectData.startTime + projectData.duration) * frameRate)}/${frameRate}s" tcStart="0/1s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
                     <spine>
                         <!-- Audio Track -->
-                        <audio-clip name="${projectData.audioFileName}" offset="0/1s" duration="${Math.ceil((projectData.startTime + projectData.duration) * frameRate)}/${frameRate}s" audioRole="dialogue">
+                        <audio-clip name="${projectData.audioFileName || 'audio.mp3'}" offset="0/1s" duration="${Math.ceil((projectData.startTime + projectData.duration) * frameRate)}/${frameRate}s" audioRole="dialogue">
                             <asset-clip ref="a1" offset="0/1s" duration="${Math.ceil((projectData.startTime + projectData.duration) * frameRate)}/${frameRate}s"/>
                         </audio-clip>
                         
@@ -794,28 +939,27 @@
             if (projectData.displayMode === 'both' || projectData.displayMode === 'arabic') {
                 xml += `
                             <title name="Arabic Subtitle" offset="${startFrame}/${frameRate}s" duration="${durationFrames}/${frameRate}s" ref="e1">
-                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="-0.5 -${height * 0.3}"/>
+                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${arabicPositionY}"/>
                                 <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
                                 <text>
                                     <text-style ref="ts1">${escapeXML(projectData.arabicText)}</text-style>
                                 </text>
                                 <text-style-def id="ts1">
-                                    <text-style font="Arial" fontSize="48" fontFace="Bold" fontColor="1 1 1 1" alignment="center"/>
+                                    <text-style font="${arabicFont}" fontSize="${arabicFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
                                 </text-style-def>
                             </title>`;
             }
 
             if (projectData.displayMode === 'both' || projectData.displayMode === 'english') {
-                const englishOffset = projectData.displayMode === 'both' ? height * 0.15 : height * 0.3;
                 xml += `
                             <title name="English Subtitle" offset="${startFrame}/${frameRate}s" duration="${durationFrames}/${frameRate}s" ref="e1">
-                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="-0.5 -${englishOffset}"/>
+                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${englishPositionY}"/>
                                 <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
                                 <text>
                                     <text-style ref="ts2">${escapeXML(projectData.englishText)}</text-style>
                                 </text>
                                 <text-style-def id="ts2">
-                                    <text-style font="Arial" fontSize="36" fontFace="Bold" fontColor="1 1 1 1" alignment="center"/>
+                                    <text-style font="${englishFont}" fontSize="${englishFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
                                 </text-style-def>
                             </title>`;
             }
@@ -824,16 +968,22 @@
                 const halfDuration = Math.floor(durationFrames / 2);
                 xml += `
                             <title name="Arabic Subtitle" offset="${startFrame}/${frameRate}s" duration="${halfDuration}/${frameRate}s" ref="e1">
-                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="-0.5 -${height * 0.3}"/>
+                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${arabicPositionY}"/>
                                 <text>
                                     <text-style ref="ts1">${escapeXML(projectData.arabicText)}</text-style>
                                 </text>
+                                <text-style-def id="ts1">
+                                    <text-style font="${arabicFont}" fontSize="${arabicFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
+                                </text-style-def>
                             </title>
                             <title name="English Subtitle" offset="${startFrame + halfDuration}/${frameRate}s" duration="${halfDuration}/${frameRate}s" ref="e1">
-                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="-0.5 -${height * 0.3}"/>
+                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${englishPositionY}"/>
                                 <text>
                                     <text-style ref="ts2">${escapeXML(projectData.englishText)}</text-style>
                                 </text>
+                                <text-style-def id="ts2">
+                                    <text-style font="${englishFont}" fontSize="${englishFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
+                                </text-style-def>
                             </title>`;
             }
 
@@ -850,24 +1000,22 @@
             document.getElementById('xmlCode').textContent = xml;
         }
 
-        function editProject() {
-            showNotification('Returning to converter for editing...', 'success');
-            setTimeout(() => {
-                window.location.href = 'converter.html';
-            }, 1000);
-        }
-
         function copyXML() {
+            if (!generatedXML) {
+                showNotification('noXmlToDownload', 'error');
+                return;
+            }
+
             navigator.clipboard.writeText(generatedXML).then(() => {
-                showNotification('XML code copied to clipboard!', 'success');
+                showNotification('xmlCopied', 'success');
             }).catch(() => {
-                showNotification('Failed to copy XML code', 'error');
+                showNotification('xmlCopyFailed', 'error');
             });
         }
 
         function downloadXML() {
             if (!generatedXML) {
-                showNotification('No XML to download', 'error');
+                showNotification('noXmlToDownload', 'error');
                 return;
             }
 
@@ -882,10 +1030,23 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            showNotification('XML file downloaded successfully!', 'success');
+            showNotification('xmlDownloaded', 'success');
         }
 
-        // Helper functions
+        function editProject() {
+            showNotification('editingProject', 'success');
+            setTimeout(() => {
+                window.location.href = 'converter.html';
+            }, 1000);
+        }
+
+        // Utility functions
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
         function generateUID() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
                 const r = Math.random() * 16 | 0;
@@ -902,304 +1063,46 @@
                       .replace(/'/g, '&#39;');
         }
 
-        function formatDisplayMode(mode) {
-            const modes = {
-                'both': 'Both Languages',
-                'arabic': 'Arabic Only',
-                'english': 'English Only',
-                'sequence': 'Sequential'
-            };
-            return modes[mode] || mode;
-        }
-
-        function formatAudioSync(sync) {
-            const syncs = {
-                'start': 'Sync to Start',
-                'center': 'Sync to Center',
-                'end': 'Sync to End',
-                'custom': 'Custom Offset'
-            };
-            return syncs[sync] || sync;
-        }
-
-        // Notifications
-        function showNotification(message, type = 'success') {
+        function showNotification(messageKey, type = 'success') {
+            const message = translations[currentLanguage][messageKey] || messageKey;
             const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
+            notification.className = `notification ${type} show`;
             notification.textContent = message;
             
             document.body.appendChild(notification);
             
             setTimeout(() => {
-                notification.classList.add('show');
-            }, 100);
-            
-            setTimeout(() => {
                 notification.classList.remove('show');
-                setTimeout(() => {
-                    if (document.body.contains(notification)) {
-                        document.body.removeChild(notification);
-                    }
-                }, 300);
+                setTimeout(() => notification.remove(), 300);
             }, 3000);
         }
 
-        // Enhanced Preview Functions with Beat Sync
-        function toggleBeatSync() {
-            beatSyncEnabled = !beatSyncEnabled;
-            const button = document.getElementById('beatSyncText');
-            
-            if (beatSyncEnabled) {
-                button.textContent = 'Disable Beat Sync';
-                showNotification('Beat sync enabled - subtitles will follow audio beats', 'success');
-            } else {
-                button.textContent = 'Enable Beat Sync';
-                showNotification('Beat sync disabled - using regular timing', 'warning');
-            }
-        }
-
-        // Override the original previewSubtitle function
-        function previewSubtitle() {
-            const arabicDisplay = document.getElementById('arabicDisplay');
-            const englishDisplay = document.getElementById('englishDisplay');
-            const subtitleOverlay = document.getElementById('subtitleOverlay');
-            const audio = document.getElementById('audioPlayer');
-            
-            // Show subtitle overlay
-            subtitleOverlay.style.display = 'block';
-            
-            if (beatSyncEnabled && projectData.beatTimestamps && projectData.beatTimestamps.length > 0) {
-                // Use beat-synced timing
-                previewWithBeatSync();
-            } else {
-                // Use regular timing
-                previewWithRegularTiming();
-            }
-        }
-
-        function previewWithBeatSync() {
-            const audio = document.getElementById('audioPlayer');
-            
-            if (currentBeatIndex >= projectData.beatTimestamps.length) {
-                currentBeatIndex = 0;
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved language preference
+            const savedLanguage = localStorage.getItem('preferredLanguage') || 'ar';
+            if (savedLanguage !== 'ar') {
+                switchLanguage(savedLanguage);
             }
             
-            const beatTime = projectData.beatTimestamps[currentBeatIndex];
-            const nextBeatTime = currentBeatIndex + 1 < projectData.beatTimestamps.length ? 
-                projectData.beatTimestamps[currentBeatIndex + 1] : beatTime + projectData.duration;
+            // Load project data
+            setTimeout(loadProjectData, 500);
             
-            // Seek to beat time
-            audio.currentTime = beatTime;
-            audio.play();
-            
-            // Show subtitles based on display mode
-            showSubtitlesAtBeat(beatTime, nextBeatTime - beatTime);
-            
-            currentBeatIndex++;
-            
-            showNotification(`Synced to beat ${currentBeatIndex} at ${beatTime.toFixed(2)}s`, 'success');
-        }
-
-        function previewWithRegularTiming() {
-            const audio = document.getElementById('audioPlayer');
-            
-            // Seek to start time
-            audio.currentTime = projectData.startTime;
-            audio.play();
-            
-            // Show subtitles based on display mode
-            showSubtitlesAtTime(projectData.startTime, projectData.duration);
-            
-            // Auto-pause after duration
-            setTimeout(() => {
-                audio.pause();
-            }, projectData.duration * 1000);
-        }
-
-        function showSubtitlesAtBeat(startTime, duration) {
-            const arabicDisplay = document.getElementById('arabicDisplay');
-            const englishDisplay = document.getElementById('englishDisplay');
-            
-            // Apply fade and animation settings
-            applySubtitleAnimations(arabicDisplay, englishDisplay, duration);
-            
-            switch (projectData.displayMode) {
-                case 'both':
-                    arabicDisplay.textContent = projectData.arabicText;
-                    englishDisplay.textContent = projectData.englishText;
-                    arabicDisplay.style.display = 'block';
-                    englishDisplay.style.display = 'block';
-                    break;
-                case 'arabic':
-                    arabicDisplay.textContent = projectData.arabicText;
-                    englishDisplay.textContent = '';
-                    arabicDisplay.style.display = 'block';
-                    englishDisplay.style.display = 'none';
-                    break;
-                case 'english':
-                    englishDisplay.textContent = projectData.englishText;
-                    arabicDisplay.textContent = '';
-                    englishDisplay.style.display = 'block';
-                    arabicDisplay.style.display = 'none';
-                    break;
-                case 'sequence':
-                    const halfDuration = duration / 2;
-                    // Show Arabic first
-                    arabicDisplay.textContent = projectData.arabicText;
-                    englishDisplay.textContent = '';
-                    arabicDisplay.style.display = 'block';
-                    englishDisplay.style.display = 'none';
-                    
-                    // Switch to English after half duration
-                    setTimeout(() => {
-                        arabicDisplay.textContent = '';
-                        englishDisplay.textContent = projectData.englishText;
-                        arabicDisplay.style.display = 'none';
-                        englishDisplay.style.display = 'block';
-                    }, halfDuration * 500);
-                    break;
-            }
-        }
-
-        function showSubtitlesAtTime(startTime, duration) {
-            const arabicDisplay = document.getElementById('arabicDisplay');
-            const englishDisplay = document.getElementById('englishDisplay');
-            
-            // Apply fade and animation settings
-            applySubtitleAnimations(arabicDisplay, englishDisplay, duration);
-            
-            switch (projectData.displayMode) {
-                case 'both':
-                    arabicDisplay.textContent = projectData.arabicText;
-                    englishDisplay.textContent = projectData.englishText;
-                    arabicDisplay.style.display = 'block';
-                    englishDisplay.style.display = 'block';
-                    break;
-                case 'arabic':
-                    arabicDisplay.textContent = projectData.arabicText;
-                    englishDisplay.textContent = '';
-                    arabicDisplay.style.display = 'block';
-                    englishDisplay.style.display = 'none';
-                    break;
-                case 'english':
-                    englishDisplay.textContent = projectData.englishText;
-                    arabicDisplay.textContent = '';
-                    englishDisplay.style.display = 'block';
-                    arabicDisplay.style.display = 'none';
-                    break;
-                case 'sequence':
-                    const halfDuration = duration / 2;
-                    // Show Arabic first
-                    arabicDisplay.textContent = projectData.arabicText;
-                    englishDisplay.textContent = '';
-                    arabicDisplay.style.display = 'block';
-                    englishDisplay.style.display = 'none';
-                    
-                    // Switch to English after half duration
-                    setTimeout(() => {
-                        arabicDisplay.textContent = '';
-                        englishDisplay.textContent = projectData.englishText;
-                        arabicDisplay.style.display = 'none';
-                        englishDisplay.style.display = 'block';
-                    }, halfDuration * 1000);
-                    break;
-            }
-        }
-
-        function applySubtitleAnimations(arabicEl, englishEl, duration) {
-            const fadeIn = projectData.fadeInDuration || 0.5;
-            const fadeOut = projectData.fadeOutDuration || 0.5;
-            const animStyle = projectData.animationStyle || 'fade';
-            const fadeType = projectData.fadeType || 'ease-in-out';
-            
-            // Apply animation styles
-            [arabicEl, englishEl].forEach(el => {
-                if (el && el.style.display !== 'none') {
-                    el.style.transition = `all ${fadeIn}s ${fadeType}`;
-                    
-                    // Apply animation based on style
-                    switch (animStyle) {
-                        case 'slide-up':
-                            el.style.transform = 'translateY(20px)';
-                            el.style.opacity = '0';
-                            setTimeout(() => {
-                                el.style.transform = 'translateY(0)';
-                                el.style.opacity = '1';
-                            }, 50);
-                            break;
-                        case 'slide-down':
-                            el.style.transform = 'translateY(-20px)';
-                            el.style.opacity = '0';
-                            setTimeout(() => {
-                                el.style.transform = 'translateY(0)';
-                                el.style.opacity = '1';
-                            }, 50);
-                            break;
-                        case 'zoom-in':
-                            el.style.transform = 'scale(0.8)';
-                            el.style.opacity = '0';
-                            setTimeout(() => {
-                                el.style.transform = 'scale(1)';
-                                el.style.opacity = '1';
-                            }, 50);
-                            break;
-                        case 'typewriter':
-                            const text = el.textContent;
-                            el.textContent = '';
-                            el.style.opacity = '1';
-                            let i = 0;
-                            const typeInterval = setInterval(() => {
-                                el.textContent += text[i];
-                                i++;
-                                if (i >= text.length) {
-                                    clearInterval(typeInterval);
-                                }
-                            }, (fadeIn * 1000) / text.length);
-                            break;
-                        default: // fade
-                            el.style.opacity = '0';
-                            setTimeout(() => {
-                                el.style.opacity = '1';
-                            }, 50);
-                            break;
-                    }
-                    
-                    // Apply fade out
-                    setTimeout(() => {
-                        el.style.transition = `all ${fadeOut}s ${fadeType}`;
-                        el.style.opacity = '0';
-                    }, (duration - fadeOut) * 1000);
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Ctrl/Cmd + L to switch language
+                if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
+                    e.preventDefault();
+                    switchLanguage(currentLanguage === 'ar' ? 'en' : 'ar');
+                }
+                
+                // Space to play/pause audio
+                if (e.code === 'Space' && audioPlayer) {
+                    e.preventDefault();
+                    toggleAudio();
                 }
             });
-        }
-
-        // Override setCurrentTime function
-        function setCurrentTime() {
-            const audio = document.getElementById('audioPlayer');
-            const currentTime = audio.currentTime;
-            
-            if (beatSyncEnabled && projectData.beatTimestamps && projectData.beatTimestamps.length > 0) {
-                // Find closest beat
-                let closestBeat = 0;
-                let minDistance = Math.abs(currentTime - projectData.beatTimestamps[0]);
-                
-                for (let i = 1; i < projectData.beatTimestamps.length; i++) {
-                    const distance = Math.abs(currentTime - projectData.beatTimestamps[i]);
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        closestBeat = i;
-                    }
-                }
-                
-                currentBeatIndex = closestBeat;
-                showNotification(`Set to beat ${closestBeat + 1} at ${projectData.beatTimestamps[closestBeat].toFixed(2)}s`, 'success');
-            } else {
-                // Update start time in project data
-                projectData.startTime = currentTime;
-                displayProjectInfo(); // Refresh the display
-                showNotification(`Start time set to ${currentTime.toFixed(2)}s`, 'success');
-            }
-        }
+        });
     </script>
 </body>
 </html>
