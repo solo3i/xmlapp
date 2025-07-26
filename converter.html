@@ -1234,7 +1234,7 @@
             return lines.join('\n');
         }
 
-        <!-- تم إصلاح مشاكل DTD في توليد ملف FCPXML بشكل نهائي -->
+        // Generate Final Cut Pro XML with enhanced UX
         function generateXML() {
             const arabicTextRaw = document.getElementById('arabicText').value.trim();
             const repetitiveTextRaw = document.getElementById('repetitiveText').value.trim();
@@ -1242,7 +1242,7 @@
             if (!arabicTextRaw && !repetitiveTextRaw) return showNotification('noTextContent', 'error');
 
             const settings = loadSettings();
-            settings.skipPoetryIntros = document.getElementById('skipPoetryIntros').checked;
+            settings.skipPoetryIntros = document.getElementById('skipPoetryIntros') ? document.getElementById('skipPoetryIntros').checked : false;
             const arabicText = processPoetryText(arabicTextRaw, settings);
             const repetitiveText = processPoetryText(repetitiveTextRaw, settings);
 
@@ -1276,6 +1276,17 @@
             // uid ثابت للمشروع
             const projectUID = uid;
 
+            // توليد عناصر التايتل بشكل قياسي مع ربط text-style-def
+            const addTitle = (text, styleId, posY, refName, offsetFrames, durationFrames) => {
+                return `              <title ref="e1" name="${refName}" lane="1" role="title" enabled="1" offset="${toFrameTime(offsetFrames, frameRate)}" duration="${toFrameTime(durationFrames, frameRate)}">
+                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${posY}"/>
+                <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
+                <text>
+                  <text-style ref="${styleId}">${escape(text)}</text-style>
+                </text>
+              </title>`;
+            };
+
             let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <fcpxml version="1.10">
   <resources>
@@ -1284,6 +1295,8 @@
     <asset id="a1" name="${audioName}" uid="${assetUID}" start="0s" duration="${toFrameTime(totalFrames, frameRate)}" hasVideo="0" hasAudio="1">
       <media-rep kind="original-media" src="file:///${audioName}"/>
     </asset>
+    <text-style-def id="tsd1" font="${arabicFont}" fontSize="${arabicFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
+    <text-style-def id="tsd2" font="${englishFont}" fontSize="${englishFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
   </resources>
   <library location="file:///Users/user/Movies/">
     <event name="Subtitle Project ${new Date().toLocaleDateString()}">
@@ -1293,27 +1306,19 @@
             <asset-clip name="${audioName}" ref="a1" offset="0s" duration="${toFrameTime(totalFrames, frameRate)}" tcFormat="NDF" audioRole="dialogue"/>
             <gap name="Gap" offset="${toFrameTime(0, frameRate)}" duration="${toFrameTime(totalFrames, frameRate)}">
 `;
-            // توليد عناصر التايتل بشكل قياسي
-            const addTitle = (text, font, size, posY, refName, offsetFrames, durationFrames) => {
-                return `              <title ref="e1" name="${refName}" lane="1" role="title" enabled="1" offset="${toFrameTime(offsetFrames, frameRate)}" duration="${toFrameTime(durationFrames, frameRate)}">
-                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${posY}"/>
-                <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
-                <text>
-                  <text-style font="${font}" fontSize="${size}" fontFace="Regular" fontColor="1 1 1 1" alignment="center">${escape(text)}</text-style>
-                </text>
-              </title>`;
-            };
+
             if (displayMode === 'arabic' || displayMode === 'both') {
-                xml += addTitle(arabicText, arabicFont, arabicFontSize, arabicPositionY, 'Arabic Text', startFrames, totalFrames - startFrames);
+                xml += addTitle(arabicText, 'tsd1', arabicPositionY, 'Arabic Text', startFrames, totalFrames - startFrames);
             }
             if (displayMode === 'repetitive' || displayMode === 'both') {
-                xml += addTitle(repetitiveText, englishFont, englishFontSize, englishPositionY, 'English Text', startFrames, totalFrames - startFrames);
+                xml += addTitle(repetitiveText, 'tsd2', englishPositionY, 'English Text', startFrames, totalFrames - startFrames);
             }
             if (displayMode === 'alternating') {
                 const half = Math.floor((totalFrames - startFrames) / 2);
-                xml += addTitle(arabicText, arabicFont, arabicFontSize, arabicPositionY, 'Arabic Text', startFrames, half);
-                xml += addTitle(repetitiveText, englishFont, englishFontSize, englishPositionY, 'English Text', startFrames + half, totalFrames - startFrames - half);
+                xml += addTitle(arabicText, 'tsd1', arabicPositionY, 'Arabic Text', startFrames, half);
+                xml += addTitle(repetitiveText, 'tsd2', englishPositionY, 'English Text', startFrames + half, totalFrames - startFrames - half);
             }
+
             xml += `
             </gap>
           </spine>
@@ -1322,8 +1327,22 @@
     </event>
   </library>
 </fcpxml>`;
+
             generatedXML = xml;
-            downloadXML();
+            
+            // Download XML file
+            const blob = new Blob([xml], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${audioName.replace(/\.[^/.]+$/, '') || 'project'}.fcpxml`;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+            
             document.getElementById('xmlSection').style.display = 'block';
             showNotification('xmlGenerated', 'success');
         }
@@ -1334,61 +1353,28 @@
                 showNotification('noXmlToDownload', 'error');
                 return;
             }
-
+            
             const blob = new Blob([generatedXML], { type: 'application/xml' });
             const url = URL.createObjectURL(blob);
-            
             const a = document.createElement('a');
             a.href = url;
-            a.download = `fcp_subtitle_project_${Date.now()}.fcpxml`;
+            a.download = `${audioFile ? audioFile.name.replace(/\.[^/.]+$/, '') : 'project'}.fcpxml`;
             document.body.appendChild(a);
             a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+            
             showNotification('xmlDownloaded', 'success');
         }
 
-        // Utility functions
-        function generateUID() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                const r = Math.random() * 16 | 0;
-                const v = c === 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        }
-
-        function escapeXML(text) {
-            return text.replace(/&/g, '&amp;')
-                      .replace(/</g, '&lt;')
-                      .replace(/>/g, '&gt;')
-                      .replace(/"/g, '&quot;')
-                      .replace(/'/g, '&#39;');
-        }
-
-        // Load settings from localStorage
+        // Load settings function
         function loadSettings() {
             const defaultSettings = {
-                fadeInDuration: 0.5,
-                fadeOutDuration: 0.5,
-                fadeInType: 'ease-in-out',
-                fadeOutType: 'ease-in-out',
-                animationStyle: 'fade',
-                animationSpeed: 1,
-                blurAmount: 0,
-                shadowIntensity: 50,
-                startTime: 0,
                 duration: 5,
+                startTime: 0,
                 displayMode: 'arabic',
-                previewResolution: '1920x1080',
-                audioSync: 'start',
-                autoTiming: true,
-                speechSpeed: 'normal',
-                sentenceDuration: 4,
-                detectRepeats: true,
-                voiceThreshold: 0.3,
-                autoSyncBeats: true,
-                // Translation settings
                 skipPoetryIntros: true,
                 poetryIntroPatterns: ['مستهل', 'يا حسين', 'لبيك يا حسين', 'السلام عليك', 'صلى الله عليه وآله'],
                 skipBeginningIntros: true,
@@ -1402,6 +1388,26 @@
             } catch {
                 return defaultSettings;
             }
+        }
+
+        // Generate UID function
+        function generateUID() {
+            return 'xxxx-xxxx-4xxx-yxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // Escape XML function
+        function escapeXML(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
         // Notification system
