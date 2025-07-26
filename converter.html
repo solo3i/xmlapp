@@ -1238,13 +1238,11 @@
         function generateXML() {
             const arabicTextRaw = document.getElementById('arabicText').value.trim();
             const repetitiveTextRaw = document.getElementById('repetitiveText').value.trim();
-
             if (!audioFile) return showNotification('noAudioFile', 'error');
             if (!arabicTextRaw && !repetitiveTextRaw) return showNotification('noTextContent', 'error');
 
             const settings = loadSettings();
             settings.skipPoetryIntros = document.getElementById('skipPoetryIntros').checked;
-
             const arabicText = processPoetryText(arabicTextRaw, settings);
             const repetitiveText = processPoetryText(repetitiveTextRaw, settings);
 
@@ -1255,47 +1253,44 @@
             const englishFont = globalSettings.englishFont || 'Helvetica';
             const englishFontSize = globalSettings.englishFontSize || 25;
             const englishPositionY = globalSettings.englishPositionY || -420;
-
             const resolution = globalSettings.previewResolution || '1920x1080';
             const frameRate = 25;
             const [width, height] = resolution.split('x').map(Number);
-
             const duration = settings.duration || 5;
             const startTime = settings.startTime || 0;
             const totalFrames = Math.ceil(duration * frameRate);
             const startFrames = Math.floor(startTime * frameRate);
-
             const displayMode = settings.displayMode || 'arabic';
             const uid = generateUID();
             const date = new Date().toISOString();
-
             const escape = escapeXML;
             const audioName = escape(audioFile.name);
 
+            // تحويل القيم الزمنية إلى صيغة الفريمات/معدل الفريم (frames/frameRate)s
+            function toFrameTime(frames, frameRate) {
+                return `${frames}/${frameRate}s`;
+            }
+
             let xml = `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE fcpxml>
 <fcpxml version="1.10">
   <resources>
     <format id="r1" name="FFVideoFormat${height}p${frameRate}" frameDuration="1/${frameRate}s" width="${width}" height="${height}" colorSpace="1-1-1 (Rec. 709)"/>
-    <effect id="e1" name="Basic Title" uid=".../Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"/>
-    <asset id="a1" name="${audioName}" uid="${generateUID()}" start="0s" duration="${totalFrames}/${frameRate}s" hasVideo="0" hasAudio="1">
+    <effect id="e1" name="Basic Title" uid="/Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"/>
+    <asset id="a1" name="${audioName}" uid="${generateUID()}" start="0s" duration="${toFrameTime(totalFrames, frameRate)}" hasVideo="0" hasAudio="1">
       <media-rep kind="original-media" src="file:///${audioName}"/>
     </asset>
   </resources>
   <library location="file:///Users/user/Movies/">
     <event name="Subtitle Project ${new Date().toLocaleDateString()}">
       <project name="Arabic English Subtitles" uid="${uid}" modDate="${date}">
-        <sequence format="r1" duration="${totalFrames}/${frameRate}s" tcStart="0s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
+        <sequence format="r1" duration="${toFrameTime(totalFrames, frameRate)}" tcStart="0s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
           <spine>
-            <asset-clip name="${audioName}" ref="a1" offset="0s" duration="${totalFrames}/${frameRate}s" tcFormat="NDF" audioRole="dialogue"/>
-            <gap name="Gap" offset="0s" duration="${totalFrames}/${frameRate}s">
+            <asset-clip name="${audioName}" ref="a1" offset="0s" duration="${toFrameTime(totalFrames, frameRate)}" tcFormat="NDF" audioRole="dialogue"/>
+            <gap name="Gap" offset="0s" duration="${toFrameTime(totalFrames, frameRate)}">
 `;
-            // إضافة السمات lane و role و enabled وتحويل القيم الزمنية إلى ثواني صحيحة
-            function toSeconds(frames, frameRate) {
-                return (frames / frameRate).toFixed(3).replace(/\.000$/, '') + 's';
-            }
+            // توليد عناصر التايتل بشكل قياسي
             const addTitle = (text, font, size, posY, refName, offsetFrames, durationFrames) => {
-                return `              <title ref="e1" name="${refName}" lane="1" role="title" enabled="1" offset="${toSeconds(offsetFrames, frameRate)}" duration="${toSeconds(durationFrames, frameRate)}">
+                return `              <title ref="e1" name="${refName}" lane="1" role="title" enabled="1" offset="${toFrameTime(offsetFrames, frameRate)}" duration="${toFrameTime(durationFrames, frameRate)}">
                 <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${posY}"/>
                 <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
                 <text>
@@ -1303,7 +1298,6 @@
                 </text>
               </title>`;
             };
-
             if (displayMode === 'arabic' || displayMode === 'both') {
                 xml += addTitle(arabicText, arabicFont, arabicFontSize, arabicPositionY, 'Arabic Text', startFrames, totalFrames - startFrames);
             }
@@ -1315,7 +1309,6 @@
                 xml += addTitle(arabicText, arabicFont, arabicFontSize, arabicPositionY, 'Arabic Text', startFrames, half);
                 xml += addTitle(repetitiveText, englishFont, englishFontSize, englishPositionY, 'English Text', startFrames + half, totalFrames - startFrames - half);
             }
-
             xml += `
             </gap>
           </spine>
@@ -1324,7 +1317,6 @@
     </event>
   </library>
 </fcpxml>`;
-
             generatedXML = xml;
             downloadXML();
             document.getElementById('xmlSection').style.display = 'block';
