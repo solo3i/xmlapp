@@ -769,20 +769,71 @@
         <!-- XML Output Section -->
         <div class="card animate-slide-in" style="animation-delay: 0.3s; display: none;" id="xmlSection">
             <div class="card-header">
-                <i class="fas fa-code"></i>
-                <h3 id="xml-title">كود XML المُولد</h3>
+                <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
+                <h3 id="xml-title">تم إنشاء ملف XML بنجاح!</h3>
             </div>
             <div class="card-body">
-                <div class="xml-actions" style="margin-bottom: 1rem; text-align: center;">
-                    <button class="btn btn-secondary" onclick="copyXML()" id="copyBtn">
-                        <i class="fas fa-copy"></i> <span id="copy-btn-text">نسخ</span>
-                    </button>
-                    <button class="btn btn-primary" onclick="downloadXML()" id="downloadBtn">
-                        <i class="fas fa-download"></i> <span id="download-btn-text">تحميل XML</span>
+                <div class="success-message" style="text-align: center; margin-bottom: 2rem;">
+                    <div style="font-size: 4rem; color: var(--success-color); margin-bottom: 1rem;">
+                        <i class="fas fa-file-download"></i>
+                    </div>
+                    <h4 style="margin-bottom: 0.5rem; color: var(--text-primary);" id="success-title">ملف Final Cut Pro جاهز للتحميل</h4>
+                    <p style="color: var(--text-secondary);" id="success-description">سيتم تحميل الملف تلقائياً، أو يمكنك الضغط على زر التحميل أدناه</p>
+                </div>
+                
+                <div class="download-actions" style="text-align: center; margin-bottom: 2rem;">
+                    <button class="btn btn-success btn-large" onclick="downloadXML()" id="downloadBtn">
+                        <i class="fas fa-download"></i> <span id="download-btn-text">تحميل ملف XML</span>
                     </button>
                 </div>
-                <div class="xml-code" id="xmlCode" style="background: var(--surface-color); padding: 1rem; border-radius: 8px; font-family: var(--font-mono); font-size: 0.85rem; white-space: pre-wrap; max-height: 400px; overflow-y: auto; border: 1px solid var(--border-color);">
-                    <!-- XML code will be populated here -->
+
+                <!-- Instructions Section -->
+                <div class="instructions-container" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(6, 182, 212, 0.1)); border-radius: 12px; padding: 2rem; border: 1px solid var(--border-color);">
+                    <h4 style="margin-bottom: 1.5rem; color: var(--text-primary); text-align: center;" id="instructions-title">
+                        <i class="fas fa-play-circle" style="color: var(--accent-color); margin-left: 0.5rem;"></i>
+                        إرشادات التشغيل في Final Cut Pro
+                    </h4>
+                    
+                    <div class="instruction-steps" style="display: grid; gap: 1.5rem;">
+                        <div class="step" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px; border-right: 4px solid var(--accent-color);">
+                            <div style="background: var(--accent-color); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">1</div>
+                            <div>
+                                <h5 style="margin-bottom: 0.5rem; color: var(--text-primary);" id="step1-title">تحضير الملفات</h5>
+                                <p style="color: var(--text-secondary); margin: 0;" id="step1-desc">ضع الملف الصوتي المرفوع في مجلد مع ملف XML الذي تم تحميله</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px; border-right: 4px solid var(--accent-color);">
+                            <div style="background: var(--accent-color); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">2</div>
+                            <div>
+                                <h5 style="margin-bottom: 0.5rem; color: var(--text-primary);" id="step2-title">فتح Final Cut Pro</h5>
+                                <p style="color: var(--text-secondary); margin: 0;" id="step2-desc">افتح برنامج Final Cut Pro على جهاز Mac</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px; border-right: 4px solid var(--accent-color);">
+                            <div style="background: var(--accent-color); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">3</div>
+                            <div>
+                                <h5 style="margin-bottom: 0.5rem; color: var(--text-primary);" id="step3-title">استيراد المشروع</h5>
+                                <p style="color: var(--text-secondary); margin: 0;" id="step3-desc">اسحب ملف XML إلى نافذة Final Cut Pro أو استخدم File > Import > XML</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px; border-right: 4px solid var(--accent-color);">
+                            <div style="background: var(--success-color); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">4</div>
+                            <div>
+                                <h5 style="margin-bottom: 0.5rem; color: var(--text-primary);" id="step4-title">التشغيل والتعديل</h5>
+                                <p style="color: var(--text-secondary); margin: 0;" id="step4-desc">ستجد المشروع في مكتبة FCP مع الصوت والترجمة جاهزين للتشغيل والتعديل</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                        <p style="margin: 0; color: var(--text-secondary); text-align: center; font-size: 0.9rem;" id="note-text">
+                            <i class="fas fa-lightbulb" style="color: var(--warning-color); margin-left: 0.5rem;"></i>
+                            نصيحة: يمكنك تعديل النصوص والخطوط والمواضع مباشرة في Final Cut Pro بعد الاستيراد
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -837,9 +888,20 @@
                 generateBtnText: 'توليد ملف XML',
                 settingsLinkText: 'يمكنك تخصيص الإعدادات المتقدمة من صفحة',
                 settingsLink: 'الإعدادات',
-                xmlTitle: 'كود XML المُولد',
-                copyBtnText: 'نسخ',
-                downloadBtnText: 'تحميل XML',
+                xmlTitle: 'تم إنشاء ملف XML بنجاح!',
+                successTitle: 'ملف Final Cut Pro جاهز للتحميل',
+                successDescription: 'سيتم تحميل الملف تلقائياً، أو يمكنك الضغط على زر التحميل أدناه',
+                downloadBtnText: 'تحميل ملف XML',
+                instructionsTitle: 'إرشادات التشغيل في Final Cut Pro',
+                step1Title: 'تحضير الملفات',
+                step1Desc: 'ضع الملف الصوتي المرفوع في مجلد مع ملف XML الذي تم تحميله',
+                step2Title: 'فتح Final Cut Pro',
+                step2Desc: 'افتح برنامج Final Cut Pro على جهاز Mac',
+                step3Title: 'استيراد المشروع',
+                step3Desc: 'اسحب ملف XML إلى نافذة Final Cut Pro أو استخدم File > Import > XML',
+                step4Title: 'التشغيل والتعديل',
+                step4Desc: 'ستجد المشروع في مكتبة FCP مع الصوت والترجمة جاهزين للتشغيل والتعديل',
+                noteText: 'نصيحة: يمكنك تعديل النصوص والخطوط والمواضع مباشرة في Final Cut Pro بعد الاستيراد',
                 // Notifications
                 fileUploadSuccess: 'تم تحميل الملف الصوتي بنجاح!',
                 invalidFileType: 'يرجى اختيار ملف صوتي أو فيديو',
@@ -888,9 +950,20 @@
                 generateBtnText: 'Generate XML File',
                 settingsLinkText: 'You can customize advanced settings from the',
                 settingsLink: 'Settings',
-                xmlTitle: 'Generated XML Code',
-                copyBtnText: 'Copy',
-                downloadBtnText: 'Download XML',
+                xmlTitle: 'XML File Created Successfully!',
+                successTitle: 'Final Cut Pro File Ready for Download',
+                successDescription: 'The file will download automatically, or you can click the download button below',
+                downloadBtnText: 'Download XML File',
+                instructionsTitle: 'Instructions for Final Cut Pro',
+                step1Title: 'Prepare Files',
+                step1Desc: 'Place the uploaded audio file in a folder with the downloaded XML file',
+                step2Title: 'Open Final Cut Pro',
+                step2Desc: 'Open Final Cut Pro application on your Mac',
+                step3Title: 'Import Project',
+                step3Desc: 'Drag XML file to Final Cut Pro window or use File > Import > XML',
+                step4Title: 'Play and Edit',
+                step4Desc: 'You will find the project in FCP library with audio and subtitles ready to play and edit',
+                noteText: 'Tip: You can edit texts, fonts, and positions directly in Final Cut Pro after import',
                 // Notifications
                 fileUploadSuccess: 'Audio file uploaded successfully!',
                 invalidFileType: 'Please select an audio or video file',
@@ -961,12 +1034,34 @@
             
             // Update XML section texts if visible
             const xmlTitleElement = document.getElementById('xml-title');
-            const copyBtnElement = document.getElementById('copy-btn-text');
             const downloadBtnElement = document.getElementById('download-btn-text');
+            const successTitleElement = document.getElementById('success-title');
+            const successDescElement = document.getElementById('success-description');
+            const instructionsTitleElement = document.getElementById('instructions-title');
+            const step1TitleElement = document.getElementById('step1-title');
+            const step1DescElement = document.getElementById('step1-desc');
+            const step2TitleElement = document.getElementById('step2-title');
+            const step2DescElement = document.getElementById('step2-desc');
+            const step3TitleElement = document.getElementById('step3-title');
+            const step3DescElement = document.getElementById('step3-desc');
+            const step4TitleElement = document.getElementById('step4-title');
+            const step4DescElement = document.getElementById('step4-desc');
+            const noteTextElement = document.getElementById('note-text');
             
             if (xmlTitleElement) xmlTitleElement.textContent = t.xmlTitle;
-            if (copyBtnElement) copyBtnElement.textContent = t.copyBtnText;
             if (downloadBtnElement) downloadBtnElement.textContent = t.downloadBtnText;
+            if (successTitleElement) successTitleElement.textContent = t.successTitle;
+            if (successDescElement) successDescElement.textContent = t.successDescription;
+            if (instructionsTitleElement) instructionsTitleElement.innerHTML = '<i class="fas fa-play-circle" style="color: var(--accent-color); margin-left: 0.5rem;"></i>' + t.instructionsTitle;
+            if (step1TitleElement) step1TitleElement.textContent = t.step1Title;
+            if (step1DescElement) step1DescElement.textContent = t.step1Desc;
+            if (step2TitleElement) step2TitleElement.textContent = t.step2Title;
+            if (step2DescElement) step2DescElement.textContent = t.step2Desc;
+            if (step3TitleElement) step3TitleElement.textContent = t.step3Title;
+            if (step3DescElement) step3DescElement.textContent = t.step3Desc;
+            if (step4TitleElement) step4TitleElement.textContent = t.step4Title;
+            if (step4DescElement) step4DescElement.textContent = t.step4Desc;
+            if (noteTextElement) noteTextElement.innerHTML = '<i class="fas fa-lightbulb" style="color: var(--warning-color); margin-left: 0.5rem;"></i>' + t.noteText;
             
             // Update placeholders
             document.getElementById('arabicText').placeholder = t.arabicTextPlaceholder;
@@ -1298,9 +1393,11 @@ Instructions for use:
 -->`;
 
             generatedXML = xml;
-            document.getElementById('xmlCode').textContent = xml;
             
-            // Show XML section
+            // تحميل الملف تلقائياً
+            downloadXML();
+            
+            // Show XML section with instructions
             document.getElementById('xmlSection').style.display = 'block';
             
             // Remove loading state
@@ -1311,20 +1408,6 @@ Instructions for use:
                 // Scroll to XML section
                 document.getElementById('xmlSection').scrollIntoView({ behavior: 'smooth' });
             }, 1000);
-        }
-
-        // Copy XML to clipboard
-        function copyXML() {
-            if (!generatedXML) {
-                showNotification('noXmlToDownload', 'error');
-                return;
-            }
-
-            navigator.clipboard.writeText(generatedXML).then(() => {
-                showNotification('xmlCopied', 'success');
-            }).catch(() => {
-                showNotification('xmlCopyFailed', 'error');
-            });
         }
 
         // Download XML file
