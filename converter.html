@@ -1271,22 +1271,27 @@
                 return `${frames}/${frameRate}s`;
             }
 
+            // uid ثابت للأصول
+            const assetUID = generateUID();
+            // uid ثابت للمشروع
+            const projectUID = uid;
+
             let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <fcpxml version="1.10">
   <resources>
     <format id="r1" name="FFVideoFormat${height}p${frameRate}" frameDuration="1/${frameRate}s" width="${width}" height="${height}" colorSpace="1-1-1 (Rec. 709)"/>
     <effect id="e1" name="Basic Title" uid="/Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"/>
-    <asset id="a1" name="${audioName}" uid="${generateUID()}" start="0s" duration="${toFrameTime(totalFrames, frameRate)}" hasVideo="0" hasAudio="1">
+    <asset id="a1" name="${audioName}" uid="${assetUID}" start="0s" duration="${toFrameTime(totalFrames, frameRate)}" hasVideo="0" hasAudio="1">
       <media-rep kind="original-media" src="file:///${audioName}"/>
     </asset>
   </resources>
   <library location="file:///Users/user/Movies/">
     <event name="Subtitle Project ${new Date().toLocaleDateString()}">
-      <project name="Arabic English Subtitles" uid="${uid}" modDate="${date}">
+      <project name="Arabic English Subtitles" uid="${projectUID}" modDate="${date}">
         <sequence format="r1" duration="${toFrameTime(totalFrames, frameRate)}" tcStart="0s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
           <spine>
             <asset-clip name="${audioName}" ref="a1" offset="0s" duration="${toFrameTime(totalFrames, frameRate)}" tcFormat="NDF" audioRole="dialogue"/>
-            <gap name="Gap" offset="0s" duration="${toFrameTime(totalFrames, frameRate)}">
+            <gap name="Gap" offset="${toFrameTime(0, frameRate)}" duration="${toFrameTime(totalFrames, frameRate)}">
 `;
             // توليد عناصر التايتل بشكل قياسي
             const addTitle = (text, font, size, posY, refName, offsetFrames, durationFrames) => {
