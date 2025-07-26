@@ -1302,14 +1302,6 @@
         <asset id="a1" name="${escapeXML(projectData.audioFileName)}" uid="${generateUID()}" start="0/1s" duration="${totalDurationFrames}/${frameRate}s" hasVideo="0" hasAudio="1">
             <media-rep kind="original-media" src="file:///${escapeXML(projectData.audioFileName)}"/>
         </asset>
-        
-        <!-- Text style definitions -->
-        <text-style-def id="ts1">
-            <text-style font="${arabicFont}" fontSize="${arabicFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
-        </text-style-def>
-        <text-style-def id="ts2">
-            <text-style font="${englishFont}" fontSize="${englishFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
-        </text-style-def>
     </resources>
     <library location="file:///Users/user/Movies/">
         <event name="Subtitle Project ${new Date().toLocaleDateString()}">
@@ -1325,22 +1317,22 @@
             // Add subtitle titles based on display mode
             if (projectData.displayMode === 'both' || projectData.displayMode === 'arabic') {
                 xml += `
-                            <title name="Arabic Text" offset="${startFrames}/${frameRate}s" duration="${totalDurationFrames - startFrames}/${frameRate}s" start="3600/1s">
+                            <title ref="e1" name="Arabic Text" offset="${startFrames}/${frameRate}s" duration="${totalDurationFrames - startFrames}/${frameRate}s" start="3600/1s">
                                 <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${arabicPositionY}"/>
                                 <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
                                 <text>
-                                    <text-style ref="ts1">${escapeXML(projectData.arabicText)}</text-style>
+                                    <text-style font="${arabicFont}" fontSize="${arabicFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center">${escapeXML(projectData.arabicText)}</text-style>
                                 </text>
                             </title>`;
             }
 
             if (projectData.displayMode === 'both' || projectData.displayMode === 'repetitive') {
                 xml += `
-                            <title name="English Text" offset="${startFrames}/${frameRate}s" duration="${totalDurationFrames - startFrames}/${frameRate}s" start="3600/1s">
+                            <title ref="e1" name="English Text" offset="${startFrames}/${frameRate}s" duration="${totalDurationFrames - startFrames}/${frameRate}s" start="3600/1s">
                                 <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${englishPositionY}"/>
                                 <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
                                 <text>
-                                    <text-style ref="ts2">${escapeXML(projectData.englishText)}</text-style>
+                                    <text-style font="${englishFont}" fontSize="${englishFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center">${escapeXML(projectData.englishText)}</text-style>
                                 </text>
                             </title>`;
             }
@@ -1351,18 +1343,18 @@
                 const secondHalfStart = startFrames + halfDuration;
                 
                 xml += `
-                            <title name="Arabic Text" offset="${startFrames}/${frameRate}s" duration="${halfDuration}/${frameRate}s" start="3600/1s">
+                            <title ref="e1" name="Arabic Text" offset="${startFrames}/${frameRate}s" duration="${halfDuration}/${frameRate}s" start="3600/1s">
                                 <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${arabicPositionY}"/>
                                 <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
                                 <text>
-                                    <text-style ref="ts1">${escapeXML(projectData.arabicText)}</text-style>
+                                    <text-style font="${arabicFont}" fontSize="${arabicFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center">${escapeXML(projectData.arabicText)}</text-style>
                                 </text>
                             </title>
-                            <title name="English Text" offset="${secondHalfStart}/${frameRate}s" duration="${totalDurationFrames - secondHalfStart}/${frameRate}s" start="3600/1s">
+                            <title ref="e1" name="English Text" offset="${secondHalfStart}/${frameRate}s" duration="${totalDurationFrames - secondHalfStart}/${frameRate}s" start="3600/1s">
                                 <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${englishPositionY}"/>
                                 <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
                                 <text>
-                                    <text-style ref="ts2">${escapeXML(projectData.englishText)}</text-style>
+                                    <text-style font="${englishFont}" fontSize="${englishFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center">${escapeXML(projectData.englishText)}</text-style>
                                 </text>
                             </title>`;
             }
