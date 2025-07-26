@@ -1276,13 +1276,13 @@
             // uid ثابت للمشروع
             const projectUID = uid;
 
-            // توليد عناصر التايتل بشكل قياسي مع ربط text-style-def
-            const addTitle = (text, styleId, posY, refName, offsetFrames, durationFrames) => {
+            // توليد عناصر التايتل بشكل قياسي مع خصائص النص المباشرة
+            const addTitle = (text, font, fontSize, posY, refName, offsetFrames, durationFrames) => {
                 return `              <title ref="e1" name="${refName}" lane="1" role="title" enabled="1" offset="${toFrameTime(offsetFrames, frameRate)}" duration="${toFrameTime(durationFrames, frameRate)}">
                 <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${posY}"/>
                 <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
                 <text>
-                  <text-style ref="${styleId}">${escape(text)}</text-style>
+                  <text-style font="${font}" fontSize="${fontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center">${escape(text)}</text-style>
                 </text>
               </title>`;
             };
@@ -1295,8 +1295,6 @@
     <asset id="a1" name="${audioName}" uid="${assetUID}" start="0s" duration="${toFrameTime(totalFrames, frameRate)}" hasVideo="0" hasAudio="1">
       <media-rep kind="original-media" src="file:///${audioName}"/>
     </asset>
-    <text-style-def id="tsd1" font="${arabicFont}" fontSize="${arabicFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
-    <text-style-def id="tsd2" font="${englishFont}" fontSize="${englishFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
   </resources>
   <library location="file:///Users/user/Movies/">
     <event name="Subtitle Project ${new Date().toLocaleDateString()}">
@@ -1308,15 +1306,15 @@
 `;
 
             if (displayMode === 'arabic' || displayMode === 'both') {
-                xml += addTitle(arabicText, 'tsd1', arabicPositionY, 'Arabic Text', startFrames, totalFrames - startFrames);
+                xml += addTitle(arabicText, arabicFont, arabicFontSize, arabicPositionY, 'Arabic Text', startFrames, totalFrames - startFrames);
             }
             if (displayMode === 'repetitive' || displayMode === 'both') {
-                xml += addTitle(repetitiveText, 'tsd2', englishPositionY, 'English Text', startFrames, totalFrames - startFrames);
+                xml += addTitle(repetitiveText, englishFont, englishFontSize, englishPositionY, 'English Text', startFrames, totalFrames - startFrames);
             }
             if (displayMode === 'alternating') {
                 const half = Math.floor((totalFrames - startFrames) / 2);
-                xml += addTitle(arabicText, 'tsd1', arabicPositionY, 'Arabic Text', startFrames, half);
-                xml += addTitle(repetitiveText, 'tsd2', englishPositionY, 'English Text', startFrames + half, totalFrames - startFrames - half);
+                xml += addTitle(arabicText, arabicFont, arabicFontSize, arabicPositionY, 'Arabic Text', startFrames, half);
+                xml += addTitle(repetitiveText, englishFont, englishFontSize, englishPositionY, 'English Text', startFrames + half, totalFrames - startFrames - half);
             }
 
             xml += `
