@@ -1290,6 +1290,7 @@
             <asset-clip name="${audioName}" ref="a1" offset="0s" duration="${totalFrames}/${frameRate}s" tcFormat="NDF" audioRole="dialogue"/>
             <gap name="Gap" offset="0s" duration="${totalFrames}/${frameRate}s">
 `;
+            // تم التعديل: إزالة السمة start من عناصر <title> لتوافق DTD
             const addTitle = (text, font, size, posY, refName, offsetFrames, durationFrames) => {
                 return `              <title ref="e1" name="${refName}" offset="${offsetFrames}/${frameRate}s" duration="${durationFrames}/${frameRate}s">
                 <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${posY}"/>
