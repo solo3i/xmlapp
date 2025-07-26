@@ -1234,172 +1234,97 @@
             return lines.join('\n');
         }
 
+        <!-- تم إصلاح مشاكل DTD في توليد ملف FCPXML -->
         function generateXML() {
-            // Get text values
             const arabicTextRaw = document.getElementById('arabicText').value.trim();
             const repetitiveTextRaw = document.getElementById('repetitiveText').value.trim();
-            
-            if (!audioFile) {
-                showNotification('noAudioFile', 'error');
-                return;
-            }
-            
-            if (!arabicTextRaw && !repetitiveTextRaw) {
-                showNotification('noTextContent', 'error');
-                return;
-            }
 
-            // Add loading state
-            const generateBtn = document.getElementById('generateProjectBtn');
-            generateBtn.classList.add('loading');
+            if (!audioFile) return showNotification('noAudioFile', 'error');
+            if (!arabicTextRaw && !repetitiveTextRaw) return showNotification('noTextContent', 'error');
 
-            // Load settings from settings page (localStorage)
             const settings = loadSettings();
-            
-            // Override poetry filtering setting with current checkbox state
             settings.skipPoetryIntros = document.getElementById('skipPoetryIntros').checked;
-            
-            // Process texts to remove poetry intros if enabled
+
             const arabicText = processPoetryText(arabicTextRaw, settings);
             const repetitiveText = processPoetryText(repetitiveTextRaw, settings);
-            
-            // Get default settings for fonts and positions
+
             const globalSettings = typeof getConverterSettings !== 'undefined' ? getConverterSettings() : {};
-            const englishFont = globalSettings.englishFont || 'Helvetica';
-            const englishFontSize = globalSettings.englishFontSize || 25;
-            const englishPositionY = globalSettings.englishPositionY || -420;
-            
             const arabicFont = globalSettings.arabicFont || 'Arial';
             const arabicFontSize = globalSettings.arabicFontSize || 34;
             const arabicPositionY = globalSettings.arabicPositionY || -381;
+            const englishFont = globalSettings.englishFont || 'Helvetica';
+            const englishFontSize = globalSettings.englishFontSize || 25;
+            const englishPositionY = globalSettings.englishPositionY || -420;
 
-            // Create project data
-            const projectData = {
-                arabicText: arabicText,
-                englishText: repetitiveText, // Using repetitive text as English
-                audioFileName: audioFile.name,
-                startTime: settings.startTime || 0,
-                duration: settings.duration || 5,
-                displayMode: settings.displayMode || 'arabic',
-                previewResolution: settings.previewResolution || '1920x1080',
-                frameRate: 25
-            };
-
-            const resolution = projectData.previewResolution;
-            const frameRate = projectData.frameRate;
+            const resolution = globalSettings.previewResolution || '1920x1080';
+            const frameRate = 25;
             const [width, height] = resolution.split('x').map(Number);
-            
-            // Calculate frame-based timing
-            const totalDurationFrames = Math.ceil(projectData.duration * frameRate);
-            const startFrames = Math.floor(projectData.startTime * frameRate);
+
+            const duration = settings.duration || 5;
+            const startTime = settings.startTime || 0;
+            const totalFrames = Math.ceil(duration * frameRate);
+            const startFrames = Math.floor(startTime * frameRate);
+
+            const displayMode = settings.displayMode || 'arabic';
+            const uid = generateUID();
+            const date = new Date().toISOString();
+
+            const escape = escapeXML;
+            const audioName = escape(audioFile.name);
 
             let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE fcpxml>
 <fcpxml version="1.10">
-    <resources>
-        <format id="r1" name="FFVideoFormat${height}p${frameRate}" frameDuration="1/${frameRate}s" width="${width}" height="${height}" colorSpace="1-1-1 (Rec. 709)"/>
-        <effect id="e1" name="Basic Title" uid=".../Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"/>
-        <asset id="a1" name="${escapeXML(projectData.audioFileName)}" uid="${generateUID()}" start="0/1s" duration="${totalDurationFrames}/${frameRate}s" hasVideo="0" hasAudio="1">
-            <media-rep kind="original-media" src="file:///${escapeXML(projectData.audioFileName)}"/>
-        </asset>
-    </resources>
-    <library location="file:///Users/user/Movies/">
-        <event name="Subtitle Project ${new Date().toLocaleDateString()}">
-            <project name="Arabic English Subtitles" uid="${generateUID()}" modDate="${new Date().toISOString()}">
-                <sequence format="r1" duration="${totalDurationFrames}/${frameRate}s" tcStart="0/1s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
-                    <spine>
-                        <!-- Audio Track -->
-                        <asset-clip name="${escapeXML(projectData.audioFileName)}" ref="a1" offset="0/1s" duration="${totalDurationFrames}/${frameRate}s" tcFormat="NDF" audioRole="dialogue"/>
-                        
-                        <!-- Gap for subtitle tracks -->
-                        <gap name="Gap" offset="0/1s" duration="${totalDurationFrames}/${frameRate}s">`;
+  <resources>
+    <format id="r1" name="FFVideoFormat${height}p${frameRate}" frameDuration="1/${frameRate}s" width="${width}" height="${height}" colorSpace="1-1-1 (Rec. 709)"/>
+    <effect id="e1" name="Basic Title" uid=".../Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"/>
+    <asset id="a1" name="${audioName}" uid="${generateUID()}" start="0s" duration="${totalFrames}/${frameRate}s" hasVideo="0" hasAudio="1">
+      <media-rep kind="original-media" src="file:///${audioName}"/>
+    </asset>
+  </resources>
+  <library location="file:///Users/user/Movies/">
+    <event name="Subtitle Project ${new Date().toLocaleDateString()}">
+      <project name="Arabic English Subtitles" uid="${uid}" modDate="${date}">
+        <sequence format="r1" duration="${totalFrames}/${frameRate}s" tcStart="0s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
+          <spine>
+            <asset-clip name="${audioName}" ref="a1" offset="0s" duration="${totalFrames}/${frameRate}s" tcFormat="NDF" audioRole="dialogue"/>
+            <gap name="Gap" offset="0s" duration="${totalFrames}/${frameRate}s">
+`;
+            const addTitle = (text, font, size, posY, refName, offsetFrames, durationFrames) => {
+                return `              <title ref="e1" name="${refName}" offset="${offsetFrames}/${frameRate}s" duration="${durationFrames}/${frameRate}s" start="3600/1s">
+                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${posY}"/>
+                <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
+                <text>
+                  <text-style font="${font}" fontSize="${size}" fontFace="Regular" fontColor="1 1 1 1" alignment="center">${escape(text)}</text-style>
+                </text>
+              </title>`;
+            };
 
-            // Add subtitle titles based on display mode
-            if (projectData.displayMode === 'both' || projectData.displayMode === 'arabic') {
-                xml += `
-                            <title ref="e1" name="Arabic Text" offset="${startFrames}/${frameRate}s" duration="${totalDurationFrames - startFrames}/${frameRate}s" start="3600/1s">
-                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${arabicPositionY}"/>
-                                <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
-                                <text>
-                                    <text-style font="${arabicFont}" fontSize="${arabicFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center">${escapeXML(projectData.arabicText)}</text-style>
-                                </text>
-                            </title>`;
+            if (displayMode === 'arabic' || displayMode === 'both') {
+                xml += addTitle(arabicText, arabicFont, arabicFontSize, arabicPositionY, 'Arabic Text', startFrames, totalFrames - startFrames);
             }
-
-            if (projectData.displayMode === 'both' || projectData.displayMode === 'repetitive') {
-                xml += `
-                            <title ref="e1" name="English Text" offset="${startFrames}/${frameRate}s" duration="${totalDurationFrames - startFrames}/${frameRate}s" start="3600/1s">
-                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${englishPositionY}"/>
-                                <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
-                                <text>
-                                    <text-style font="${englishFont}" fontSize="${englishFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center">${escapeXML(projectData.englishText)}</text-style>
-                                </text>
-                            </title>`;
+            if (displayMode === 'repetitive' || displayMode === 'both') {
+                xml += addTitle(repetitiveText, englishFont, englishFontSize, englishPositionY, 'English Text', startFrames, totalFrames - startFrames);
             }
-            
-            // Handle alternating mode (Arabic first, then English)
-            if (projectData.displayMode === 'alternating') {
-                const halfDuration = Math.floor((totalDurationFrames - startFrames) / 2);
-                const secondHalfStart = startFrames + halfDuration;
-                
-                xml += `
-                            <title ref="e1" name="Arabic Text" offset="${startFrames}/${frameRate}s" duration="${halfDuration}/${frameRate}s" start="3600/1s">
-                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${arabicPositionY}"/>
-                                <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
-                                <text>
-                                    <text-style font="${arabicFont}" fontSize="${arabicFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center">${escapeXML(projectData.arabicText)}</text-style>
-                                </text>
-                            </title>
-                            <title ref="e1" name="English Text" offset="${secondHalfStart}/${frameRate}s" duration="${totalDurationFrames - secondHalfStart}/${frameRate}s" start="3600/1s">
-                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${englishPositionY}"/>
-                                <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
-                                <text>
-                                    <text-style font="${englishFont}" fontSize="${englishFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center">${escapeXML(projectData.englishText)}</text-style>
-                                </text>
-                            </title>`;
+            if (displayMode === 'alternating') {
+                const half = Math.floor((totalFrames - startFrames) / 2);
+                xml += addTitle(arabicText, arabicFont, arabicFontSize, arabicPositionY, 'Arabic Text', startFrames, half);
+                xml += addTitle(repetitiveText, englishFont, englishFontSize, englishPositionY, 'English Text', startFrames + half, totalFrames - startFrames - half);
             }
 
             xml += `
-                        </gap>
-                    </spine>
-                </sequence>
-            </project>
-        </event>
-    </library>
-</fcpxml>
-
-<!-- 
-إرشادات الاستخدام:
-1. احفظ هذا الملف بامتداد .fcpxml
-2. ضع الملف الصوتي في نفس مجلد ملف XML أو حدث مسار الصوت في السطر الخاص بـ media-rep
-3. افتح Final Cut Pro واسحب ملف XML إلى البرنامج
-4. ستجد المشروع في مكتبة Final Cut Pro
-5. يمكنك تعديل النصوص والخطوط والمواضع حسب الحاجة
-
-Instructions for use:
-1. Save this file with .fcpxml extension
-2. Place audio file in same folder as XML or update audio path in media-rep line
-3. Open Final Cut Pro and drag XML file into the application
-4. Project will appear in Final Cut Pro library
-5. You can edit texts, fonts, and positions as needed
--->`;
+            </gap>
+          </spine>
+        </sequence>
+      </project>
+    </event>
+  </library>
+</fcpxml>`;
 
             generatedXML = xml;
-            
-            // تحميل الملف تلقائياً
             downloadXML();
-            
-            // Show XML section with instructions
             document.getElementById('xmlSection').style.display = 'block';
-            
-            // Remove loading state
-            setTimeout(() => {
-                generateBtn.classList.remove('loading');
-                showNotification('xmlGenerated', 'success');
-                
-                // Scroll to XML section
-                document.getElementById('xmlSection').scrollIntoView({ behavior: 'smooth' });
-            }, 1000);
+            showNotification('xmlGenerated', 'success');
         }
 
         // Download XML file
