@@ -1234,7 +1234,7 @@
             return lines.join('\n');
         }
 
-        <!-- تم إصلاح مشاكل DTD في توليد ملف FCPXML -->
+        <!-- تم إصلاح مشاكل DTD في توليد ملف FCPXML بشكل نهائي -->
         function generateXML() {
             const arabicTextRaw = document.getElementById('arabicText').value.trim();
             const repetitiveTextRaw = document.getElementById('repetitiveText').value.trim();
@@ -1291,7 +1291,7 @@
             <gap name="Gap" offset="0s" duration="${totalFrames}/${frameRate}s">
 `;
             const addTitle = (text, font, size, posY, refName, offsetFrames, durationFrames) => {
-                return `              <title ref="e1" name="${refName}" offset="${offsetFrames}/${frameRate}s" duration="${durationFrames}/${frameRate}s" start="3600/1s">
+                return `              <title ref="e1" name="${refName}" offset="${offsetFrames}/${frameRate}s" duration="${durationFrames}/${frameRate}s">
                 <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${posY}"/>
                 <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
                 <text>
