@@ -1247,12 +1247,6 @@
             const repetitiveText = processPoetryText(repetitiveTextRaw, settings);
 
             const globalSettings = typeof getConverterSettings !== 'undefined' ? getConverterSettings() : {};
-            const arabicFont = globalSettings.arabicFont || 'Arial';
-            const arabicFontSize = globalSettings.arabicFontSize || 34;
-            const arabicPositionY = globalSettings.arabicPositionY || -381;
-            const englishFont = globalSettings.englishFont || 'Helvetica';
-            const englishFontSize = globalSettings.englishFontSize || 25;
-            const englishPositionY = globalSettings.englishPositionY || -420;
             const resolution = globalSettings.previewResolution || '1920x1080';
             const frameRate = 25;
             const [width, height] = resolution.split('x').map(Number);
@@ -1276,23 +1270,13 @@
             // uid ثابت للمشروع
             const projectUID = uid;
 
-            // توليد عناصر التايتل بشكل قياسي مع خصائص النص المباشرة
-            const addTitle = (text, font, fontSize, posY, refName, offsetFrames, durationFrames) => {
-                return `              <title ref="e1" name="${refName}" lane="1" role="title" enabled="1" offset="${toFrameTime(offsetFrames, frameRate)}" duration="${toFrameTime(durationFrames, frameRate)}">
-                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${posY}"/>
-                <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
-                <text>
-                  <text-style font="${font}" fontSize="${fontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center">${escape(text)}</text-style>
-                </text>
-              </title>`;
-            };
-
+            // إنشاء XML مبسط ومتوافق مع FCPXML DTD
             let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <fcpxml version="1.10">
   <resources>
     <format id="r1" name="FFVideoFormat${height}p${frameRate}" frameDuration="1/${frameRate}s" width="${width}" height="${height}" colorSpace="1-1-1 (Rec. 709)"/>
-    <effect id="e1" name="Basic Title" uid="/Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"/>
-    <asset id="a1" name="${audioName}" uid="${assetUID}" start="0s" duration="${toFrameTime(totalFrames, frameRate)}" hasVideo="0" hasAudio="1">
+    <effect id="r2" name="Basic Title" uid=".../Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"/>
+    <asset id="r3" name="${audioName}" uid="${assetUID}" start="0s" duration="${toFrameTime(totalFrames, frameRate)}" hasVideo="0" hasAudio="1">
       <media-rep kind="original-media" src="file:///${audioName}"/>
     </asset>
   </resources>
@@ -1301,24 +1285,43 @@
       <project name="Arabic English Subtitles" uid="${projectUID}" modDate="${date}">
         <sequence format="r1" duration="${toFrameTime(totalFrames, frameRate)}" tcStart="0s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
           <spine>
-            <asset-clip name="${audioName}" ref="a1" offset="0s" duration="${toFrameTime(totalFrames, frameRate)}" tcFormat="NDF" audioRole="dialogue"/>
-            <gap name="Gap" offset="${toFrameTime(0, frameRate)}" duration="${toFrameTime(totalFrames, frameRate)}">
-`;
+            <asset-clip name="${audioName}" ref="r3" offset="0s" duration="${toFrameTime(totalFrames, frameRate)}" tcFormat="NDF" audioRole="dialogue"/>`;
 
+            // إضافة التايتل بطريقة مبسطة
             if (displayMode === 'arabic' || displayMode === 'both') {
-                xml += addTitle(arabicText, arabicFont, arabicFontSize, arabicPositionY, 'Arabic Text', startFrames, totalFrames - startFrames);
+                xml += `
+            <title ref="r2" name="Arabic Title" offset="${toFrameTime(startFrames, frameRate)}" duration="${toFrameTime(totalFrames - startFrames, frameRate)}" start="${toFrameTime(startFrames, frameRate)}">
+              <text>
+                <text-style font="Arial" fontSize="34" fontFace="Regular" fontColor="1 1 1 1">${escape(arabicText)}</text-style>
+              </text>
+            </title>`;
             }
+
             if (displayMode === 'repetitive' || displayMode === 'both') {
-                xml += addTitle(repetitiveText, englishFont, englishFontSize, englishPositionY, 'English Text', startFrames, totalFrames - startFrames);
+                xml += `
+            <title ref="r2" name="English Title" offset="${toFrameTime(startFrames, frameRate)}" duration="${toFrameTime(totalFrames - startFrames, frameRate)}" start="${toFrameTime(startFrames, frameRate)}">
+              <text>
+                <text-style font="Helvetica" fontSize="25" fontFace="Regular" fontColor="1 1 1 1">${escape(repetitiveText)}</text-style>
+              </text>
+            </title>`;
             }
+
             if (displayMode === 'alternating') {
                 const half = Math.floor((totalFrames - startFrames) / 2);
-                xml += addTitle(arabicText, arabicFont, arabicFontSize, arabicPositionY, 'Arabic Text', startFrames, half);
-                xml += addTitle(repetitiveText, englishFont, englishFontSize, englishPositionY, 'English Text', startFrames + half, totalFrames - startFrames - half);
+                xml += `
+            <title ref="r2" name="Arabic Title" offset="${toFrameTime(startFrames, frameRate)}" duration="${toFrameTime(half, frameRate)}" start="${toFrameTime(startFrames, frameRate)}">
+              <text>
+                <text-style font="Arial" fontSize="34" fontFace="Regular" fontColor="1 1 1 1">${escape(arabicText)}</text-style>
+              </text>
+            </title>
+            <title ref="r2" name="English Title" offset="${toFrameTime(startFrames + half, frameRate)}" duration="${toFrameTime(totalFrames - startFrames - half, frameRate)}" start="${toFrameTime(startFrames + half, frameRate)}">
+              <text>
+                <text-style font="Helvetica" fontSize="25" fontFace="Regular" fontColor="1 1 1 1">${escape(repetitiveText)}</text-style>
+              </text>
+            </title>`;
             }
 
             xml += `
-            </gap>
           </spine>
         </sequence>
       </project>
