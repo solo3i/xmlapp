@@ -885,20 +885,20 @@
                 poetryFilterLabel: 'تنقية نصوص القصائد:',
                 skipIntrosText: 'تجاهل المستهلات',
                 poetryFilterDescription: 'سيتم تجاهل العبارات الافتتاحية والختامية في القصائد',
-                generateBtnText: 'توليد ملف XML',
+                generateBtnText: 'توليد Final Cut Pro Bundle',
                 settingsLinkText: 'يمكنك تخصيص الإعدادات المتقدمة من صفحة',
                 settingsLink: 'الإعدادات',
-                xmlTitle: 'تم إنشاء ملف XML بنجاح!',
-                successTitle: 'ملف Final Cut Pro جاهز للتحميل',
-                successDescription: 'سيتم تحميل الملف تلقائياً، أو يمكنك الضغط على زر التحميل أدناه',
-                downloadBtnText: 'تحميل ملف XML',
+                xmlTitle: 'تم إنشاء Final Cut Pro Bundle بنجاح!',
+                successTitle: 'ملف Final Cut Pro Bundle جاهز للتحميل',
+                successDescription: 'سيتم تحميل الـ Bundle تلقائياً، أو يمكنك الضغط على زر التحميل أدناه',
+                downloadBtnText: 'تحميل Final Cut Pro Bundle',
                 instructionsTitle: 'إرشادات التشغيل في Final Cut Pro',
                 step1Title: 'تحضير الملفات',
-                step1Desc: 'ضع الملف الصوتي المرفوع في مجلد مع ملف XML الذي تم تحميله',
+                step1Desc: 'ضع الملف الصوتي في نفس مجلد الـ Bundle (.fcpbundle) المحمّل',
                 step2Title: 'فتح Final Cut Pro',
                 step2Desc: 'افتح برنامج Final Cut Pro على جهاز Mac',
                 step3Title: 'استيراد المشروع',
-                step3Desc: 'اسحب ملف XML إلى نافذة Final Cut Pro أو استخدم File > Import > XML',
+                step3Desc: 'انقر نقراً مزدوجاً على ملف .fcpbundle أو اسحبه إلى Final Cut Pro',
                 step4Title: 'التشغيل والتعديل',
                 step4Desc: 'ستجد المشروع في مكتبة FCP مع الصوت والترجمة جاهزين للتشغيل والتعديل',
                 noteText: 'نصيحة: يمكنك تعديل النصوص والخطوط والمواضع مباشرة في Final Cut Pro بعد الاستيراد',
@@ -907,11 +907,11 @@
                 invalidFileType: 'يرجى اختيار ملف صوتي أو فيديو',
                 noAudioFile: 'يرجى رفع ملف صوتي أولاً',
                 noTextContent: 'يرجى إدخال نص عربي أو نص متكرر',
-                xmlGenerated: 'تم توليد ملف XML بنجاح!',
+                xmlGenerated: 'تم توليد Final Cut Pro Bundle بنجاح!',
                 xmlCopied: 'تم نسخ كود XML!',
                 xmlCopyFailed: 'فشل في نسخ كود XML',
-                xmlDownloaded: 'تم تحميل ملف XML بنجاح!',
-                noXmlToDownload: 'لا يوجد كود XML للتحميل',
+                xmlDownloaded: 'تم تحميل Final Cut Pro Bundle بنجاح!',
+                noXmlToDownload: 'لا يوجد Bundle للتحميل',
                 libraryComingSoon: 'ميزة مكتبة الفيديو ستكون متاحة قريباً',
                 // Audio info
                 fileLabel: 'الملف:',
@@ -947,20 +947,20 @@
                 poetryFilterLabel: 'Poetry Text Filtering:',
                 skipIntrosText: 'Skip Introductory Phrases',
                 poetryFilterDescription: 'Will ignore introductory and concluding phrases in poems',
-                generateBtnText: 'Generate XML File',
+                generateBtnText: 'Generate Final Cut Pro Bundle',
                 settingsLinkText: 'You can customize advanced settings from the',
                 settingsLink: 'Settings',
-                xmlTitle: 'XML File Created Successfully!',
-                successTitle: 'Final Cut Pro File Ready for Download',
-                successDescription: 'The file will download automatically, or you can click the download button below',
-                downloadBtnText: 'Download XML File',
+                xmlTitle: 'Final Cut Pro Bundle Created Successfully!',
+                successTitle: 'Final Cut Pro Bundle Ready for Download',
+                successDescription: 'The bundle will download automatically, or you can click the download button below',
+                downloadBtnText: 'Download Final Cut Pro Bundle',
                 instructionsTitle: 'Instructions for Final Cut Pro',
                 step1Title: 'Prepare Files',
-                step1Desc: 'Place the uploaded audio file in a folder with the downloaded XML file',
+                step1Desc: 'Place the audio file in the same folder as the downloaded Bundle (.fcpbundle)',
                 step2Title: 'Open Final Cut Pro',
                 step2Desc: 'Open Final Cut Pro application on your Mac',
                 step3Title: 'Import Project',
-                step3Desc: 'Drag XML file to Final Cut Pro window or use File > Import > XML',
+                step3Desc: 'Double-click the .fcpbundle file or drag it to Final Cut Pro',
                 step4Title: 'Play and Edit',
                 step4Desc: 'You will find the project in FCP library with audio and subtitles ready to play and edit',
                 noteText: 'Tip: You can edit texts, fonts, and positions directly in Final Cut Pro after import',
@@ -969,11 +969,11 @@
                 invalidFileType: 'Please select an audio or video file',
                 noAudioFile: 'Please upload an audio file first',
                 noTextContent: 'Please enter Arabic text or repetitive text',
-                xmlGenerated: 'XML file generated successfully!',
+                xmlGenerated: 'Final Cut Pro Bundle generated successfully!',
                 xmlCopied: 'XML code copied!',
                 xmlCopyFailed: 'Failed to copy XML code',
-                xmlDownloaded: 'XML file downloaded successfully!',
-                noXmlToDownload: 'No XML code to download',
+                xmlDownloaded: 'Final Cut Pro Bundle downloaded successfully!',
+                noXmlToDownload: 'No Bundle to download',
                 libraryComingSoon: 'Video library feature will be available soon',
                 // Audio info
                 fileLabel: 'File:',
@@ -1332,11 +1332,103 @@
 
             generatedXML = xml;
             
-            // إنشاء اسم ملف محسّن
-            const fileName = `${audioName.replace(/\.[^/.]+$/, '') || 'project'}.fcpxml`;
+            // إنشاء Final Cut Pro Bundle بدلاً من XML منفرد
+            createFCPBundle(xml, audioFile.name);
             
-            // Download XML file with proper MIME type and encoding
-            const blob = new Blob([xml], { 
+            document.getElementById('xmlSection').style.display = 'block';
+            showNotification('xmlGenerated', 'success');
+        }
+
+        // إنشاء Final Cut Pro Bundle
+        async function createFCPBundle(xmlContent, audioFileName) {
+            try {
+                // إنشاء JSZip instance
+                const JSZip = window.JSZip || await loadJSZip();
+                const zip = new JSZip();
+                
+                // إنشاء البنية المطلوبة لـ FCP Bundle
+                const projectName = audioFileName.replace(/\.[^/.]+$/, '') || 'project';
+                
+                // إضافة ملف Info.plist
+                const infoPlist = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDisplayName</key>
+    <string>${projectName}</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.apple.finalcutpro.xmlproject</string>
+    <key>CFBundleName</key>
+    <string>${projectName}</string>
+    <key>CFBundlePackageType</key>
+    <string>fcpx</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>UTExportedTypeDeclarations</key>
+    <array>
+        <dict>
+            <key>UTTypeConformsTo</key>
+            <array>
+                <string>com.apple.package</string>
+            </array>
+            <key>UTTypeDescription</key>
+            <string>Final Cut Pro Project</string>
+            <key>UTTypeIdentifier</key>
+            <string>com.apple.finalcutpro.project</string>
+            <key>UTTypeTagSpecification</key>
+            <dict>
+                <key>public.filename-extension</key>
+                <array>
+                    <string>fcpbundle</string>
+                </array>
+            </dict>
+        </dict>
+    </array>
+</dict>
+</plist>`;
+
+                // إضافة الملفات إلى Bundle
+                zip.file("Info.plist", infoPlist);
+                zip.file("project.fcpxml", xmlContent);
+                
+                // إنشاء مجلد الموارد
+                zip.folder("Media");
+                
+                // توليد Bundle
+                const content = await zip.generateAsync({
+                    type: "blob",
+                    compression: "DEFLATE",
+                    compressionOptions: {
+                        level: 6
+                    }
+                });
+                
+                // تحميل Bundle
+                const url = URL.createObjectURL(content);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${projectName}.fcpbundle`;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+                
+            } catch (error) {
+                console.error('Error creating FCP Bundle:', error);
+                // Fallback لـ XML عادي
+                downloadXMLFallback(xmlContent, audioFileName);
+            }
+        }
+
+        // Fallback لتحميل XML عادي
+        function downloadXMLFallback(xmlContent, audioFileName) {
+            const fileName = `${audioFileName.replace(/\.[^/.]+$/, '') || 'project'}.fcpxml`;
+            const blob = new Blob([xmlContent], { 
                 type: 'application/xml; charset=utf-8',
                 endings: 'native'
             });
@@ -1352,6 +1444,23 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
             }, 100);
+        }
+
+        // تحميل JSZip library
+        async function loadJSZip() {
+            return new Promise((resolve, reject) => {
+                if (window.JSZip) {
+                    resolve(window.JSZip);
+                    return;
+                }
+                
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+                script.onload = () => resolve(window.JSZip);
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
             
             document.getElementById('xmlSection').style.display = 'block';
             showNotification('xmlGenerated', 'success');
@@ -1364,26 +1473,8 @@
                 return;
             }
             
-            // إنشاء اسم ملف محسّن
-            const fileName = `${audioFile ? audioFile.name.replace(/\.[^/.]+$/, '') : 'project'}.fcpxml`;
-            
-            const blob = new Blob([generatedXML], { 
-                type: 'application/xml; charset=utf-8',
-                endings: 'native'
-            });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            a.setAttribute('type', 'application/xml');
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(() => {
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }, 100);
-            
+            // إنشاء Final Cut Pro Bundle
+            createFCPBundle(generatedXML, audioFile ? audioFile.name : 'project');
             showNotification('xmlDownloaded', 'success');
         }
 
