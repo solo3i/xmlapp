@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" id="html-root">
+<html lang="en" dir="ltr" id="html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مكتبة الفيديو - FCP Audio to XML</title>
+    <title>Video Library - FCP Audio to XML</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Default Settings System -->
@@ -485,17 +485,17 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <i class="fas fa-video"></i> <span id="logo-text">مكتبة الفيديو FCP</span>
+                <i class="fas fa-video"></i> <span id="logo-text">FCP Video Library</span>
             </div>
             <ul class="nav-links">
-                <li><a href="index.html" id="nav-home">الرئيسية</a></li>
-                <li><a href="converter.html" id="nav-converter">المحول</a></li>
-                <li><a href="settings.html" id="nav-settings">الإعدادات</a></li>
-                <li><a href="video-library.html" class="active" id="nav-library">مكتبة الفيديو</a></li>
+                <li><a href="index.html" id="nav-home">Home</a></li>
+                <li><a href="converter.html" id="nav-converter">Converter</a></li>
+                <li><a href="settings.html" id="nav-settings">Settings</a></li>
+                <li><a href="video-library.html" class="active" id="nav-library">Video Library</a></li>
             </ul>
             <div class="language-toggle">
-                <button class="lang-btn active" onclick="switchLanguage('ar')" id="btn-arabic">العربية</button>
-                <button class="lang-btn" onclick="switchLanguage('en')" id="btn-english">English</button>
+                <button class="lang-btn" onclick="switchLanguage('ar')" id="btn-arabic">العربية</button>
+                <button class="lang-btn active" onclick="switchLanguage('en')" id="btn-english">English</button>
             </div>
         </div>
     </nav>
@@ -611,7 +611,7 @@
             }
         };
 
-        let currentLanguage = 'ar';
+        let currentLanguage = 'en';
         let videoLibrary = [];
 
         // Language switching function
@@ -1092,8 +1092,8 @@ Instructions for use:
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             // Load saved language preference
-            const savedLanguage = localStorage.getItem('preferredLanguage') || 'ar';
-            if (savedLanguage !== 'ar') {
+            const savedLanguage = localStorage.getItem('preferredLanguage') || 'en';
+            if (savedLanguage !== 'en') {
                 switchLanguage(savedLanguage);
             }
             
