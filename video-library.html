@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مكتبة الفيديو - FCP Audio to XML</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Default Settings System -->
+    <script src="default-settings.js"></script>
     <style>
         :root {
             --primary-color: #3b82f6;
@@ -488,7 +490,6 @@
             <ul class="nav-links">
                 <li><a href="index.html" id="nav-home">الرئيسية</a></li>
                 <li><a href="converter.html" id="nav-converter">المحول</a></li>
-                <li><a href="preview.html" id="nav-preview">المعاينة</a></li>
                 <li><a href="settings.html" id="nav-settings">الإعدادات</a></li>
                 <li><a href="video-library.html" class="active" id="nav-library">مكتبة الفيديو</a></li>
             </ul>
@@ -547,7 +548,6 @@
                 logoText: 'مكتبة الفيديو FCP',
                 navHome: 'الرئيسية',
                 navConverter: 'المحول',
-                navPreview: 'المعاينة',
                 navSettings: 'الإعدادات',
                 navLibrary: 'مكتبة الفيديو',
                 mainTitle: 'مكتبة الفيديو',
@@ -561,6 +561,7 @@
                 deleteBtn: 'حذف',
                 downloadBtn: 'تحميل',
                 previewBtn: 'معاينة',
+                createXmlBtn: 'إنشاء XML',
                 uploading: 'جاري الرفع...',
                 uploadSuccess: 'تم رفع الملف بنجاح!',
                 uploadError: 'حدث خطأ أثناء رفع الملف',
@@ -568,6 +569,8 @@
                 fileDeleted: 'تم حذف الملف بنجاح',
                 fileUsed: 'تم تحديد الملف للاستخدام في المحول',
                 invalidFile: 'نوع الملف غير مدعوم',
+                xmlCreated: 'تم إنشاء ملف XML بنجاح!',
+                enterText: 'يجب إدخال نص واحد على الأقل',
                 size: 'الحجم:',
                 duration: 'المدة:',
                 type: 'النوع:',
@@ -578,7 +581,6 @@
                 logoText: 'FCP Video Library',
                 navHome: 'Home',
                 navConverter: 'Converter',
-                navPreview: 'Preview',
                 navSettings: 'Settings',
                 navLibrary: 'Video Library',
                 mainTitle: 'Video Library',
@@ -592,6 +594,7 @@
                 deleteBtn: 'Delete',
                 downloadBtn: 'Download',
                 previewBtn: 'Preview',
+                createXmlBtn: 'Create XML',
                 uploading: 'Uploading...',
                 uploadSuccess: 'File uploaded successfully!',
                 uploadError: 'Error uploading file',
@@ -599,6 +602,8 @@
                 fileDeleted: 'File deleted successfully',
                 fileUsed: 'File selected for use in converter',
                 invalidFile: 'Unsupported file type',
+                xmlCreated: 'XML file created successfully!',
+                enterText: 'At least one text must be entered',
                 size: 'Size:',
                 duration: 'Duration:',
                 type: 'Type:',
@@ -647,7 +652,6 @@
             document.getElementById('logo-text').textContent = t.logoText;
             document.getElementById('nav-home').textContent = t.navHome;
             document.getElementById('nav-converter').textContent = t.navConverter;
-            document.getElementById('nav-preview').textContent = t.navPreview;
             document.getElementById('nav-settings').textContent = t.navSettings;
             document.getElementById('nav-library').textContent = t.navLibrary;
             document.getElementById('main-title').textContent = t.mainTitle;
@@ -791,6 +795,9 @@
                             <button class="btn btn-primary" onclick="useFile('${file.id}')">
                                 <i class="fas fa-check"></i> ${t.useBtn}
                             </button>
+                            <button class="btn btn-secondary" onclick="createXMLFile('${file.id}')">
+                                <i class="fas fa-file-code"></i> ${t.createXmlBtn}
+                            </button>
                             <button class="btn btn-secondary" onclick="downloadFile('${file.id}')">
                                 <i class="fas fa-download"></i> ${t.downloadBtn}
                             </button>
@@ -877,6 +884,168 @@
                 renderVideoGrid();
                 showNotification('fileDeleted', 'success');
             }
+        }
+
+        // Create XML file for a specific audio/video file
+        function createXMLFile(fileId) {
+            const file = videoLibrary.find(f => f.id == fileId);
+            if (!file) return;
+
+            const t = translations[currentLanguage];
+
+            // Prompt for Arabic and English text
+            const arabicText = prompt(currentLanguage === 'ar' ? 'أدخل النص العربي:' : 'Enter Arabic text:') || '';
+            const englishText = prompt(currentLanguage === 'ar' ? 'أدخل النص الإنجليزي:' : 'Enter English text:') || '';
+
+            if (!arabicText && !englishText) {
+                alert(t.enterText);
+                return;
+            }
+
+            // Generate XML
+            const xmlContent = generateFCPXML(file, arabicText, englishText);
+            
+            // Create and download XML file
+            const blob = new Blob([xmlContent], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${file.name.replace(/\.[^/.]+$/, '')}_subtitle_project.fcpxml`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showNotification('xmlCreated', 'success');
+        }
+
+        // Generate Final Cut Pro XML content
+        function generateFCPXML(file, arabicText, englishText) {
+            // Default settings
+            const settings = {
+                startTime: 0,
+                duration: 5,
+                previewResolution: '1920x1080',
+                frameRate: 25,
+                arabicFont: 'Neo Sans Arabic',
+                arabicFontSize: 34,
+                arabicPositionY: -381,
+                englishFont: 'Sinzano', 
+                englishFontSize: 25,
+                englishPositionY: -420
+            };
+
+            const [width, height] = settings.previewResolution.split('x').map(Number);
+            const totalDurationFrames = Math.ceil(settings.duration * settings.frameRate);
+            const startFrames = Math.floor(settings.startTime * settings.frameRate);
+
+            let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE fcpxml>
+<fcpxml version="1.10">
+    <resources>
+        <format id="r1" name="FFVideoFormat${height}p${settings.frameRate}" frameDuration="1/${settings.frameRate}s" width="${width}" height="${height}" colorSpace="1-1-1 (Rec. 709)"/>
+        <effect id="e1" name="Basic Title" uid=".../Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"/>
+        <asset id="a1" name="${escapeXML(file.name)}" uid="${generateUID()}" start="0/1s" duration="${totalDurationFrames}/${settings.frameRate}s" hasVideo="0" hasAudio="1">
+            <media-rep kind="original-media" src="file:///${escapeXML(file.name)}"/>
+        </asset>
+        
+        <!-- Text style definitions -->`;
+
+            if (arabicText) {
+                xml += `
+        <text-style-def id="ts1">
+            <text-style font="${settings.arabicFont}" fontSize="${settings.arabicFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
+        </text-style-def>`;
+            }
+
+            if (englishText) {
+                xml += `
+        <text-style-def id="ts2">
+            <text-style font="${settings.englishFont}" fontSize="${settings.englishFontSize}" fontFace="Regular" fontColor="1 1 1 1" alignment="center"/>
+        </text-style-def>`;
+            }
+
+            xml += `
+    </resources>
+    <library location="file:///Users/user/Movies/">
+        <event name="Subtitle Project ${new Date().toLocaleDateString()}">
+            <project name="Arabic English Subtitles" uid="${generateUID()}" modDate="${new Date().toISOString()}">
+                <sequence format="r1" duration="${totalDurationFrames}/${settings.frameRate}s" tcStart="0/1s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
+                    <spine>
+                        <!-- Audio Track -->
+                        <asset-clip name="${escapeXML(file.name)}" ref="a1" offset="0/1s" duration="${totalDurationFrames}/${settings.frameRate}s" tcFormat="NDF" audioRole="dialogue"/>
+                        
+                        <!-- Gap for subtitle tracks -->
+                        <gap name="Gap" offset="0/1s" duration="${totalDurationFrames}/${settings.frameRate}s">`;
+
+            // Add Arabic text if provided
+            if (arabicText) {
+                xml += `
+                            <title name="Arabic Text" offset="${startFrames}/${settings.frameRate}s" duration="${totalDurationFrames - startFrames}/${settings.frameRate}s" start="3600/1s">
+                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${settings.arabicPositionY}"/>
+                                <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
+                                <text>
+                                    <text-style ref="ts1">${escapeXML(arabicText)}</text-style>
+                                </text>
+                            </title>`;
+            }
+
+            // Add English text if provided
+            if (englishText) {
+                xml += `
+                            <title name="English Text" offset="${startFrames}/${settings.frameRate}s" duration="${totalDurationFrames - startFrames}/${settings.frameRate}s" start="3600/1s">
+                                <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${settings.englishPositionY}"/>
+                                <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
+                                <text>
+                                    <text-style ref="ts2">${escapeXML(englishText)}</text-style>
+                                </text>
+                            </title>`;
+            }
+
+            xml += `
+                        </gap>
+                    </spine>
+                </sequence>
+            </project>
+        </event>
+    </library>
+</fcpxml>
+
+<!-- 
+إرشادات الاستخدام:
+1. احفظ هذا الملف بامتداد .fcpxml
+2. ضع الملف الصوتي في نفس مجلد ملف XML أو حدث مسار الصوت في السطر الخاص بـ media-rep
+3. افتح Final Cut Pro واسحب ملف XML إلى البرنامج
+4. ستجد المشروع في مكتبة Final Cut Pro
+5. يمكنك تعديل النصوص والخطوط والمواضع حسب الحاجة
+
+Instructions for use:
+1. Save this file with .fcpxml extension
+2. Place audio file in same folder as XML or update audio path in media-rep line
+3. Open Final Cut Pro and drag XML file into the application
+4. Project will appear in Final Cut Pro library
+5. You can edit texts, fonts, and positions as needed
+-->`;
+
+            return xml;
+        }
+
+        // Utility functions
+        function generateUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function escapeXML(text) {
+            return text.replace(/&/g, '&amp;')
+                      .replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;')
+                      .replace(/"/g, '&quot;')
+                      .replace(/'/g, '&#39;');
         }
 
         function saveLibraryToStorage() {
