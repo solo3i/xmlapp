@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" id="html-root">
+<html lang="en" dir="ltr" id="html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الإعدادات - FCP Audio to XML</title>
+    <title>Settings - FCP Audio to XML</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Default Settings System -->
@@ -512,17 +512,17 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <i class="fas fa-cog"></i> <span id="logo-text">إعدادات FCP</span>
+                <i class="fas fa-cog"></i> <span id="logo-text">FCP Settings</span>
             </div>
             <ul class="nav-links">
-                <li><a href="index.html" id="nav-home">الرئيسية</a></li>
-                <li><a href="converter.html" id="nav-converter">المحول</a></li>
-                <li><a href="settings.html" class="active" id="nav-settings">الإعدادات</a></li>
-                <li><a href="video-library.html" id="nav-library">مكتبة الفيديو</a></li>
+                <li><a href="index.html" id="nav-home">Home</a></li>
+                <li><a href="converter.html" id="nav-converter">Converter</a></li>
+                <li><a href="settings.html" class="active" id="nav-settings">Settings</a></li>
+                <li><a href="video-library.html" id="nav-library">Video Library</a></li>
             </ul>
             <div class="language-toggle">
-                <button class="lang-btn active" onclick="switchLanguage('ar')" id="btn-arabic">العربية</button>
-                <button class="lang-btn" onclick="switchLanguage('en')" id="btn-english">English</button>
+                <button class="lang-btn" onclick="switchLanguage('ar')" id="btn-arabic">العربية</button>
+                <button class="lang-btn active" onclick="switchLanguage('en')" id="btn-english">English</button>
             </div>
         </div>
     </nav>
@@ -530,8 +530,8 @@
     <!-- Main Container -->
     <div class="container">
         <div class="page-header animate-fade-up">
-            <h1 id="main-title">إعدادات المحول</h1>
-            <p id="main-subtitle">تخصيص إعدادات التحويل والمؤثرات البصرية</p>
+            <h1 id="main-title">Converter Settings</h1>
+            <p id="main-subtitle">Customize conversion settings and visual effects</p>
         </div>
 
         <!-- Fade Effects Settings -->
@@ -937,7 +937,7 @@
             }
         };
 
-        let currentLanguage = 'ar';
+        let currentLanguage = 'en';
 
         // Language switching function
         function switchLanguage(lang) {
@@ -1213,8 +1213,8 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             // Load saved language preference
-            const savedLanguage = localStorage.getItem('preferredLanguage') || 'ar';
-            if (savedLanguage !== 'ar') {
+            const savedLanguage = localStorage.getItem('preferredLanguage') || 'en';
+            if (savedLanguage !== 'en') {
                 switchLanguage(savedLanguage);
             }
             
