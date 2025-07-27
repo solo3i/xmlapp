@@ -170,48 +170,23 @@
             cursor: pointer;
             transition: all 0.3s ease;
             background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .upload-zone::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            transition: left 0.6s ease;
-        }
-
-        .upload-zone:hover::before {
-            left: 100%;
         }
 
         .upload-zone:hover {
             border-color: var(--accent-color);
             background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
         }
 
         .upload-zone.dragover {
             border-color: var(--success-color);
             background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
-            transform: scale(1.02);
         }
 
         .upload-icon {
             font-size: 4rem;
             color: var(--accent-color);
             margin-bottom: 1rem;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
         }
 
         .upload-zone h3 {
@@ -490,173 +465,23 @@
             background: rgba(6, 182, 212, 0.1);
         }
 
-        /* Enhanced Animations */
-        @keyframes slideInFromRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
 
-        @keyframes slideInFromLeft {
-            from {
-                transform: translateX(-100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
 
-        @keyframes fadeInUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
 
-        .animate-slide-in {
-            animation: slideInFromRight 0.6s ease-out;
-        }
 
-        [dir="ltr"] .animate-slide-in {
-            animation: slideInFromLeft 0.6s ease-out;
-        }
 
-        .animate-fade-up {
-            animation: fadeInUp 0.8s ease-out;
-        }
 
-        /* Language Transition */
-        .transitioning {
-            transition: all 0.5s ease-in-out;
-        }
 
-        /* Enhanced Cards */
-        .card {
-            position: relative;
-            overflow: hidden;
-        }
 
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 2px;
-            background: var(--gradient-primary);
-            transition: left 0.3s ease;
-        }
 
-        .card:hover::before {
-            left: 0;
-        }
-
-        /* Enhanced Upload Zone */
-        .upload-zone {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .upload-zone::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg, transparent, rgba(59, 130, 246, 0.1), transparent);
-            animation: rotate 4s linear infinite;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .upload-zone:hover::after {
-            opacity: 1;
-        }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* Modern Button Styles */
-        .btn {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
 
         /* Loading States */
         .loading {
-            position: relative;
+            opacity: 0.7;
             pointer-events: none;
         }
 
-        .loading::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 20px;
-            height: 20px;
-            margin: -10px 0 0 -10px;
-            border: 2px solid transparent;
-            border-top: 2px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
 
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* Enhanced Notifications */
-        .notification {
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .notification::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: rgba(255,255,255,0.3);
-            animation: progress 3s linear;
-        }
-
-        @keyframes progress {
-            from { width: 100%; }
-            to { width: 0%; }
-        }
     </style>
 </head>
 <body>
@@ -681,19 +506,19 @@
 
     <!-- Main Container -->
     <div class="container">
-        <div class="page-header animate-fade-up">
+        <div class="page-header">
             <h1 id="main-title">محول الصوت إلى XML</h1>
             <p id="main-subtitle">ارفع ملف الصوت وأدخل النصوص لإنشاء مشروع Final Cut Pro</p>
         </div>
 
         <!-- Media Upload Section -->
-        <div class="card animate-slide-in">
+        <div class="card">
             <div class="card-header">
                 <i class="fas fa-music"></i>
                 <h3 id="upload-title">رفع الملف الصوتي</h3>
             </div>
             <div class="card-body">
-                <div class="upload-zone" onclick="document.getElementById('audioInput').click()">
+                <div class="upload-zone" onclick="triggerFileInput()">
                     <div class="upload-icon">
                         <i class="fas fa-cloud-upload-alt"></i>
                     </div>
@@ -723,7 +548,7 @@
         </div>
 
         <!-- Text Content Section -->
-        <div class="card animate-slide-in" style="animation-delay: 0.2s;">
+        <div class="card">
             <div class="card-header">
                 <i class="fas fa-keyboard"></i>
                 <h3 id="text-content-title">محتوى النص</h3>
@@ -767,10 +592,10 @@
         </div>
 
         <!-- XML Output Section -->
-        <div class="card animate-slide-in" style="animation-delay: 0.3s; display: none;" id="xmlSection">
+        <div class="card" style="display: none;" id="xmlSection">
             <div class="card-header">
                 <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
-                <h3 id="xml-title">تم إنشاء ملف XML بنجاح!</h3>
+                <h3 id="xml-title">تم إنشاء Final Cut Pro Bundle بنجاح!</h3>
             </div>
             <div class="card-body">
                 <div class="success-message" style="text-align: center; margin-bottom: 2rem;">
@@ -839,7 +664,7 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="action-buttons animate-fade-up" style="animation-delay: 0.4s;">
+        <div class="action-buttons">
             <button class="btn btn-success btn-large" onclick="generateXML()" id="generateProjectBtn" disabled>
                 <i class="fas fa-magic"></i> <span id="generate-btn-text">توليد ملف XML</span>
             </button>
@@ -995,9 +820,6 @@
             const htmlRoot = document.getElementById('html-root');
             const t = translations[lang];
             
-            // Add transition effect
-            document.body.classList.add('transitioning');
-            
             // Update HTML attributes
             htmlRoot.lang = lang;
             htmlRoot.dir = lang === 'ar' ? 'rtl' : 'ltr';
@@ -1089,16 +911,26 @@
             
             // Save language preference
             localStorage.setItem('preferredLanguage', lang);
-            
-            // Remove transition effect
-            setTimeout(() => {
-                document.body.classList.remove('transitioning');
-            }, 500);
         }
 
         // Enhanced notification system with language support
         function showNotification(messageKey, type = 'success') {
-            const message = translations[currentLanguage][messageKey] || messageKey;
+            const t = translations[currentLanguage];
+            
+            // Additional messages not in translations
+            const additionalMessages = {
+                poetryFilterEnabled: {
+                    ar: 'تم تفعيل تنقية نصوص القصائد - سيتم تجاهل المستهلات',
+                    en: 'Poetry text filtering enabled - introductory phrases will be ignored'
+                },
+                poetryFilterDisabled: {
+                    ar: 'تم إلغاء تنقية نصوص القصائد - سيتم إدراج جميع النصوص',
+                    en: 'Poetry text filtering disabled - all text will be included'
+                }
+            };
+            
+            let message = t[messageKey] || additionalMessages[messageKey]?.[currentLanguage] || messageKey;
+            
             const notification = document.createElement('div');
             notification.className = `notification ${type} show`;
             notification.textContent = message;
@@ -1111,29 +943,43 @@
             }, 3000);
         }
 
-        // Drag and drop functionality
-        const uploadZone = document.querySelector('.upload-zone');
-        
-        uploadZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadZone.classList.add('dragover');
-        });
-
-        uploadZone.addEventListener('dragleave', () => {
-            uploadZone.classList.remove('dragover');
-        });
-
-        uploadZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadZone.classList.remove('dragover');
+        // Drag and drop functionality - will be initialized after DOM loads
+        function initializeDragAndDrop() {
+            const uploadZone = document.querySelector('.upload-zone');
             
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                handleAudioFile(files[0]);
+            if (!uploadZone) {
+                console.error('Upload zone not found!');
+                return;
             }
-        });
+            
+            uploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadZone.classList.add('dragover');
+            });
+
+            uploadZone.addEventListener('dragleave', () => {
+                uploadZone.classList.remove('dragover');
+            });
+
+            uploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleAudioFile(files[0]);
+                }
+            });
+        }
 
         // Audio upload handling with enhanced UX
+        function triggerFileInput() {
+            const fileInput = document.getElementById('audioInput');
+            if (fileInput) {
+                fileInput.click();
+            }
+        }
+
         function handleAudioUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1147,10 +993,6 @@
                 showNotification('invalidFileType', 'error');
                 return;
             }
-
-            // Add loading state
-            const generateBtn = document.getElementById('generateProjectBtn');
-            generateBtn.classList.add('loading');
 
             audioFile = file;
             projectData.audio = file;
@@ -1175,18 +1017,21 @@
             
             audioPreview.style.display = 'block';
             
-            // Remove loading state and enable generate button
-            setTimeout(() => {
-                generateBtn.classList.remove('loading');
-                generateBtn.disabled = false;
-            }, 500);
+            // Enable generate button
+            document.getElementById('generateProjectBtn').disabled = false;
             
             showNotification('fileUploadSuccess', 'success');
         }
 
         // Load from video library
         function loadFromVideoLibrary() {
-            showNotification('libraryComingSoon', 'warning');
+            try {
+                showNotification('libraryComingSoon', 'warning');
+                console.log('Video library feature coming soon...');
+            } catch (error) {
+                console.error('Error in loadFromVideoLibrary:', error);
+                alert('ميزة مكتبة الفيديو ستكون متاحة قريباً / Video library feature will be available soon');
+            }
         }
 
         // Generate Final Cut Pro XML with enhanced UX
@@ -1519,60 +1364,11 @@
                 .replace(/'/g, '&#39;');
         }
 
-        // Notification system
-        function showNotification(messageKey, type = 'success') {
-            const t = translations[currentLanguage];
-            const messages = {
-                poetryFilterEnabled: {
-                    ar: 'تم تفعيل تنقية نصوص القصائد - سيتم تجاهل المستهلات',
-                    en: 'Poetry text filtering enabled - introductory phrases will be ignored'
-                },
-                poetryFilterDisabled: {
-                    ar: 'تم إلغاء تنقية نصوص القصائد - سيتم إدراج جميع النصوص',
-                    en: 'Poetry text filtering disabled - all text will be included'
-                },
-                noAudioFile: {
-                    ar: 'يرجى رفع ملف صوتي أولاً',
-                    en: 'Please upload an audio file first'
-                },
-                noTextContent: {
-                    ar: 'يرجى إدخال النص العربي أو النص المتكرر',
-                    en: 'Please enter Arabic text or repetitive text'
-                },
-                xmlGenerated: {
-                    ar: 'تم توليد ملف XML بنجاح!',
-                    en: 'XML file generated successfully!'
-                },
-                xmlCopied: {
-                    ar: 'تم نسخ XML إلى الحافظة',
-                    en: 'XML copied to clipboard'
-                },
-                xmlDownloaded: {
-                    ar: 'تم تحميل ملف XML',
-                    en: 'XML file downloaded'
-                },
-                fileUploadSuccess: {
-                    ar: 'تم رفع الملف بنجاح',
-                    en: 'File uploaded successfully'
-                }
-            };
-            
-            const message = messages[messageKey] ? messages[messageKey][currentLanguage] : messageKey;
-            
-            const notification = document.createElement('div');
-            notification.className = `notification ${type} show`;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-
         // Initialize on page load with enhanced features
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize drag and drop functionality
+            initializeDragAndDrop();
+            
             // Load saved language preference
             const savedLanguage = localStorage.getItem('preferredLanguage') || 'ar';
             if (savedLanguage !== 'ar') {
@@ -1626,9 +1422,6 @@
             if (savedSkipIntros !== null) {
                 document.getElementById('skipPoetryIntros').checked = savedSkipIntros === 'true';
             }
-            
-            // Add smooth scroll behavior
-            document.documentElement.style.scrollBehavior = 'smooth';
             
             // Add keyboard shortcuts
             document.addEventListener('keydown', function(e) {
