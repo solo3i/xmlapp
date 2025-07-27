@@ -1270,18 +1270,19 @@
             // uid ثابت للمشروع
             const projectUID = uid;
 
-            // إنشاء XML مبسط ومتوافق مع FCPXML DTD
+            // إنشاء XML متوافق مع Final Cut Pro مع معلومات كاملة
             let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE fcpxml>
 <fcpxml version="1.10">
   <resources>
     <format id="r1" name="FFVideoFormat${height}p${frameRate}" frameDuration="1/${frameRate}s" width="${width}" height="${height}" colorSpace="1-1-1 (Rec. 709)"/>
     <effect id="r2" name="Basic Title" uid=".../Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"/>
-    <asset id="r3" name="${audioName}" uid="${assetUID}" start="0s" duration="${toFrameTime(totalFrames, frameRate)}" hasVideo="0" hasAudio="1">
-      <media-rep kind="original-media" src="file:///${audioName}"/>
+    <asset id="r3" name="${audioName}" uid="${assetUID}" start="0s" duration="${toFrameTime(totalFrames, frameRate)}" hasVideo="0" hasAudio="1" audioSources="1" audioChannels="2" audioRate="48k">
+      <media-rep kind="original-media" sig="${generateUID()}" src="file:///${audioName}"/>
     </asset>
   </resources>
-  <library location="file:///Users/user/Movies/">
-    <event name="Subtitle Project ${new Date().toLocaleDateString()}">
+  <library location="file:///Users/Shared/FCP%20Audio%20Projects/">
+    <event name="Subtitle Project ${new Date().toLocaleDateString()}" uid="${generateUID()}">
       <project name="Arabic English Subtitles" uid="${projectUID}" modDate="${date}">
         <sequence format="r1" duration="${toFrameTime(totalFrames, frameRate)}" tcStart="0s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
           <spine>
@@ -1331,12 +1332,20 @@
 
             generatedXML = xml;
             
-            // Download XML file
-            const blob = new Blob([xml], { type: 'application/xml' });
+            // إنشاء اسم ملف محسّن
+            const fileName = `${audioName.replace(/\.[^/.]+$/, '') || 'project'}.fcpxml`;
+            
+            // Download XML file with proper MIME type and encoding
+            const blob = new Blob([xml], { 
+                type: 'application/xml; charset=utf-8',
+                endings: 'native'
+            });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${audioName.replace(/\.[^/.]+$/, '') || 'project'}.fcpxml`;
+            a.download = fileName;
+            a.setAttribute('type', 'application/xml');
+            a.style.display = 'none';
             document.body.appendChild(a);
             a.click();
             setTimeout(() => {
@@ -1355,11 +1364,19 @@
                 return;
             }
             
-            const blob = new Blob([generatedXML], { type: 'application/xml' });
+            // إنشاء اسم ملف محسّن
+            const fileName = `${audioFile ? audioFile.name.replace(/\.[^/.]+$/, '') : 'project'}.fcpxml`;
+            
+            const blob = new Blob([generatedXML], { 
+                type: 'application/xml; charset=utf-8',
+                endings: 'native'
+            });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${audioFile ? audioFile.name.replace(/\.[^/.]+$/, '') : 'project'}.fcpxml`;
+            a.download = fileName;
+            a.setAttribute('type', 'application/xml');
+            a.style.display = 'none';
             document.body.appendChild(a);
             a.click();
             setTimeout(() => {
