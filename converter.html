@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محول الصوت - FCP Audio to XML</title>
+    <title>الإعدادات - FCP Audio to XML</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Default Settings System -->
@@ -101,7 +101,43 @@
             background: rgba(59, 130, 246, 0.1);
         }
 
-        /* Main Container */
+        /* Language Toggle */
+        .language-toggle {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--surface-color);
+            border-radius: 50px;
+            padding: 0.3rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-family: var(--font-primary);
+        }
+
+        .lang-btn.active {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .lang-btn:hover:not(.active) {
+            color: var(--accent-color);
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        /* Container */
         .container {
             max-width: 1000px;
             margin: 0 auto;
@@ -135,6 +171,22 @@
             border: 1px solid var(--border-color);
             overflow: hidden;
             margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: left 0.3s ease;
+        }
+
+        .card:hover::before {
+            left: 0;
         }
 
         .card-header {
@@ -161,75 +213,7 @@
             padding: 2rem;
         }
 
-        /* Upload Zone */
-        .upload-zone {
-            border: 3px dashed var(--border-color);
-            border-radius: var(--radius);
-            padding: 3rem 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%);
-        }
-
-        .upload-zone:hover {
-            border-color: var(--accent-color);
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
-            transform: translateY(-2px);
-        }
-
-        .upload-zone.dragover {
-            border-color: var(--success-color);
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
-        }
-
-        .upload-icon {
-            font-size: 4rem;
-            color: var(--accent-color);
-            margin-bottom: 1rem;
-        }
-
-        .upload-zone h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-        }
-
-        .upload-zone p {
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        /* Audio Preview */
-        .audio-preview {
-            background: var(--surface-color);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-            border: 1px solid var(--border-color);
-            display: none;
-        }
-
-        .audio-preview audio {
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-
-        .audio-info {
-            font-family: var(--font-mono);
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            background: rgba(0,0,0,0.3);
-            padding: 1rem;
-            border-radius: 8px;
-        }
-
-        /* Form Groups */
+        /* Form Elements */
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -267,9 +251,53 @@
             box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
         }
 
-        textarea.form-control {
-            resize: vertical;
-            min-height: 120px;
+        /* Range Slider */
+        .range-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .range-input {
+            flex: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: var(--surface-color);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .range-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .range-input::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .range-value {
+            min-width: 60px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--accent-color);
+            background: var(--surface-color);
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
         }
 
         /* Buttons */
@@ -286,6 +314,23 @@
             cursor: pointer;
             font-size: 1rem;
             font-family: var(--font-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn-primary {
@@ -309,22 +354,23 @@
             box-shadow: 0 15px 35px rgba(16, 185, 129, 0.3);
         }
 
-        .btn-large {
-            padding: 1rem 2rem;
-            font-size: 1.1rem;
-            font-weight: 700;
-            min-height: 60px;
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color), #fbbf24);
+            color: white;
         }
 
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(245, 158, 11, 0.3);
         }
 
         .action-buttons {
             text-align: center;
             margin-top: 3rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
         /* Notifications */
@@ -341,6 +387,8 @@
             transition: transform 0.3s ease;
             max-width: 400px;
             box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .notification.success {
@@ -357,6 +405,43 @@
 
         .notification.show {
             transform: translateX(0);
+        }
+
+        .notification::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255,255,255,0.3);
+            animation: progress 3s linear;
+        }
+
+        @keyframes progress {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+
+        /* Language Transition */
+        .transitioning {
+            transition: all 0.5s ease-in-out;
+        }
+
+        /* Enhanced Animations */
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .animate-fade-up {
+            animation: fadeInUp 0.8s ease-out;
         }
 
         /* Responsive */
@@ -382,12 +467,9 @@
                 font-size: 2rem;
             }
 
-            .upload-zone {
-                padding: 2rem 1rem;
-            }
-
-            .upload-icon {
-                font-size: 3rem;
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
             }
             
             .lang-btn {
@@ -413,11 +495,6 @@
             .page-header h1 {
                 font-size: 1.75rem;
             }
-            
-            .btn-large {
-                padding: 0.8rem 1.5rem;
-                font-size: 1rem;
-            }
         }
 
         /* RTL Support */
@@ -428,60 +505,6 @@
         [dir="rtl"] .nav-container {
             flex-direction: row-reverse;
         }
-
-        /* Language Toggle */
-        .language-toggle {
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--surface-color);
-            border-radius: 50px;
-            padding: 0.3rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .lang-btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            font-weight: 600;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-            font-family: var(--font-primary);
-        }
-
-        .lang-btn.active {
-            background: var(--gradient-primary);
-            color: white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-
-        .lang-btn:hover:not(.active) {
-            color: var(--accent-color);
-            background: rgba(6, 182, 212, 0.1);
-        }
-
-
-
-
-
-
-
-
-
-
-
-        /* Loading States */
-        .loading {
-            opacity: 0.7;
-            pointer-events: none;
-        }
-
-
     </style>
 </head>
 <body>
@@ -489,12 +512,12 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <i class="fas fa-film"></i> <span id="logo-text">محول صوت FCP</span>
+                <i class="fas fa-cog"></i> <span id="logo-text">إعدادات FCP</span>
             </div>
             <ul class="nav-links">
                 <li><a href="index.html" id="nav-home">الرئيسية</a></li>
-                <li><a href="converter.html" class="active" id="nav-converter">المحول</a></li>
-                <li><a href="settings.html" id="nav-settings">الإعدادات</a></li>
+                <li><a href="converter.html" id="nav-converter">المحول</a></li>
+                <li><a href="settings.html" class="active" id="nav-settings">الإعدادات</a></li>
                 <li><a href="video-library.html" id="nav-library">مكتبة الفيديو</a></li>
             </ul>
             <div class="language-toggle">
@@ -506,307 +529,411 @@
 
     <!-- Main Container -->
     <div class="container">
-        <div class="page-header">
-            <h1 id="main-title">محول الصوت إلى XML</h1>
-            <p id="main-subtitle">ارفع ملف الصوت وأدخل النصوص لإنشاء مشروع Final Cut Pro</p>
+        <div class="page-header animate-fade-up">
+            <h1 id="main-title">إعدادات المحول</h1>
+            <p id="main-subtitle">تخصيص إعدادات التحويل والمؤثرات البصرية</p>
         </div>
 
-        <!-- Media Upload Section -->
-        <div class="card">
+        <!-- Fade Effects Settings -->
+        <div class="card animate-fade-up" style="animation-delay: 0.1s;">
             <div class="card-header">
-                <i class="fas fa-music"></i>
-                <h3 id="upload-title">رفع الملف الصوتي</h3>
-            </div>
-            <div class="card-body">
-                <div class="upload-zone" onclick="triggerFileInput()">
-                    <div class="upload-icon">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                    </div>
-                    <h3 id="upload-main-text">رفع ملف صوتي أو فيديو</h3>
-                    <p id="upload-support-text">يدعم: MP3, WAV, M4A, AAC, FLAC, OGG, MP4, MOV, AVI</p>
-                    <p id="upload-instruction-text">اسحب وأفلت أو اضغط للاختيار</p>
-                    <input type="file" id="audioInput" class="file-input" accept=".mp3,.wav,.m4a,.aac,.flac,.ogg,.mp4,.mov,.avi" onchange="handleAudioUpload(event)">
-                </div>
-                
-                <div id="audioPreview" class="audio-preview">
-                    <audio controls id="audioPlayer">
-                        متصفحك لا يدعم عرض الملفات الصوتية.
-                    </audio>
-                    <div id="audioInfo" class="audio-info"></div>
-                </div>
-
-                <!-- Video Library Integration -->
-                <div style="margin-top: 1rem; text-align: center;">
-                    <button class="btn btn-primary" onclick="loadFromVideoLibrary()">
-                        <i class="fas fa-video"></i> <span id="library-btn-text">تحميل من مكتبة الفيديو</span>
-                    </button>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;" id="library-description">
-                        اختر من الفيديوهات المرفوعة مسبقاً
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Text Content Section -->
-        <div class="card">
-            <div class="card-header">
-                <i class="fas fa-keyboard"></i>
-                <h3 id="text-content-title">محتوى النص</h3>
+                <i class="fas fa-adjust"></i>
+                <h3 id="fade-title">إعدادات التلاشي</h3>
             </div>
             <div class="card-body">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label class="form-label" id="arabic-text-label">النص العربي الأساسي:</label>
-                        <textarea id="arabicText" class="form-control" placeholder="" style="direction: rtl; text-align: right;"></textarea>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;" id="arabic-text-description">
-                            النص الرئيسي الذي سيظهر في الترجمة
-                        </p>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" id="repetitive-text-label">المستهل (النص المتكرر):</label>
-                        <textarea id="repetitiveText" class="form-control" placeholder="" style="direction: rtl; text-align: right;"></textarea>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;" id="repetitive-text-description">
-                            النص الذي سيتم تكراره في المقطع (مثل: يا حسين، لبيك يا حسين، إلخ)
-                        </p>
-                    </div>
-
-                    <!-- Poetry Processing Settings -->
-                    <div class="form-group" style="background: rgba(59, 130, 246, 0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                            <i class="fas fa-filter" style="color: var(--primary-color);"></i>
-                            <label class="form-label" style="margin: 0;" id="poetry-filter-label">تنقية نصوص القصائد:</label>
+                        <label class="form-label" id="fade-in-duration-label">مدة التلاشي للداخل (ثانية):</label>
+                        <div class="range-container">
+                            <input type="range" id="fadeInDuration" class="range-input" min="0" max="3" step="0.1" value="0.5">
+                            <span class="range-value" id="fadeInDurationValue">0.5</span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-                            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
-                                <input type="checkbox" id="skipPoetryIntros" checked style="margin: 0;">
-                                <span id="skip-intros-text">تجاهل المستهلات</span>
-                            </label>
-                            <span style="font-size: 0.8rem; color: var(--text-muted);" id="poetry-filter-description">
-                                سيتم تجاهل العبارات الافتتاحية والختامية في القصائد
-                            </span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" id="fade-out-duration-label">مدة التلاشي للخارج (ثانية):</label>
+                        <div class="range-container">
+                            <input type="range" id="fadeOutDuration" class="range-input" min="0" max="3" step="0.1" value="0.5">
+                            <span class="range-value" id="fadeOutDurationValue">0.5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" id="fade-in-type-label">نوع التلاشي للداخل:</label>
+                        <select id="fadeInType" class="form-control">
+                            <option value="ease-in-out" id="ease-in-out-option">سلس</option>
+                            <option value="ease-in" id="ease-in-option">بطيء في البداية</option>
+                            <option value="ease-out" id="ease-out-option">بطيء في النهاية</option>
+                            <option value="linear" id="linear-option">خطي</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" id="fade-out-type-label">نوع التلاشي للخارج:</label>
+                        <select id="fadeOutType" class="form-control">
+                            <option value="ease-in-out" id="ease-in-out-option2">سلس</option>
+                            <option value="ease-in" id="ease-in-option2">بطيء في البداية</option>
+                            <option value="ease-out" id="ease-out-option2">بطيء في النهاية</option>
+                            <option value="linear" id="linear-option2">خطي</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Animation Settings -->
+        <div class="card animate-fade-up" style="animation-delay: 0.2s;">
+            <div class="card-header">
+                <i class="fas fa-magic"></i>
+                <h3 id="animation-title">إعدادات الحركة</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" id="animation-style-label">نمط الحركة:</label>
+                        <select id="animationStyle" class="form-control">
+                            <option value="fade" id="fade-option">تلاشي</option>
+                            <option value="slide" id="slide-option">انزلاق</option>
+                            <option value="scale" id="scale-option">تكبير/تصغير</option>
+                            <option value="bounce" id="bounce-option">ارتداد</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" id="animation-speed-label">سرعة الحركة:</label>
+                        <div class="range-container">
+                            <input type="range" id="animationSpeed" class="range-input" min="0.5" max="3" step="0.1" value="1">
+                            <span class="range-value" id="animationSpeedValue">1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" id="blur-amount-label">مستوى الضبابية:</label>
+                        <div class="range-container">
+                            <input type="range" id="blurAmount" class="range-input" min="0" max="10" step="0.5" value="0">
+                            <span class="range-value" id="blurAmountValue">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" id="shadow-intensity-label">شدة الظل:</label>
+                        <div class="range-container">
+                            <input type="range" id="shadowIntensity" class="range-input" min="0" max="100" step="5" value="50">
+                            <span class="range-value" id="shadowIntensityValue">50</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- XML Output Section -->
-        <div class="card" style="display: none;" id="xmlSection">
+        <!-- Timing Settings -->
+        <div class="card animate-fade-up" style="animation-delay: 0.3s;">
             <div class="card-header">
-                <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
-                <h3 id="xml-title">تم إنشاء Final Cut Pro Bundle بنجاح!</h3>
+                <i class="fas fa-clock"></i>
+                <h3 id="timing-title">إعدادات التوقيت</h3>
             </div>
             <div class="card-body">
-                <div class="success-message" style="text-align: center; margin-bottom: 2rem;">
-                    <div style="font-size: 4rem; color: var(--success-color); margin-bottom: 1rem;">
-                        <i class="fas fa-file-download"></i>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" id="start-time-label">وقت البداية (ثانية):</label>
+                        <input type="number" id="startTime" class="form-control" min="0" step="0.1" value="0">
                     </div>
-                    <h4 style="margin-bottom: 0.5rem; color: var(--text-primary);" id="success-title">ملف Final Cut Pro جاهز للتحميل</h4>
-                    <p style="color: var(--text-secondary);" id="success-description">سيتم تحميل الملف تلقائياً، أو يمكنك الضغط على زر التحميل أدناه</p>
-                </div>
-                
-                <div class="download-actions" style="text-align: center; margin-bottom: 2rem;">
-                    <button class="btn btn-success btn-large" onclick="downloadXML()" id="downloadBtn">
-                        <i class="fas fa-download"></i> <span id="download-btn-text">تحميل ملف XML</span>
-                    </button>
+                    
+                    <div class="form-group">
+                        <label class="form-label" id="duration-label">المدة الافتراضية (ثانية):</label>
+                        <input type="number" id="duration" class="form-control" min="1" step="0.1" value="5">
+                    </div>
                 </div>
 
-                <!-- Instructions Section -->
-                <div class="instructions-container" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(6, 182, 212, 0.1)); border-radius: 12px; padding: 2rem; border: 1px solid var(--border-color);">
-                    <h4 style="margin-bottom: 1.5rem; color: var(--text-primary); text-align: center;" id="instructions-title">
-                        <i class="fas fa-play-circle" style="color: var(--accent-color); margin-left: 0.5rem;"></i>
-                        إرشادات التشغيل في Final Cut Pro
-                    </h4>
-                    
-                    <div class="instruction-steps" style="display: grid; gap: 1.5rem;">
-                        <div class="step" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px; border-right: 4px solid var(--accent-color);">
-                            <div style="background: var(--accent-color); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">1</div>
-                            <div>
-                                <h5 style="margin-bottom: 0.5rem; color: var(--text-primary);" id="step1-title">تحضير الملفات</h5>
-                                <p style="color: var(--text-secondary); margin: 0;" id="step1-desc">ضع الملف الصوتي المرفوع في مجلد مع ملف XML الذي تم تحميله</p>
-                            </div>
-                        </div>
-                        
-                        <div class="step" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px; border-right: 4px solid var(--accent-color);">
-                            <div style="background: var(--accent-color); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">2</div>
-                            <div>
-                                <h5 style="margin-bottom: 0.5rem; color: var(--text-primary);" id="step2-title">فتح Final Cut Pro</h5>
-                                <p style="color: var(--text-secondary); margin: 0;" id="step2-desc">افتح برنامج Final Cut Pro على جهاز Mac</p>
-                            </div>
-                        </div>
-                        
-                        <div class="step" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px; border-right: 4px solid var(--accent-color);">
-                            <div style="background: var(--accent-color); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">3</div>
-                            <div>
-                                <h5 style="margin-bottom: 0.5rem; color: var(--text-primary);" id="step3-title">استيراد المشروع</h5>
-                                <p style="color: var(--text-secondary); margin: 0;" id="step3-desc">اسحب ملف XML إلى نافذة Final Cut Pro أو استخدم File > Import > XML</p>
-                            </div>
-                        </div>
-                        
-                        <div class="step" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px; border-right: 4px solid var(--accent-color);">
-                            <div style="background: var(--success-color); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">4</div>
-                            <div>
-                                <h5 style="margin-bottom: 0.5rem; color: var(--text-primary);" id="step4-title">التشغيل والتعديل</h5>
-                                <p style="color: var(--text-secondary); margin: 0;" id="step4-desc">ستجد المشروع في مكتبة FCP مع الصوت والترجمة جاهزين للتشغيل والتعديل</p>
-                            </div>
-                        </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" id="display-mode-label">وضع العرض:</label>
+                        <select id="displayMode" class="form-control">
+                            <option value="arabic" id="arabic-only-option">العربي فقط</option>
+                            <option value="repetitive" id="repetitive-only-option">المتكرر فقط</option>
+                            <option value="both" id="both-option">كلاهما</option>
+                            <option value="alternating" id="alternating-option">متناوب</option>
+                        </select>
                     </div>
                     
-                    <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3);">
-                        <p style="margin: 0; color: var(--text-secondary); text-align: center; font-size: 0.9rem;" id="note-text">
-                            <i class="fas fa-lightbulb" style="color: var(--warning-color); margin-left: 0.5rem;"></i>
-                            نصيحة: يمكنك تعديل النصوص والخطوط والمواضع مباشرة في Final Cut Pro بعد الاستيراد
-                        </p>
+                    <div class="form-group">
+                        <label class="form-label" id="preview-resolution-label">دقة المعاينة:</label>
+                        <select id="previewResolution" class="form-control">
+                            <option value="1920x1080" id="resolution-1080p">1920x1080 (1080p)</option>
+                            <option value="1280x720" id="resolution-720p">1280x720 (720p)</option>
+                            <option value="3840x2160" id="resolution-4k">3840x2160 (4K)</option>
+                        </select>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audio Settings -->
+        <div class="card animate-fade-up" style="animation-delay: 0.4s;">
+            <div class="card-header">
+                <i class="fas fa-volume-up"></i>
+                <h3 id="audio-title">إعدادات الصوت</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" id="audio-sync-label">مزامنة الصوت:</label>
+                        <select id="audioSync" class="form-control">
+                            <option value="start" id="sync-start-option">بداية المقطع</option>
+                            <option value="center" id="sync-center-option">وسط المقطع</option>
+                            <option value="end" id="sync-end-option">نهاية المقطع</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" id="auto-timing-label">التوقيت التلقائي:</label>
+                        <select id="autoTiming" class="form-control">
+                            <option value="true" id="auto-timing-yes">نعم</option>
+                            <option value="false" id="auto-timing-no">لا</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" id="speech-speed-label">سرعة الكلام:</label>
+                        <select id="speechSpeed" class="form-control">
+                            <option value="slow" id="speech-slow">بطيء</option>
+                            <option value="normal" id="speech-normal">عادي</option>
+                            <option value="fast" id="speech-fast">سريع</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" id="sentence-duration-label">مدة الجملة (ثانية):</label>
+                        <div class="range-container">
+                            <input type="range" id="sentenceDuration" class="range-input" min="2" max="10" step="0.5" value="4">
+                            <span class="range-value" id="sentenceDurationValue">4</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Settings -->
+        <div class="card animate-fade-up" style="animation-delay: 0.5s;">
+            <div class="card-header">
+                <i class="fas fa-sliders-h"></i>
+                <h3 id="advanced-title">إعدادات متقدمة</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" id="detect-repeats-label">اكتشاف التكرارات:</label>
+                        <select id="detectRepeats" class="form-control">
+                            <option value="true" id="detect-repeats-yes">نعم</option>
+                            <option value="false" id="detect-repeats-no">لا</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" id="voice-threshold-label">حساسية الصوت:</label>
+                        <div class="range-container">
+                            <input type="range" id="voiceThreshold" class="range-input" min="0.1" max="1" step="0.1" value="0.3">
+                            <span class="range-value" id="voiceThresholdValue">0.3</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" id="auto-sync-beats-label">مزامنة تلقائية مع الإيقاع:</label>
+                    <select id="autoSyncBeats" class="form-control">
+                        <option value="true" id="auto-sync-yes">نعم</option>
+                        <option value="false" id="auto-sync-no">لا</option>
+                    </select>
                 </div>
             </div>
         </div>
 
         <!-- Action Buttons -->
-        <div class="action-buttons">
-            <button class="btn btn-success btn-large" onclick="generateXML()" id="generateProjectBtn" disabled>
-                <i class="fas fa-magic"></i> <span id="generate-btn-text">توليد ملف XML</span>
+        <div class="action-buttons animate-fade-up" style="animation-delay: 0.6s;">
+            <button class="btn btn-success" onclick="saveSettings()">
+                <i class="fas fa-save"></i> <span id="save-btn-text">حفظ الإعدادات</span>
             </button>
-            <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 1rem;" id="settings-link-text">
-                يمكنك تخصيص الإعدادات المتقدمة من صفحة <a href="settings.html" style="color: var(--accent-color);" id="settings-link">الإعدادات</a>
-            </p>
+            <button class="btn btn-warning" onclick="resetSettings()">
+                <i class="fas fa-undo"></i> <span id="reset-btn-text">إعادة التعيين</span>
+            </button>
+            <button class="btn btn-primary" onclick="exportSettings()">
+                <i class="fas fa-download"></i> <span id="export-btn-text">تصدير الإعدادات</span>
+            </button>
+            <button class="btn btn-secondary" onclick="showImportDialog()">
+                <i class="fas fa-upload"></i> <span id="import-btn-text">استيراد الإعدادات</span>
+            </button>
+            <button class="btn btn-info" onclick="resetToGlobalDefaults()">
+                <i class="fas fa-cog"></i> <span id="defaults-btn-text">الإعدادات الافتراضية</span>
+            </button>
+        </div>
+
+        <!-- Import Dialog -->
+        <div id="importDialog" style="display: none; margin-top: 2rem;">
+            <div style="background: var(--card-bg); padding: 2rem; border-radius: var(--radius); border: 1px solid var(--border-color);">
+                <h3 id="import-title" style="margin-bottom: 1rem; color: var(--text-primary);">استيراد الإعدادات</h3>
+                <input type="file" id="importFile" accept=".json" style="margin-bottom: 1rem; width: 100%; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-primary);">
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button class="btn btn-secondary" onclick="hideImportDialog()">
+                        <i class="fas fa-times"></i> <span id="cancel-btn-text">إلغاء</span>
+                    </button>
+                    <button class="btn btn-primary" onclick="handleImport()">
+                        <i class="fas fa-check"></i> <span id="confirm-btn-text">تأكيد</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        let audioFile = null;
-        let projectData = {
-            audio: null,
-            arabicText: '',
-            repetitiveText: ''
-        };
-
         // Language system
         const translations = {
             ar: {
-                title: 'محول الصوت - FCP Audio to XML',
-                logoText: 'محول صوت FCP',
+                title: 'الإعدادات - FCP Audio to XML',
+                logoText: 'إعدادات FCP',
                 navHome: 'الرئيسية',
                 navConverter: 'المحول',
-                navPreview: 'المعاينة',
                 navSettings: 'الإعدادات',
                 navLibrary: 'مكتبة الفيديو',
-                mainTitle: 'محول الصوت إلى XML',
-                mainSubtitle: 'ارفع ملف الصوت وأدخل النصوص لإنشاء مشروع Final Cut Pro',
-                uploadTitle: 'رفع الملف الصوتي',
-                uploadMainText: 'رفع ملف صوتي أو فيديو',
-                uploadSupportText: 'يدعم: MP3, WAV, M4A, AAC, FLAC, OGG, MP4, MOV, AVI',
-                uploadInstructionText: 'اسحب وأفلت أو اضغط للاختيار',
-                libraryBtnText: 'تحميل من مكتبة الفيديو',
-                libraryDescription: 'اختر من الفيديوهات المرفوعة مسبقاً',
-                textContentTitle: 'محتوى النص',
-                arabicTextLabel: 'النص العربي الأساسي:',
-                arabicTextPlaceholder: 'أدخل النص العربي هنا...',
-                arabicTextDescription: 'النص الرئيسي الذي سيظهر في الترجمة',
-                repetitiveTextLabel: 'المستهل (النص المتكرر):',
-                repetitiveTextPlaceholder: 'أدخل النص المتكرر هنا...',
-                repetitiveTextDescription: 'النص الذي سيتم تكراره في المقطع (مثل: يا حسين، لبيك يا حسين، إلخ)',
-                poetryFilterLabel: 'تنقية نصوص القصائد:',
-                skipIntrosText: 'تجاهل المستهلات',
-                poetryFilterDescription: 'سيتم تجاهل العبارات الافتتاحية والختامية في القصائد',
-                generateBtnText: 'توليد Final Cut Pro Bundle',
-                settingsLinkText: 'يمكنك تخصيص الإعدادات المتقدمة من صفحة',
-                settingsLink: 'الإعدادات',
-                xmlTitle: 'تم إنشاء Final Cut Pro Bundle بنجاح!',
-                successTitle: 'ملف Final Cut Pro Bundle جاهز للتحميل',
-                successDescription: 'سيتم تحميل الـ Bundle تلقائياً، أو يمكنك الضغط على زر التحميل أدناه',
-                downloadBtnText: 'تحميل Final Cut Pro Bundle',
-                instructionsTitle: 'إرشادات التشغيل في Final Cut Pro',
-                step1Title: 'تحضير الملفات',
-                step1Desc: 'ضع الملف الصوتي في نفس مجلد الـ Bundle (.fcpbundle) المحمّل',
-                step2Title: 'فتح Final Cut Pro',
-                step2Desc: 'افتح برنامج Final Cut Pro على جهاز Mac',
-                step3Title: 'استيراد المشروع',
-                step3Desc: 'انقر نقراً مزدوجاً على ملف .fcpbundle أو اسحبه إلى Final Cut Pro',
-                step4Title: 'التشغيل والتعديل',
-                step4Desc: 'ستجد المشروع في مكتبة FCP مع الصوت والترجمة جاهزين للتشغيل والتعديل',
-                noteText: 'نصيحة: يمكنك تعديل النصوص والخطوط والمواضع مباشرة في Final Cut Pro بعد الاستيراد',
+                mainTitle: 'إعدادات المحول',
+                mainSubtitle: 'تخصيص إعدادات التحويل والمؤثرات البصرية',
+                fadeTitle: 'إعدادات التلاشي',
+                fadeInDurationLabel: 'مدة التلاشي للداخل (ثانية):',
+                fadeOutDurationLabel: 'مدة التلاشي للخارج (ثانية):',
+                fadeInTypeLabel: 'نوع التلاشي للداخل:',
+                fadeOutTypeLabel: 'نوع التلاشي للخارج:',
+                easeInOutOption: 'سلس',
+                easeInOption: 'بطيء في البداية',
+                easeOutOption: 'بطيء في النهاية',
+                linearOption: 'خطي',
+                animationTitle: 'إعدادات الحركة',
+                animationStyleLabel: 'نمط الحركة:',
+                fadeOption: 'تلاشي',
+                slideOption: 'انزلاق',
+                scaleOption: 'تكبير/تصغير',
+                bounceOption: 'ارتداد',
+                animationSpeedLabel: 'سرعة الحركة:',
+                blurAmountLabel: 'مستوى الضبابية:',
+                shadowIntensityLabel: 'شدة الظل:',
+                timingTitle: 'إعدادات التوقيت',
+                startTimeLabel: 'وقت البداية (ثانية):',
+                durationLabel: 'المدة الافتراضية (ثانية):',
+                displayModeLabel: 'وضع العرض:',
+                arabicOnlyOption: 'العربي فقط',
+                repetitiveOnlyOption: 'المتكرر فقط',
+                bothOption: 'كلاهما',
+                alternatingOption: 'متناوب',
+                previewResolutionLabel: 'دقة المعاينة:',
+                audioTitle: 'إعدادات الصوت',
+                audioSyncLabel: 'مزامنة الصوت:',
+                syncStartOption: 'بداية المقطع',
+                syncCenterOption: 'وسط المقطع',
+                syncEndOption: 'نهاية المقطع',
+                autoTimingLabel: 'التوقيت التلقائي:',
+                speechSpeedLabel: 'سرعة الكلام:',
+                speechSlow: 'بطيء',
+                speechNormal: 'عادي',
+                speechFast: 'سريع',
+                sentenceDurationLabel: 'مدة الجملة (ثانية):',
+                advancedTitle: 'إعدادات متقدمة',
+                detectRepeatsLabel: 'اكتشاف التكرارات:',
+                voiceThresholdLabel: 'حساسية الصوت:',
+                autoSyncBeatsLabel: 'مزامنة تلقائية مع الإيقاع:',
+                saveBtnText: 'حفظ الإعدادات',
+                resetBtnText: 'إعادة التعيين',
+                exportBtnText: 'تصدير الإعدادات',
+                importBtnText: 'استيراد الإعدادات',
+                defaultsBtnText: 'الإعدادات الافتراضية',
+                importTitle: 'استيراد الإعدادات',
+                cancelBtnText: 'إلغاء',
+                confirmBtnText: 'تأكيد',
+                yesOption: 'نعم',
+                noOption: 'لا',
                 // Notifications
-                fileUploadSuccess: 'تم تحميل الملف الصوتي بنجاح!',
-                invalidFileType: 'يرجى اختيار ملف صوتي أو فيديو',
-                noAudioFile: 'يرجى رفع ملف صوتي أولاً',
-                noTextContent: 'يرجى إدخال نص عربي أو نص متكرر',
-                xmlGenerated: 'تم توليد Final Cut Pro Bundle بنجاح!',
-                xmlCopied: 'تم نسخ كود XML!',
-                xmlCopyFailed: 'فشل في نسخ كود XML',
-                xmlDownloaded: 'تم تحميل Final Cut Pro Bundle بنجاح!',
-                noXmlToDownload: 'لا يوجد Bundle للتحميل',
-                libraryComingSoon: 'ميزة مكتبة الفيديو ستكون متاحة قريباً',
-                // Audio info
-                fileLabel: 'الملف:',
-                sizeLabel: 'الحجم:',
-                typeLabel: 'النوع:',
-                statusLabel: 'الحالة:',
-                readyStatus: 'جاهز للتحويل',
-                megabytes: 'ميجابايت'
+                settingsSaved: 'تم حفظ الإعدادات بنجاح!',
+                settingsReset: 'تم إعادة تعيين الإعدادات للقيم الافتراضية',
+                settingsExported: 'تم تصدير الإعدادات بنجاح!',
+                settingsImported: 'تم استيراد الإعدادات بنجاح!',
+                defaultsRestored: 'تم استعادة الإعدادات الافتراضية العامة!',
+                importError: 'خطأ في استيراد الإعدادات. تحقق من تنسيق الملف.',
+                confirmReset: 'هل أنت متأكد من إعادة تعيين جميع الإعدادات؟',
+                confirmDefaults: 'هل تريد استعادة جميع الإعدادات الافتراضية العامة؟'
             },
             en: {
-                title: 'Audio Converter - FCP Audio to XML',
-                logoText: 'FCP Audio Converter',
+                title: 'Settings - FCP Audio to XML',
+                logoText: 'FCP Settings',
                 navHome: 'Home',
                 navConverter: 'Converter',
-                navPreview: 'Preview',
                 navSettings: 'Settings',
                 navLibrary: 'Video Library',
-                mainTitle: 'Audio to XML Converter',
-                mainSubtitle: 'Upload audio file and enter text to create Final Cut Pro project',
-                uploadTitle: 'Upload Audio File',
-                uploadMainText: 'Upload Audio or Video File',
-                uploadSupportText: 'Supports: MP3, WAV, M4A, AAC, FLAC, OGG, MP4, MOV, AVI',
-                uploadInstructionText: 'Drag and drop or click to select',
-                libraryBtnText: 'Load from Video Library',
-                libraryDescription: 'Choose from previously uploaded videos',
-                textContentTitle: 'Text Content',
-                arabicTextLabel: 'Main Arabic Text:',
-                arabicTextPlaceholder: 'Enter Arabic text here...',
-                arabicTextDescription: 'The main text that will appear in the subtitles',
-                repetitiveTextLabel: 'Repetitive Text:',
-                repetitiveTextPlaceholder: 'Enter repetitive text here...',
-                repetitiveTextDescription: 'Text that will be repeated in the clip (e.g., Ya Hussein, Labbaik Ya Hussein, etc.)',
-                poetryFilterLabel: 'Poetry Text Filtering:',
-                skipIntrosText: 'Skip Introductory Phrases',
-                poetryFilterDescription: 'Will ignore introductory and concluding phrases in poems',
-                generateBtnText: 'Generate Final Cut Pro Bundle',
-                settingsLinkText: 'You can customize advanced settings from the',
-                settingsLink: 'Settings',
-                xmlTitle: 'Final Cut Pro Bundle Created Successfully!',
-                successTitle: 'Final Cut Pro Bundle Ready for Download',
-                successDescription: 'The bundle will download automatically, or you can click the download button below',
-                downloadBtnText: 'Download Final Cut Pro Bundle',
-                instructionsTitle: 'Instructions for Final Cut Pro',
-                step1Title: 'Prepare Files',
-                step1Desc: 'Place the audio file in the same folder as the downloaded Bundle (.fcpbundle)',
-                step2Title: 'Open Final Cut Pro',
-                step2Desc: 'Open Final Cut Pro application on your Mac',
-                step3Title: 'Import Project',
-                step3Desc: 'Double-click the .fcpbundle file or drag it to Final Cut Pro',
-                step4Title: 'Play and Edit',
-                step4Desc: 'You will find the project in FCP library with audio and subtitles ready to play and edit',
-                noteText: 'Tip: You can edit texts, fonts, and positions directly in Final Cut Pro after import',
+                mainTitle: 'Converter Settings',
+                mainSubtitle: 'Customize conversion settings and visual effects',
+                fadeTitle: 'Fade Effects Settings',
+                fadeInDurationLabel: 'Fade In Duration (seconds):',
+                fadeOutDurationLabel: 'Fade Out Duration (seconds):',
+                fadeInTypeLabel: 'Fade In Type:',
+                fadeOutTypeLabel: 'Fade Out Type:',
+                easeInOutOption: 'Smooth',
+                easeInOption: 'Slow Start',
+                easeOutOption: 'Slow End',
+                linearOption: 'Linear',
+                animationTitle: 'Animation Settings',
+                animationStyleLabel: 'Animation Style:',
+                fadeOption: 'Fade',
+                slideOption: 'Slide',
+                scaleOption: 'Scale',
+                bounceOption: 'Bounce',
+                animationSpeedLabel: 'Animation Speed:',
+                blurAmountLabel: 'Blur Amount:',
+                shadowIntensityLabel: 'Shadow Intensity:',
+                timingTitle: 'Timing Settings',
+                startTimeLabel: 'Start Time (seconds):',
+                durationLabel: 'Default Duration (seconds):',
+                displayModeLabel: 'Display Mode:',
+                arabicOnlyOption: 'Arabic Only',
+                repetitiveOnlyOption: 'Repetitive Only',
+                bothOption: 'Both',
+                alternatingOption: 'Alternating',
+                previewResolutionLabel: 'Preview Resolution:',
+                audioTitle: 'Audio Settings',
+                audioSyncLabel: 'Audio Sync:',
+                syncStartOption: 'Clip Start',
+                syncCenterOption: 'Clip Center',
+                syncEndOption: 'Clip End',
+                autoTimingLabel: 'Auto Timing:',
+                speechSpeedLabel: 'Speech Speed:',
+                speechSlow: 'Slow',
+                speechNormal: 'Normal',
+                speechFast: 'Fast',
+                sentenceDurationLabel: 'Sentence Duration (seconds):',
+                advancedTitle: 'Advanced Settings',
+                detectRepeatsLabel: 'Detect Repetitions:',
+                voiceThresholdLabel: 'Voice Sensitivity:',
+                autoSyncBeatsLabel: 'Auto Sync with Beats:',
+                saveBtnText: 'Save Settings',
+                resetBtnText: 'Reset Settings',
+                exportBtnText: 'Export Settings',
+                importBtnText: 'Import Settings',
+                defaultsBtnText: 'Default Settings',
+                importTitle: 'Import Settings',
+                cancelBtnText: 'Cancel',
+                confirmBtnText: 'Confirm',
+                yesOption: 'Yes',
+                noOption: 'No',
                 // Notifications
-                fileUploadSuccess: 'Audio file uploaded successfully!',
-                invalidFileType: 'Please select an audio or video file',
-                noAudioFile: 'Please upload an audio file first',
-                noTextContent: 'Please enter Arabic text or repetitive text',
-                xmlGenerated: 'Final Cut Pro Bundle generated successfully!',
-                xmlCopied: 'XML code copied!',
-                xmlCopyFailed: 'Failed to copy XML code',
-                xmlDownloaded: 'Final Cut Pro Bundle downloaded successfully!',
-                noXmlToDownload: 'No Bundle to download',
-                libraryComingSoon: 'Video library feature will be available soon',
-                // Audio info
-                fileLabel: 'File:',
-                sizeLabel: 'Size:',
-                typeLabel: 'Type:',
-                statusLabel: 'Status:',
-                readyStatus: 'Ready to convert',
-                megabytes: 'MB'
+                settingsSaved: 'Settings saved successfully!',
+                settingsReset: 'Settings reset to defaults',
+                settingsExported: 'Settings exported successfully!',
+                settingsImported: 'Settings imported successfully!',
+                defaultsRestored: 'Global default settings restored!',
+                importError: 'Error importing settings. Please check file format.',
+                confirmReset: 'Are you sure you want to reset all settings?',
+                confirmDefaults: 'Do you want to restore all global default settings?'
             }
         };
 
@@ -820,6 +947,9 @@
             const htmlRoot = document.getElementById('html-root');
             const t = translations[lang];
             
+            // Add transition effect
+            document.body.classList.add('transitioning');
+            
             // Update HTML attributes
             htmlRoot.lang = lang;
             htmlRoot.dir = lang === 'ar' ? 'rtl' : 'ltr';
@@ -827,83 +957,8 @@
             // Update document title
             document.title = t.title;
             
-            // Update navigation
-            document.getElementById('logo-text').textContent = t.logoText;
-            document.getElementById('nav-home').textContent = t.navHome;
-            document.getElementById('nav-converter').textContent = t.navConverter;
-            document.getElementById('nav-settings').textContent = t.navSettings;
-            document.getElementById('nav-library').textContent = t.navLibrary;
-            
-            // Update main content
-            document.getElementById('main-title').textContent = t.mainTitle;
-            document.getElementById('main-subtitle').textContent = t.mainSubtitle;
-            document.getElementById('upload-title').textContent = t.uploadTitle;
-            document.getElementById('upload-main-text').textContent = t.uploadMainText;
-            document.getElementById('upload-support-text').textContent = t.uploadSupportText;
-            document.getElementById('upload-instruction-text').textContent = t.uploadInstructionText;
-            document.getElementById('library-btn-text').textContent = t.libraryBtnText;
-            document.getElementById('library-description').textContent = t.libraryDescription;
-            document.getElementById('text-content-title').textContent = t.textContentTitle;
-            document.getElementById('arabic-text-label').textContent = t.arabicTextLabel;
-            document.getElementById('arabic-text-description').textContent = t.arabicTextDescription;
-            document.getElementById('repetitive-text-label').textContent = t.repetitiveTextLabel;
-            document.getElementById('repetitive-text-description').textContent = t.repetitiveTextDescription;
-            document.getElementById('poetry-filter-label').textContent = t.poetryFilterLabel;
-            document.getElementById('skip-intros-text').textContent = t.skipIntrosText;
-            document.getElementById('poetry-filter-description').textContent = t.poetryFilterDescription;
-            document.getElementById('generate-btn-text').textContent = t.generateBtnText;
-            document.getElementById('settings-link-text').innerHTML = t.settingsLinkText + ' <a href="settings.html" style="color: var(--accent-color);" id="settings-link">' + t.settingsLink + '</a>';
-            
-            // Update XML section texts if visible
-            const xmlTitleElement = document.getElementById('xml-title');
-            const downloadBtnElement = document.getElementById('download-btn-text');
-            const successTitleElement = document.getElementById('success-title');
-            const successDescElement = document.getElementById('success-description');
-            const instructionsTitleElement = document.getElementById('instructions-title');
-            const step1TitleElement = document.getElementById('step1-title');
-            const step1DescElement = document.getElementById('step1-desc');
-            const step2TitleElement = document.getElementById('step2-title');
-            const step2DescElement = document.getElementById('step2-desc');
-            const step3TitleElement = document.getElementById('step3-title');
-            const step3DescElement = document.getElementById('step3-desc');
-            const step4TitleElement = document.getElementById('step4-title');
-            const step4DescElement = document.getElementById('step4-desc');
-            const noteTextElement = document.getElementById('note-text');
-            
-            if (xmlTitleElement) xmlTitleElement.textContent = t.xmlTitle;
-            if (downloadBtnElement) downloadBtnElement.textContent = t.downloadBtnText;
-            if (successTitleElement) successTitleElement.textContent = t.successTitle;
-            if (successDescElement) successDescElement.textContent = t.successDescription;
-            if (instructionsTitleElement) instructionsTitleElement.innerHTML = '<i class="fas fa-play-circle" style="color: var(--accent-color); margin-left: 0.5rem;"></i>' + t.instructionsTitle;
-            if (step1TitleElement) step1TitleElement.textContent = t.step1Title;
-            if (step1DescElement) step1DescElement.textContent = t.step1Desc;
-            if (step2TitleElement) step2TitleElement.textContent = t.step2Title;
-            if (step2DescElement) step2DescElement.textContent = t.step2Desc;
-            if (step3TitleElement) step3TitleElement.textContent = t.step3Title;
-            if (step3DescElement) step3DescElement.textContent = t.step3Desc;
-            if (step4TitleElement) step4TitleElement.textContent = t.step4Title;
-            if (step4DescElement) step4DescElement.textContent = t.step4Desc;
-            if (noteTextElement) noteTextElement.innerHTML = '<i class="fas fa-lightbulb" style="color: var(--warning-color); margin-left: 0.5rem;"></i>' + t.noteText;
-            
-            // Update placeholders
-            document.getElementById('arabicText').placeholder = t.arabicTextPlaceholder;
-            document.getElementById('repetitiveText').placeholder = t.repetitiveTextPlaceholder;
-            
-            // Update text direction for input fields
-            const arabicTextArea = document.getElementById('arabicText');
-            const repetitiveTextArea = document.getElementById('repetitiveText');
-            
-            if (lang === 'ar') {
-                arabicTextArea.style.direction = 'rtl';
-                arabicTextArea.style.textAlign = 'right';
-                repetitiveTextArea.style.direction = 'rtl';
-                repetitiveTextArea.style.textAlign = 'right';
-            } else {
-                arabicTextArea.style.direction = 'ltr';
-                arabicTextArea.style.textAlign = 'left';
-                repetitiveTextArea.style.direction = 'ltr';
-                repetitiveTextArea.style.textAlign = 'left';
-            }
+            // Update all text content
+            updateAllTexts(t);
             
             // Update language toggle buttons
             document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
@@ -911,26 +966,238 @@
             
             // Save language preference
             localStorage.setItem('preferredLanguage', lang);
+            
+            // Remove transition effect
+            setTimeout(() => {
+                document.body.classList.remove('transitioning');
+            }, 500);
         }
 
-        // Enhanced notification system with language support
-        function showNotification(messageKey, type = 'success') {
-            const t = translations[currentLanguage];
+        function updateAllTexts(t) {
+            // Navigation
+            document.getElementById('logo-text').textContent = t.logoText;
+            document.getElementById('nav-home').textContent = t.navHome;
+            document.getElementById('nav-converter').textContent = t.navConverter;
+            document.getElementById('nav-settings').textContent = t.navSettings;
+            document.getElementById('nav-library').textContent = t.navLibrary;
             
-            // Additional messages not in translations
-            const additionalMessages = {
-                poetryFilterEnabled: {
-                    ar: 'تم تفعيل تنقية نصوص القصائد - سيتم تجاهل المستهلات',
-                    en: 'Poetry text filtering enabled - introductory phrases will be ignored'
-                },
-                poetryFilterDisabled: {
-                    ar: 'تم إلغاء تنقية نصوص القصائد - سيتم إدراج جميع النصوص',
-                    en: 'Poetry text filtering disabled - all text will be included'
-                }
+            // Main content
+            document.getElementById('main-title').textContent = t.mainTitle;
+            document.getElementById('main-subtitle').textContent = t.mainSubtitle;
+            
+            // Fade settings
+            document.getElementById('fade-title').textContent = t.fadeTitle;
+            document.getElementById('fade-in-duration-label').textContent = t.fadeInDurationLabel;
+            document.getElementById('fade-out-duration-label').textContent = t.fadeOutDurationLabel;
+            document.getElementById('fade-in-type-label').textContent = t.fadeInTypeLabel;
+            document.getElementById('fade-out-type-label').textContent = t.fadeOutTypeLabel;
+            
+            // Update select options
+            updateSelectOptions(t);
+            
+            // Animation settings
+            document.getElementById('animation-title').textContent = t.animationTitle;
+            document.getElementById('animation-style-label').textContent = t.animationStyleLabel;
+            document.getElementById('animation-speed-label').textContent = t.animationSpeedLabel;
+            document.getElementById('blur-amount-label').textContent = t.blurAmountLabel;
+            document.getElementById('shadow-intensity-label').textContent = t.shadowIntensityLabel;
+            
+            // Timing settings
+            document.getElementById('timing-title').textContent = t.timingTitle;
+            document.getElementById('start-time-label').textContent = t.startTimeLabel;
+            document.getElementById('duration-label').textContent = t.durationLabel;
+            document.getElementById('display-mode-label').textContent = t.displayModeLabel;
+            document.getElementById('preview-resolution-label').textContent = t.previewResolutionLabel;
+            
+            // Audio settings
+            document.getElementById('audio-title').textContent = t.audioTitle;
+            document.getElementById('audio-sync-label').textContent = t.audioSyncLabel;
+            document.getElementById('auto-timing-label').textContent = t.autoTimingLabel;
+            document.getElementById('speech-speed-label').textContent = t.speechSpeedLabel;
+            document.getElementById('sentence-duration-label').textContent = t.sentenceDurationLabel;
+            
+            // Advanced settings
+            document.getElementById('advanced-title').textContent = t.advancedTitle;
+            document.getElementById('detect-repeats-label').textContent = t.detectRepeatsLabel;
+            document.getElementById('voice-threshold-label').textContent = t.voiceThresholdLabel;
+            document.getElementById('auto-sync-beats-label').textContent = t.autoSyncBeatsLabel;
+            
+            // Buttons
+            document.getElementById('save-btn-text').textContent = t.saveBtnText;
+            document.getElementById('reset-btn-text').textContent = t.resetBtnText;
+            document.getElementById('export-btn-text').textContent = t.exportBtnText;
+            document.getElementById('import-btn-text').textContent = t.importBtnText;
+            document.getElementById('defaults-btn-text').textContent = t.defaultsBtnText;
+            document.getElementById('import-title').textContent = t.importTitle;
+            document.getElementById('cancel-btn-text').textContent = t.cancelBtnText;
+            document.getElementById('confirm-btn-text').textContent = t.confirmBtnText;
+        }
+
+        function updateSelectOptions(t) {
+            // Fade type options
+            document.getElementById('ease-in-out-option').textContent = t.easeInOutOption;
+            document.getElementById('ease-in-option').textContent = t.easeInOption;
+            document.getElementById('ease-out-option').textContent = t.easeOutOption;
+            document.getElementById('linear-option').textContent = t.linearOption;
+            
+            document.getElementById('ease-in-out-option2').textContent = t.easeInOutOption;
+            document.getElementById('ease-in-option2').textContent = t.easeInOption;
+            document.getElementById('ease-out-option2').textContent = t.easeOutOption;
+            document.getElementById('linear-option2').textContent = t.linearOption;
+            
+            // Animation options
+            document.getElementById('fade-option').textContent = t.fadeOption;
+            document.getElementById('slide-option').textContent = t.slideOption;
+            document.getElementById('scale-option').textContent = t.scaleOption;
+            document.getElementById('bounce-option').textContent = t.bounceOption;
+            
+            // Display mode options
+            document.getElementById('arabic-only-option').textContent = t.arabicOnlyOption;
+            document.getElementById('repetitive-only-option').textContent = t.repetitiveOnlyOption;
+            document.getElementById('both-option').textContent = t.bothOption;
+            document.getElementById('alternating-option').textContent = t.alternatingOption;
+            
+            // Audio sync options
+            document.getElementById('sync-start-option').textContent = t.syncStartOption;
+            document.getElementById('sync-center-option').textContent = t.syncCenterOption;
+            document.getElementById('sync-end-option').textContent = t.syncEndOption;
+            
+            // Speech speed options
+            document.getElementById('speech-slow').textContent = t.speechSlow;
+            document.getElementById('speech-normal').textContent = t.speechNormal;
+            document.getElementById('speech-fast').textContent = t.speechFast;
+            
+            // Yes/No options
+            document.getElementById('auto-timing-yes').textContent = t.yesOption;
+            document.getElementById('auto-timing-no').textContent = t.noOption;
+            document.getElementById('detect-repeats-yes').textContent = t.yesOption;
+            document.getElementById('detect-repeats-no').textContent = t.noOption;
+            document.getElementById('auto-sync-yes').textContent = t.yesOption;
+            document.getElementById('auto-sync-no').textContent = t.noOption;
+        }
+
+        // Default settings
+        const defaultSettings = {
+            fadeInDuration: 0.5,
+            fadeOutDuration: 0.5,
+            fadeInType: 'ease-in-out',
+            fadeOutType: 'ease-in-out',
+            animationStyle: 'fade',
+            animationSpeed: 1,
+            blurAmount: 0,
+            shadowIntensity: 50,
+            startTime: 0,
+            duration: 5,
+            displayMode: 'arabic',
+            previewResolution: '1920x1080',
+            audioSync: 'start',
+            autoTiming: true,
+            speechSpeed: 'normal',
+            sentenceDuration: 4,
+            detectRepeats: true,
+            voiceThreshold: 0.3,
+            autoSyncBeats: true
+        };
+
+        // Range value update functions
+        function setupRangeSliders() {
+            const rangeInputs = document.querySelectorAll('.range-input');
+            rangeInputs.forEach(input => {
+                const valueSpan = document.getElementById(input.id + 'Value');
+                
+                input.addEventListener('input', function() {
+                    valueSpan.textContent = this.value;
+                    autoSaveSettings();
+                });
+            });
+        }
+
+        // Auto-save settings when values change
+        function autoSaveSettings() {
+            const settings = getCurrentSettings();
+            localStorage.setItem('converterSettings', JSON.stringify(settings));
+        }
+
+        // Get current settings from form
+        function getCurrentSettings() {
+            return {
+                fadeInDuration: parseFloat(document.getElementById('fadeInDuration').value),
+                fadeOutDuration: parseFloat(document.getElementById('fadeOutDuration').value),
+                fadeInType: document.getElementById('fadeInType').value,
+                fadeOutType: document.getElementById('fadeOutType').value,
+                animationStyle: document.getElementById('animationStyle').value,
+                animationSpeed: parseFloat(document.getElementById('animationSpeed').value),
+                blurAmount: parseFloat(document.getElementById('blurAmount').value),
+                shadowIntensity: parseInt(document.getElementById('shadowIntensity').value),
+                startTime: parseFloat(document.getElementById('startTime').value),
+                duration: parseFloat(document.getElementById('duration').value),
+                displayMode: document.getElementById('displayMode').value,
+                previewResolution: document.getElementById('previewResolution').value,
+                audioSync: document.getElementById('audioSync').value,
+                autoTiming: document.getElementById('autoTiming').value === 'true',
+                speechSpeed: document.getElementById('speechSpeed').value,
+                sentenceDuration: parseFloat(document.getElementById('sentenceDuration').value),
+                detectRepeats: document.getElementById('detectRepeats').value === 'true',
+                voiceThreshold: parseFloat(document.getElementById('voiceThreshold').value),
+                autoSyncBeats: document.getElementById('autoSyncBeats').value === 'true'
             };
+        }
+
+        // Load settings
+        function loadSettings() {
+            try {
+                const saved = localStorage.getItem('converterSettings');
+                const settings = saved ? { ...defaultSettings, ...JSON.parse(saved) } : defaultSettings;
+                
+                // Apply settings to form
+                Object.keys(settings).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element) {
+                        if (element.type === 'range' || element.type === 'number') {
+                            element.value = settings[key];
+                            const valueSpan = document.getElementById(key + 'Value');
+                            if (valueSpan) valueSpan.textContent = settings[key];
+                        } else if (element.tagName === 'SELECT') {
+                            element.value = settings[key];
+                        }
+                    }
+                });
+            } catch (error) {
+                console.warn('Error loading settings:', error);
+            }
+        }
+
+        // Save settings
+        function saveSettings() {
+            const settings = getCurrentSettings();
+            localStorage.setItem('converterSettings', JSON.stringify(settings));
+            showNotification('settingsSaved', 'success');
+        }
+
+        // Reset settings
+        function resetSettings() {
+            localStorage.removeItem('converterSettings');
+            loadSettings();
+            showNotification('settingsReset', 'warning');
+        }
+
+        // Export settings
+        function exportSettings() {
+            const settings = getCurrentSettings();
+            const dataStr = JSON.stringify(settings, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
             
-            let message = t[messageKey] || additionalMessages[messageKey]?.[currentLanguage] || messageKey;
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = 'fcp-converter-settings.json';
+            link.click();
             
+            showNotification('settingsExported', 'success');
+        }
+
+        // Enhanced notification system
+        function showNotification(messageKey, type = 'success') {
+            const message = translations[currentLanguage][messageKey] || messageKey;
             const notification = document.createElement('div');
             notification.className = `notification ${type} show`;
             notification.textContent = message;
@@ -943,504 +1210,221 @@
             }, 3000);
         }
 
-        // Drag and drop functionality - will be initialized after DOM loads
-        function initializeDragAndDrop() {
-            const uploadZone = document.querySelector('.upload-zone');
-            
-            if (!uploadZone) {
-                console.error('Upload zone not found!');
-                return;
-            }
-            
-            uploadZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadZone.classList.add('dragover');
-            });
-
-            uploadZone.addEventListener('dragleave', () => {
-                uploadZone.classList.remove('dragover');
-            });
-
-            uploadZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadZone.classList.remove('dragover');
-                
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    handleAudioFile(files[0]);
-                }
-            });
-        }
-
-        // Audio upload handling with enhanced UX
-        function triggerFileInput() {
-            const fileInput = document.getElementById('audioInput');
-            if (fileInput) {
-                fileInput.click();
-            }
-        }
-
-        function handleAudioUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            handleAudioFile(file);
-        }
-
-        function handleAudioFile(file) {
-            // Check if file is audio or video
-            const validTypes = ['audio/', 'video/'];
-            if (!validTypes.some(type => file.type.startsWith(type))) {
-                showNotification('invalidFileType', 'error');
-                return;
-            }
-
-            audioFile = file;
-            projectData.audio = file;
-
-            // Create URL for preview
-            const audioURL = URL.createObjectURL(file);
-            
-            // Show audio preview
-            const audioPreview = document.getElementById('audioPreview');
-            const audioPlayer = document.getElementById('audioPlayer');
-            const audioInfo = document.getElementById('audioInfo');
-            
-            audioPlayer.src = audioURL;
-            
-            const t = translations[currentLanguage];
-            audioInfo.innerHTML = `
-                <strong>${t.fileLabel}</strong> ${file.name}<br>
-                <strong>${t.sizeLabel}</strong> ${(file.size / (1024 * 1024)).toFixed(2)} ${t.megabytes}<br>
-                <strong>${t.typeLabel}</strong> ${file.type}<br>
-                <strong>${t.statusLabel}</strong> <span style="color: var(--success-color);">${t.readyStatus}</span>
-            `;
-            
-            audioPreview.style.display = 'block';
-            
-            // Enable generate button
-            document.getElementById('generateProjectBtn').disabled = false;
-            
-            showNotification('fileUploadSuccess', 'success');
-        }
-
-        // Load from video library
-        function loadFromVideoLibrary() {
-            try {
-                showNotification('libraryComingSoon', 'warning');
-                console.log('Video library feature coming soon...');
-            } catch (error) {
-                console.error('Error in loadFromVideoLibrary:', error);
-                alert('ميزة مكتبة الفيديو ستكون متاحة قريباً / Video library feature will be available soon');
-            }
-        }
-
-        // Generate Final Cut Pro XML with enhanced UX
-        let generatedXML = '';
-
-        // Text processing function to handle poetry intro filtering
-        function processPoetryText(text, settings) {
-            if (!text || !settings.skipPoetryIntros) {
-                return text;
-            }
-
-            // Split text into lines for processing
-            let lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-            
-            // Default patterns to skip
-            const skipPatterns = [
-                ...(settings.poetryIntroPatterns || []),
-                ...(settings.customSkipPatterns || [])
-            ];
-
-            // Function to check if a line should be skipped
-            function shouldSkipLine(line) {
-                return skipPatterns.some(pattern => {
-                    return line.includes(pattern) || 
-                           line.startsWith(pattern) || 
-                           line.endsWith(pattern);
-                });
-            }
-
-            // Filter beginning intros if enabled
-            if (settings.skipBeginningIntros) {
-                while (lines.length > 0 && shouldSkipLine(lines[0])) {
-                    lines.shift();
-                }
-            }
-
-            // Filter ending intros if enabled  
-            if (settings.skipEndingIntros) {
-                while (lines.length > 0 && shouldSkipLine(lines[lines.length - 1])) {
-                    lines.pop();
-                }
-            }
-
-            // Return processed text
-            return lines.join('\n');
-        }
-
-        // Generate Final Cut Pro XML with enhanced UX
-        function generateXML() {
-            const arabicTextRaw = document.getElementById('arabicText').value.trim();
-            const repetitiveTextRaw = document.getElementById('repetitiveText').value.trim();
-            if (!audioFile) return showNotification('noAudioFile', 'error');
-            if (!arabicTextRaw && !repetitiveTextRaw) return showNotification('noTextContent', 'error');
-
-            const settings = loadSettings();
-            settings.skipPoetryIntros = document.getElementById('skipPoetryIntros') ? document.getElementById('skipPoetryIntros').checked : false;
-            const arabicText = processPoetryText(arabicTextRaw, settings);
-            const repetitiveText = processPoetryText(repetitiveTextRaw, settings);
-
-            const globalSettings = typeof getConverterSettings !== 'undefined' ? getConverterSettings() : {};
-            const resolution = globalSettings.previewResolution || '1920x1080';
-            const frameRate = 25;
-            const [width, height] = resolution.split('x').map(Number);
-            const duration = settings.duration || 5;
-            const startTime = settings.startTime || 0;
-            const totalFrames = Math.ceil(duration * frameRate);
-            const startFrames = Math.floor(startTime * frameRate);
-            const displayMode = settings.displayMode || 'arabic';
-            const uid = generateUID();
-            const date = new Date().toISOString();
-            const escape = escapeXML;
-            const audioName = escape(audioFile.name);
-
-            // تحويل القيم الزمنية إلى صيغة الفريمات/معدل الفريم (frames/frameRate)s
-            function toFrameTime(frames, frameRate) {
-                return `${frames}/${frameRate}s`;
-            }
-
-            // uid ثابت للأصول
-            const assetUID = generateUID();
-            // uid ثابت للمشروع
-            const projectUID = uid;
-
-            // إنشاء XML متوافق مع Final Cut Pro مع معلومات كاملة
-            let xml = `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE fcpxml>
-<fcpxml version="1.10">
-  <resources>
-    <format id="r1" name="FFVideoFormat${height}p${frameRate}" frameDuration="1/${frameRate}s" width="${width}" height="${height}" colorSpace="1-1-1 (Rec. 709)"/>
-    <effect id="r2" name="Basic Title" uid=".../Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"/>
-    <asset id="r3" name="${audioName}" uid="${assetUID}" start="0s" duration="${toFrameTime(totalFrames, frameRate)}" hasVideo="0" hasAudio="1" audioSources="1" audioChannels="2" audioRate="48k">
-      <media-rep kind="original-media" sig="${generateUID()}" src="file:///${audioName}"/>
-    </asset>
-  </resources>
-  <library location="file:///Users/Shared/FCP%20Audio%20Projects/">
-    <event name="Subtitle Project ${new Date().toLocaleDateString()}" uid="${generateUID()}">
-      <project name="Arabic English Subtitles" uid="${projectUID}" modDate="${date}">
-        <sequence format="r1" duration="${toFrameTime(totalFrames, frameRate)}" tcStart="0s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
-          <spine>
-            <asset-clip name="${audioName}" ref="r3" offset="0s" duration="${toFrameTime(totalFrames, frameRate)}" tcFormat="NDF" audioRole="dialogue"/>`;
-
-            // إضافة التايتل بطريقة مبسطة
-            if (displayMode === 'arabic' || displayMode === 'both') {
-                xml += `
-            <title ref="r2" name="Arabic Title" offset="${toFrameTime(startFrames, frameRate)}" duration="${toFrameTime(totalFrames - startFrames, frameRate)}" start="${toFrameTime(startFrames, frameRate)}">
-              <text>
-                <text-style font="Arial" fontSize="34" fontFace="Regular" fontColor="1 1 1 1">${escape(arabicText)}</text-style>
-              </text>
-            </title>`;
-            }
-
-            if (displayMode === 'repetitive' || displayMode === 'both') {
-                xml += `
-            <title ref="r2" name="English Title" offset="${toFrameTime(startFrames, frameRate)}" duration="${toFrameTime(totalFrames - startFrames, frameRate)}" start="${toFrameTime(startFrames, frameRate)}">
-              <text>
-                <text-style font="Helvetica" fontSize="25" fontFace="Regular" fontColor="1 1 1 1">${escape(repetitiveText)}</text-style>
-              </text>
-            </title>`;
-            }
-
-            if (displayMode === 'alternating') {
-                const half = Math.floor((totalFrames - startFrames) / 2);
-                xml += `
-            <title ref="r2" name="Arabic Title" offset="${toFrameTime(startFrames, frameRate)}" duration="${toFrameTime(half, frameRate)}" start="${toFrameTime(startFrames, frameRate)}">
-              <text>
-                <text-style font="Arial" fontSize="34" fontFace="Regular" fontColor="1 1 1 1">${escape(arabicText)}</text-style>
-              </text>
-            </title>
-            <title ref="r2" name="English Title" offset="${toFrameTime(startFrames + half, frameRate)}" duration="${toFrameTime(totalFrames - startFrames - half, frameRate)}" start="${toFrameTime(startFrames + half, frameRate)}">
-              <text>
-                <text-style font="Helvetica" fontSize="25" fontFace="Regular" fontColor="1 1 1 1">${escape(repetitiveText)}</text-style>
-              </text>
-            </title>`;
-            }
-
-            xml += `
-          </spine>
-        </sequence>
-      </project>
-    </event>
-  </library>
-</fcpxml>`;
-
-            generatedXML = xml;
-            
-            // إنشاء Final Cut Pro Bundle بدلاً من XML منفرد
-            createFCPBundle(xml, audioFile.name);
-            
-            document.getElementById('xmlSection').style.display = 'block';
-            showNotification('xmlGenerated', 'success');
-        }
-
-        // إنشاء Final Cut Pro Bundle
-        async function createFCPBundle(xmlContent, audioFileName) {
-            try {
-                // إنشاء JSZip instance
-                const JSZip = window.JSZip || await loadJSZip();
-                const zip = new JSZip();
-                
-                // إنشاء البنية المطلوبة لـ FCP Bundle
-                const projectName = audioFileName.replace(/\.[^/.]+$/, '') || 'project';
-                
-                // إضافة ملف Info.plist
-                const infoPlist = `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>CFBundleDisplayName</key>
-    <string>${projectName}</string>
-    <key>CFBundleIdentifier</key>
-    <string>com.apple.finalcutpro.xmlproject</string>
-    <key>CFBundleName</key>
-    <string>${projectName}</string>
-    <key>CFBundlePackageType</key>
-    <string>fcpx</string>
-    <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
-    <key>CFBundleVersion</key>
-    <string>1</string>
-    <key>UTExportedTypeDeclarations</key>
-    <array>
-        <dict>
-            <key>UTTypeConformsTo</key>
-            <array>
-                <string>com.apple.package</string>
-            </array>
-            <key>UTTypeDescription</key>
-            <string>Final Cut Pro Project</string>
-            <key>UTTypeIdentifier</key>
-            <string>com.apple.finalcutpro.project</string>
-            <key>UTTypeTagSpecification</key>
-            <dict>
-                <key>public.filename-extension</key>
-                <array>
-                    <string>fcpbundle</string>
-                </array>
-            </dict>
-        </dict>
-    </array>
-</dict>
-</plist>`;
-
-                // إضافة الملفات إلى Bundle
-                zip.file("Info.plist", infoPlist);
-                zip.file("project.fcpxml", xmlContent);
-                
-                // إنشاء مجلد الموارد
-                zip.folder("Media");
-                
-                // توليد Bundle
-                const content = await zip.generateAsync({
-                    type: "blob",
-                    compression: "DEFLATE",
-                    compressionOptions: {
-                        level: 6
-                    }
-                });
-                
-                // تحميل Bundle
-                const url = URL.createObjectURL(content);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${projectName}.fcpbundle`;
-                a.style.display = 'none';
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 100);
-                
-            } catch (error) {
-                console.error('Error creating FCP Bundle:', error);
-                // Fallback لـ XML عادي
-                downloadXMLFallback(xmlContent, audioFileName);
-            }
-        }
-
-        // Fallback لتحميل XML عادي
-        function downloadXMLFallback(xmlContent, audioFileName) {
-            const fileName = `${audioFileName.replace(/\.[^/.]+$/, '') || 'project'}.fcpxml`;
-            const blob = new Blob([xmlContent], { 
-                type: 'application/xml; charset=utf-8',
-                endings: 'native'
-            });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            a.setAttribute('type', 'application/xml');
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(() => {
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }, 100);
-        }
-
-        // تحميل JSZip library
-        async function loadJSZip() {
-            return new Promise((resolve, reject) => {
-                if (window.JSZip) {
-                    resolve(window.JSZip);
-                    return;
-                }
-                
-                const script = document.createElement('script');
-                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
-                script.onload = () => resolve(window.JSZip);
-                script.onerror = reject;
-                document.head.appendChild(script);
-            });
-        }
-            
-            document.getElementById('xmlSection').style.display = 'block';
-            showNotification('xmlGenerated', 'success');
-        }
-
-        // Download XML file
-        function downloadXML() {
-            if (!generatedXML) {
-                showNotification('noXmlToDownload', 'error');
-                return;
-            }
-            
-            // إنشاء Final Cut Pro Bundle
-            createFCPBundle(generatedXML, audioFile ? audioFile.name : 'project');
-            showNotification('xmlDownloaded', 'success');
-        }
-
-        // Load settings function
-        function loadSettings() {
-            const defaultSettings = {
-                duration: 5,
-                startTime: 0,
-                displayMode: 'arabic',
-                skipPoetryIntros: true,
-                poetryIntroPatterns: ['مستهل', 'يا حسين', 'لبيك يا حسين', 'السلام عليك', 'صلى الله عليه وآله'],
-                skipBeginningIntros: true,
-                skipEndingIntros: true,
-                customSkipPatterns: []
-            };
-            
-            try {
-                const saved = localStorage.getItem('converterSettings');
-                return saved ? { ...defaultSettings, ...JSON.parse(saved) } : defaultSettings;
-            } catch {
-                return defaultSettings;
-            }
-        }
-
-        // Generate UID function
-        function generateUID() {
-            return 'xxxx-xxxx-4xxx-yxxx'.replace(/[xy]/g, function(c) {
-                const r = Math.random() * 16 | 0;
-                const v = c === 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        }
-
-        // Escape XML function
-        function escapeXML(text) {
-            if (!text) return '';
-            return text
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
-        // Initialize on page load with enhanced features
+        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize drag and drop functionality
-            initializeDragAndDrop();
-            
             // Load saved language preference
             const savedLanguage = localStorage.getItem('preferredLanguage') || 'ar';
             if (savedLanguage !== 'ar') {
                 switchLanguage(savedLanguage);
             }
             
-            // Load saved text content
-            const savedArabic = localStorage.getItem('savedArabicText');
-            const savedRepetitive = localStorage.getItem('savedRepetitiveText');
+            // Setup range sliders
+            setupRangeSliders();
             
-            if (savedArabic) {
-                document.getElementById('arabicText').value = savedArabic;
-            }
+            // Load settings
+            loadSettings();
             
-            if (savedRepetitive) {
-                document.getElementById('repetitiveText').value = savedRepetitive;
-            }
-            
-            // Auto-save text content with debouncing
-            let saveTimeout;
-            
-            function autoSave(key, value) {
-                clearTimeout(saveTimeout);
-                saveTimeout = setTimeout(() => {
-                    localStorage.setItem(key, value);
-                }, 500);
-            }
-            
-            document.getElementById('arabicText').addEventListener('input', function() {
-                autoSave('savedArabicText', this.value);
+            // Setup auto-save for all form elements
+            const formElements = document.querySelectorAll('input, select');
+            formElements.forEach(element => {
+                element.addEventListener('change', autoSaveSettings);
             });
-            
-            document.getElementById('repetitiveText').addEventListener('input', function() {
-                autoSave('savedRepetitiveText', this.value);
-            });
-            
-            // Handle poetry filtering checkbox
-            document.getElementById('skipPoetryIntros').addEventListener('change', function() {
-                localStorage.setItem('skipPoetryIntros', this.checked);
-                
-                // Show preview of filtering effect
-                if (this.checked) {
-                    showNotification('poetryFilterEnabled', 'info');
-                } else {
-                    showNotification('poetryFilterDisabled', 'warning');
-                }
-            });
-            
-            // Load saved poetry filter setting
-            const savedSkipIntros = localStorage.getItem('skipPoetryIntros');
-            if (savedSkipIntros !== null) {
-                document.getElementById('skipPoetryIntros').checked = savedSkipIntros === 'true';
-            }
             
             // Add keyboard shortcuts
             document.addEventListener('keydown', function(e) {
+                // Ctrl/Cmd + S to save settings
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    saveSettings();
+                }
+                
                 // Ctrl/Cmd + L to switch language
                 if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
                     e.preventDefault();
                     switchLanguage(currentLanguage === 'ar' ? 'en' : 'ar');
                 }
-                
-                // Ctrl/Cmd + Enter to generate XML
-                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                    e.preventDefault();
-                    const generateBtn = document.getElementById('generateProjectBtn');
-                    if (!generateBtn.disabled) {
-                        generateXML();
-                    }
-                }
             });
+
+            // Load settings with global defaults integration
+            if (typeof getSetting !== 'undefined') {
+                console.log('🔧 Loading settings with global defaults integration');
+                loadSettingsWithDefaults();
+            } else {
+                console.log('⚠️ Global defaults not available, using local defaults');
+                loadSettings();
+            }
         });
+
+        // Enhanced functions for global defaults integration
+
+        function loadSettingsWithDefaults() {
+            try {
+                const globalDefaults = typeof getConverterSettings !== 'undefined' 
+                    ? getConverterSettings() 
+                    : defaultSettings;
+                
+                const saved = localStorage.getItem('converterSettings');
+                const settings = saved ? { ...globalDefaults, ...JSON.parse(saved) } : globalDefaults;
+                
+                // Apply settings to form
+                applySettingsToForm(settings);
+                
+                // Update range displays
+                setupRangeSliders();
+                
+                console.log('✅ Settings loaded with global defaults');
+            } catch (error) {
+                console.error('Error loading settings with defaults:', error);
+                loadSettings(); // Fallback to local method
+            }
+        }
+
+        function applySettingsToForm(settings) {
+            // Animation settings
+            document.getElementById('fadeInDuration').value = settings.fadeInDuration || 0.5;
+            document.getElementById('fadeOutDuration').value = settings.fadeOutDuration || 0.5;
+            document.getElementById('fadeInType').value = settings.fadeInType || 'ease-in-out';
+            document.getElementById('fadeOutType').value = settings.fadeOutType || 'ease-in-out';
+            document.getElementById('animationStyle').value = settings.animationStyle || 'fade';
+            document.getElementById('animationSpeed').value = settings.animationSpeed || 1;
+            document.getElementById('blurAmount').value = settings.blurAmount || 0;
+            document.getElementById('shadowIntensity').value = settings.shadowIntensity || 50;
+            
+            // Timing settings
+            document.getElementById('startTime').value = settings.startTime || 0;
+            document.getElementById('duration').value = settings.duration || 5;
+            document.getElementById('displayMode').value = settings.displayMode || 'arabic';
+            document.getElementById('previewResolution').value = settings.previewResolution || '1920x1080';
+            document.getElementById('audioSync').value = settings.audioSync || 'start';
+            document.getElementById('autoTiming').checked = settings.autoTiming !== false;
+            document.getElementById('speechSpeed').value = settings.speechSpeed || 'normal';
+            document.getElementById('sentenceDuration').value = settings.sentenceDuration || 4;
+            
+            // Advanced settings
+            document.getElementById('detectRepeats').checked = settings.detectRepeats !== false;
+            document.getElementById('voiceThreshold').value = settings.voiceThreshold || 0.3;
+            document.getElementById('autoSyncBeats').checked = settings.autoSyncBeats !== false;
+            
+            // Update value displays
+            updateRangeDisplays();
+        }
+
+        function updateRangeDisplays() {
+            document.getElementById('fadeInDurationValue').textContent = document.getElementById('fadeInDuration').value;
+            document.getElementById('fadeOutDurationValue').textContent = document.getElementById('fadeOutDuration').value;
+            document.getElementById('animationSpeedValue').textContent = document.getElementById('animationSpeed').value;
+            document.getElementById('blurAmountValue').textContent = document.getElementById('blurAmount').value;
+            document.getElementById('shadowIntensityValue').textContent = document.getElementById('shadowIntensity').value;
+            document.getElementById('startTimeValue').textContent = document.getElementById('startTime').value;
+            document.getElementById('durationValue').textContent = document.getElementById('duration').value;
+            document.getElementById('sentenceDurationValue').textContent = document.getElementById('sentenceDuration').value;
+            document.getElementById('voiceThresholdValue').textContent = document.getElementById('voiceThreshold').value;
+        }
+
+        function showImportDialog() {
+            document.getElementById('importDialog').style.display = 'block';
+        }
+
+        function hideImportDialog() {
+            document.getElementById('importDialog').style.display = 'none';
+            document.getElementById('importFile').value = '';
+        }
+
+        function handleImport() {
+            const fileInput = document.getElementById('importFile');
+            if (fileInput.files.length === 0) {
+                showNotification('Please select a file to import', 'error');
+                return;
+            }
+
+            if (typeof importSettings !== 'undefined') {
+                importSettings(fileInput);
+                hideImportDialog();
+            } else {
+                // Fallback local import
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const settings = JSON.parse(e.target.result);
+                        
+                        // Save imported settings
+                        localStorage.setItem('converterSettings', JSON.stringify(settings));
+                        
+                        showNotification(translations[currentLanguage].settingsImported, 'success');
+                        
+                        // Reload settings
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    } catch (error) {
+                        showNotification(translations[currentLanguage].importError, 'error');
+                    }
+                };
+                reader.readAsText(file);
+                hideImportDialog();
+            }
+        }
+
+        function resetToGlobalDefaults() {
+            const t = translations[currentLanguage];
+            
+            if (confirm(t.confirmDefaults)) {
+                if (typeof resetToDefaults !== 'undefined') {
+                    resetToDefaults();
+                } else {
+                    // Fallback local reset
+                    localStorage.removeItem('converterSettings');
+                    showNotification(t.defaultsRestored, 'success');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                }
+            }
+        }
+
+        // Enhanced reset function
+        function resetSettings() {
+            const t = translations[currentLanguage];
+            
+            if (confirm(t.confirmReset)) {
+                if (typeof getConverterSettings !== 'undefined') {
+                    const globalDefaults = getConverterSettings();
+                    localStorage.setItem('converterSettings', JSON.stringify(globalDefaults));
+                } else {
+                    localStorage.removeItem('converterSettings');
+                }
+                
+                showNotification(t.settingsReset, 'success');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
+        }
+
+        // Enhanced export function
+        function exportSettings() {
+            const t = translations[currentLanguage];
+            
+            if (typeof exportSettings !== 'undefined' && exportSettings !== arguments.callee) {
+                // Use global export function
+                window.exportSettings();
+            } else {
+                // Fallback local export
+                const settings = getCurrentSettings();
+                const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `fcp-converter-settings-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+            
+            showNotification(t.settingsExported, 'success');
+        }
     </script>
 </body>
 </html>
