@@ -629,8 +629,15 @@
                 
                 <div class="download-actions" style="text-align: center; margin-bottom: 2rem;">
                     <button class="btn btn-success btn-large" onclick="downloadXML()" id="downloadBtn">
-                        <i class="fas fa-download"></i> <span id="download-btn-text">تحميل ملف XML</span>
+                        <i class="fas fa-download"></i> <span id="download-btn-text">Download FCP Bundle</span>
                     </button>
+                    <br><br>
+                    <button class="btn btn-primary" onclick="downloadXMLOnly()" id="downloadXMLOnlyBtn" style="margin-top: 1rem;">
+                        <i class="fas fa-file-code"></i> <span id="download-xml-only-text">Download XML Only</span>
+                    </button>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;" id="xml-only-description">
+                        If bundle doesn't work, try XML file only
+                    </p>
                 </div>
 
                 <!-- Instructions Section -->
@@ -737,6 +744,8 @@
                 successTitle: 'ملف Final Cut Pro Bundle جاهز للتحميل',
                 successDescription: 'سيتم تحميل الـ Bundle تلقائياً، أو يمكنك الضغط على زر التحميل أدناه',
                 downloadBtnText: 'تحميل Final Cut Pro Bundle',
+                downloadXmlOnlyText: 'تحميل XML فقط',
+                xmlOnlyDescription: 'إذا لم يعمل الـ Bundle، جرب ملف XML منفرد',
                 instructionsTitle: 'إرشادات التشغيل في Final Cut Pro',
                 step1Title: 'تحضير الملفات',
                 step1Desc: 'ضع الملف الصوتي في نفس مجلد الـ Bundle (.fcpbundle) المحمّل',
@@ -798,6 +807,8 @@
                 successTitle: 'Final Cut Pro Bundle Ready for Download',
                 successDescription: 'The bundle will download automatically, or you can click the download button below',
                 downloadBtnText: 'Download Final Cut Pro Bundle',
+                downloadXmlOnlyText: 'Download XML Only',
+                xmlOnlyDescription: 'If bundle doesn\'t work, try XML file only',
                 instructionsTitle: 'Instructions for Final Cut Pro',
                 step1Title: 'Prepare Files',
                 step1Desc: 'Place the audio file in the same folder as the downloaded Bundle (.fcpbundle)',
@@ -876,6 +887,8 @@
             // Update XML section texts if visible
             const xmlTitleElement = document.getElementById('xml-title');
             const downloadBtnElement = document.getElementById('download-btn-text');
+            const downloadXmlOnlyElement = document.getElementById('download-xml-only-text');
+            const xmlOnlyDescElement = document.getElementById('xml-only-description');
             const successTitleElement = document.getElementById('success-title');
             const successDescElement = document.getElementById('success-description');
             const instructionsTitleElement = document.getElementById('instructions-title');
@@ -891,6 +904,8 @@
             
             if (xmlTitleElement) xmlTitleElement.textContent = t.xmlTitle;
             if (downloadBtnElement) downloadBtnElement.textContent = t.downloadBtnText;
+            if (downloadXmlOnlyElement) downloadXmlOnlyElement.textContent = t.downloadXmlOnlyText;
+            if (xmlOnlyDescElement) xmlOnlyDescElement.textContent = t.xmlOnlyDescription;
             if (successTitleElement) successTitleElement.textContent = t.successTitle;
             if (successDescElement) successDescElement.textContent = t.successDescription;
             if (instructionsTitleElement) instructionsTitleElement.innerHTML = '<i class="fas fa-play-circle" style="color: var(--accent-color); margin-left: 0.5rem;"></i>' + t.instructionsTitle;
@@ -1258,31 +1273,57 @@
                 // إنشاء البنية المطلوبة لـ FCP Bundle
                 const projectName = audioFileName.replace(/\.[^/.]+$/, '') || 'project';
                 
-                // إضافة ملف Info.plist
+                // إضافة ملف Info.plist المُحسن لـ Final Cut Pro
                 const infoPlist = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CFBundleDisplayName</key>
-    <string>${projectName}</string>
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>fcpbundle</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>Final Cut Pro</string>
+            <key>CFBundleTypeName</key>
+            <string>Final Cut Pro Project Bundle</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSHandlerRank</key>
+            <string>Owner</string>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>com.apple.finalcutpro.project</string>
+            </array>
+        </dict>
+    </array>
+    <key>CFBundleExecutable</key>
+    <string>Final Cut Pro</string>
     <key>CFBundleIdentifier</key>
-    <string>com.apple.finalcutpro.xmlproject</string>
+    <string>com.apple.FinalCutPro</string>
     <key>CFBundleName</key>
     <string>${projectName}</string>
+    <key>CFBundleDisplayName</key>
+    <string>${projectName}</string>
     <key>CFBundlePackageType</key>
-    <string>fcpx</string>
+    <string>BNDL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
+    <string>10.6.5</string>
     <key>CFBundleVersion</key>
-    <string>1</string>
+    <string>10.6.5</string>
     <key>UTExportedTypeDeclarations</key>
     <array>
         <dict>
             <key>UTTypeConformsTo</key>
             <array>
                 <string>com.apple.package</string>
+                <string>public.composite-content</string>
             </array>
             <key>UTTypeDescription</key>
+            <string>Final Cut Pro Project</string>
+            <key>UTTypeIconFile</key>
             <string>Final Cut Pro Project</string>
             <key>UTTypeIdentifier</key>
             <string>com.apple.finalcutpro.project</string>
@@ -1292,6 +1333,30 @@
                 <array>
                     <string>fcpbundle</string>
                 </array>
+                <key>public.mime-type</key>
+                <array>
+                    <string>application/vnd.apple.finalcutpro</string>
+                </array>
+            </dict>
+        </dict>
+    </array>
+    <key>UTImportedTypeDeclarations</key>
+    <array>
+        <dict>
+            <key>UTTypeConformsTo</key>
+            <array>
+                <string>public.xml</string>
+            </array>
+            <key>UTTypeDescription</key>
+            <string>Final Cut Pro XML</string>
+            <key>UTTypeIdentifier</key>
+            <string>com.apple.finalcutpro.xml</string>
+            <key>UTTypeTagSpecification</key>
+            <dict>
+                <key>public.filename-extension</key>
+                <array>
+                    <string>fcpxml</string>
+                </array>
             </dict>
         </dict>
     </array>
@@ -1300,10 +1365,67 @@
 
                 // إضافة الملفات إلى Bundle
                 zip.file("Info.plist", infoPlist);
-                zip.file("project.fcpxml", xmlContent);
                 
-                // إنشاء مجلد الموارد
-                zip.folder("Media");
+                // إضافة ملف CurrentVersion.flexolibrary (مطلوب لـ FCP)
+                const currentVersionContent = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>ArchiveVersion</key>
+    <integer>1</integer>
+    <key>CreationDate</key>
+    <date>${new Date().toISOString()}</date>
+    <key>Creator</key>
+    <string>Final Cut Pro</string>
+    <key>MinVersion</key>
+    <string>10.6</string>
+    <key>Version</key>
+    <string>10.6.5</string>
+</dict>
+</plist>`;
+                
+                zip.file("CurrentVersion.flexolibrary", currentVersionContent);
+                
+                // إضافة ملف الـ XML الرئيسي
+                zip.file(`${projectName}.fcpxml`, xmlContent);
+                
+                // إنشاء بنية المجلدات المطلوبة
+                zip.folder("Analysis Files");
+                zip.folder("Proxies");
+                zip.folder("Transcoding Data");
+                zip.folder("Render Files");
+                
+                // إضافة ملف Settings.plist للمشروع
+                const settingsPlist = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>FFProjectSettings</key>
+    <dict>
+        <key>FFDefaultDuration</key>
+        <real>10.0</real>
+        <key>FFDefaultStillDuration</key>
+        <real>4.0</real>
+        <key>FFDefaultTransitionDuration</key>
+        <real>1.0</real>
+        <key>FFVideoProperties</key>
+        <dict>
+            <key>FFVideoFormatRateIsDropFrame</key>
+            <false/>
+            <key>FFVideoFormatRateNumerator</key>
+            <integer>25</integer>
+            <key>FFVideoFormatRateDenominator</key>
+            <integer>1</integer>
+            <key>FFVideoFormatFrameWidth</key>
+            <integer>1920</integer>
+            <key>FFVideoFormatFrameHeight</key>
+            <integer>1080</integer>
+        </dict>
+    </dict>
+</dict>
+</plist>`;
+                
+                zip.file("Settings.plist", settingsPlist);
                 
                 // توليد Bundle
                 const content = await zip.generateAsync({
@@ -1380,6 +1502,17 @@
             
             // إنشاء Final Cut Pro Bundle
             createFCPBundle(generatedXML, audioFile ? audioFile.name : 'project');
+            showNotification('xmlDownloaded', 'success');
+        }
+
+        // Download XML file only (fallback)
+        function downloadXMLOnly() {
+            if (!generatedXML) {
+                showNotification('noXmlToDownload', 'error');
+                return;
+            }
+            
+            downloadXMLFallback(generatedXML, audioFile ? audioFile.name : 'project');
             showNotification('xmlDownloaded', 'success');
         }
 
