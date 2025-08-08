@@ -1174,25 +1174,27 @@
             const resolution = globalSettings.previewResolution || '1920x1080';
             const frameRate = 25;
             const [width, height] = resolution.split('x').map(Number);
-            const duration = settings.duration || 5;
+            const duration = settings.duration || 300; // مدة افتراضية أطول (5 دقائق)
             const startTime = settings.startTime || 0;
             const totalFrames = Math.ceil(duration * frameRate);
             const startFrames = Math.floor(startTime * frameRate);
             const displayMode = settings.displayMode || 'arabic';
-            const uid = generateUID();
-            const date = new Date().toISOString();
             const escape = escapeXML;
             const audioName = escape(audioFile.name);
+
+            // إنشاء معرفات فريدة لكل عنصر
+            const eventUID = generateUID();
+            const projectUID = generateUID();
+            const sequenceUID = generateUID();
+            const assetUID = generateUID();
+            const titleUID1 = generateUID();
+            const titleUID2 = generateUID();
+            const date = new Date().toISOString();
 
             // تحويل القيم الزمنية إلى صيغة الفريمات/معدل الفريم (frames/frameRate)s
             function toFrameTime(frames, frameRate) {
                 return `${frames}/${frameRate}s`;
             }
-
-            // uid ثابت للأصول
-            const assetUID = generateUID();
-            // uid ثابت للمشروع
-            const projectUID = uid;
 
             // إنشاء XML متوافق مع Final Cut Pro مع معلومات كاملة
             let xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -1202,46 +1204,66 @@
     <format id="r1" name="FFVideoFormat${height}p${frameRate}" frameDuration="1/${frameRate}s" width="${width}" height="${height}" colorSpace="1-1-1 (Rec. 709)"/>
     <effect id="r2" name="Basic Title" uid=".../Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"/>
     <asset id="r3" name="${audioName}" uid="${assetUID}" start="0s" duration="${toFrameTime(totalFrames, frameRate)}" hasVideo="0" hasAudio="1" audioSources="1" audioChannels="2" audioRate="48k">
-      <media-rep kind="original-media" sig="${generateUID()}" src="file:///${audioName}"/>
+      <media-rep kind="original-media" sig="${assetUID}-media" src="file:///${audioName}"/>
     </asset>
   </resources>
   <library location="file:///Users/Shared/FCP%20Audio%20Projects/">
-    <event name="Subtitle Project ${new Date().toLocaleDateString()}" uid="${generateUID()}">
-      <project name="Arabic English Subtitles" uid="${projectUID}" modDate="${date}">
-        <sequence format="r1" duration="${toFrameTime(totalFrames, frameRate)}" tcStart="0s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
+    <event name="Subtitle Project ${new Date().toLocaleDateString()}" uid="${eventUID}">
+      <project name="Arabic Audio Project" uid="${projectUID}" modDate="${date}">
+        <sequence format="r1" duration="${toFrameTime(totalFrames, frameRate)}" tcStart="0s" tcFormat="NDF" audioLayout="stereo" audioRate="48k" uid="${sequenceUID}">
           <spine>
-            <asset-clip name="${audioName}" ref="r3" offset="0s" duration="${toFrameTime(totalFrames, frameRate)}" tcFormat="NDF" audioRole="dialogue"/>`;
+            <asset-clip name="${audioName}" ref="r3" offset="0s" duration="${toFrameTime(totalFrames, frameRate)}" tcFormat="NDF" audioRole="dialogue">
+              <audio audioRole="dialogue" srcCh="1, 2" outCh="1, 2"/>
+            </asset-clip>`;
 
-            // إضافة التايتل بطريقة مبسطة
-            if (displayMode === 'arabic' || displayMode === 'both') {
+            // إضافة التايتل مع معرفات صحيحة
+            const textDuration = toFrameTime(totalFrames - startFrames, frameRate);
+            const textOffset = toFrameTime(startFrames, frameRate);
+
+            if (arabicText && (displayMode === 'arabic' || displayMode === 'both')) {
                 xml += `
-            <title ref="r2" name="Arabic Title" offset="${toFrameTime(startFrames, frameRate)}" duration="${toFrameTime(totalFrames - startFrames, frameRate)}" start="${toFrameTime(startFrames, frameRate)}">
+            <title ref="r2" name="Arabic Title" offset="${textOffset}" duration="${textDuration}" start="${textOffset}" lane="1" uid="${titleUID1}">
+              <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 -50"/>
+              <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
               <text>
-                <text-style font="Arial" fontSize="34" fontFace="Regular" fontColor="1 1 1 1">${escape(arabicText)}</text-style>
+                <text-style font="Helvetica" fontSize="48" fontFace="Regular" fontColor="1 1 1 1" strokeColor="0 0 0 1" strokeWidth="2" alignment="center">${escape(arabicText)}</text-style>
               </text>
             </title>`;
             }
 
-            if (displayMode === 'repetitive' || displayMode === 'both') {
+            if (repetitiveText && (displayMode === 'repetitive' || displayMode === 'both')) {
+                const yPosition = arabicText && displayMode === 'both' ? 50 : 0;
                 xml += `
-            <title ref="r2" name="English Title" offset="${toFrameTime(startFrames, frameRate)}" duration="${toFrameTime(totalFrames - startFrames, frameRate)}" start="${toFrameTime(startFrames, frameRate)}">
+            <title ref="r2" name="Repetitive Title" offset="${textOffset}" duration="${textDuration}" start="${textOffset}" lane="2" uid="${titleUID2}">
+              <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 ${yPosition}"/>
+              <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
               <text>
-                <text-style font="Helvetica" fontSize="25" fontFace="Regular" fontColor="1 1 1 1">${escape(repetitiveText)}</text-style>
+                <text-style font="Helvetica" fontSize="36" fontFace="Regular" fontColor="1 1 0.8 1" strokeColor="0 0 0 1" strokeWidth="1" alignment="center">${escape(repetitiveText)}</text-style>
               </text>
             </title>`;
             }
 
-            if (displayMode === 'alternating') {
+            if (displayMode === 'alternating' && arabicText && repetitiveText) {
                 const half = Math.floor((totalFrames - startFrames) / 2);
+                const firstHalf = toFrameTime(half, frameRate);
+                const secondOffset = toFrameTime(startFrames + half, frameRate);
+                const secondDuration = toFrameTime(totalFrames - startFrames - half, frameRate);
+                
+                xml = xml.replace(/<title.*?<\/title>/gs, ''); // إزالة التايتل السابق
+                
                 xml += `
-            <title ref="r2" name="Arabic Title" offset="${toFrameTime(startFrames, frameRate)}" duration="${toFrameTime(half, frameRate)}" start="${toFrameTime(startFrames, frameRate)}">
+            <title ref="r2" name="Arabic Title" offset="${textOffset}" duration="${firstHalf}" start="${textOffset}" lane="1" uid="${titleUID1}">
+              <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 0"/>
+              <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
               <text>
-                <text-style font="Arial" fontSize="34" fontFace="Regular" fontColor="1 1 1 1">${escape(arabicText)}</text-style>
+                <text-style font="Helvetica" fontSize="48" fontFace="Regular" fontColor="1 1 1 1" strokeColor="0 0 0 1" strokeWidth="2" alignment="center">${escape(arabicText)}</text-style>
               </text>
             </title>
-            <title ref="r2" name="English Title" offset="${toFrameTime(startFrames + half, frameRate)}" duration="${toFrameTime(totalFrames - startFrames - half, frameRate)}" start="${toFrameTime(startFrames + half, frameRate)}">
+            <title ref="r2" name="Repetitive Title" offset="${secondOffset}" duration="${secondDuration}" start="${secondOffset}" lane="1" uid="${titleUID2}">
+              <param name="Position" key="9999/999166631/999166633/1/100/101" value="0 0"/>
+              <param name="Alignment" key="9999/999166631/999166633/2/351" value="1 (Center)"/>
               <text>
-                <text-style font="Helvetica" fontSize="25" fontFace="Regular" fontColor="1 1 1 1">${escape(repetitiveText)}</text-style>
+                <text-style font="Helvetica" fontSize="36" fontFace="Regular" fontColor="1 1 0.8 1" strokeColor="0 0 0 1" strokeWidth="1" alignment="center">${escape(repetitiveText)}</text-style>
               </text>
             </title>`;
             }
@@ -1266,15 +1288,72 @@
         // إنشاء Final Cut Pro Bundle
         async function createFCPBundle(xmlContent, audioFileName) {
             try {
-                // إنشاء JSZip instance
+                // تحميل JSZip إذا لم تكن متوفرة
                 const JSZip = window.JSZip || await loadJSZip();
                 const zip = new JSZip();
                 
                 // إنشاء البنية المطلوبة لـ FCP Bundle
-                const projectName = audioFileName.replace(/\.[^/.]+$/, '') || 'project';
+                const projectName = sanitizeFileName(audioFileName.replace(/\.[^/.]+$/, '') || 'Audio_Project');
                 
                 // إضافة ملف Info.plist المُحسن لـ Final Cut Pro
-                const infoPlist = `<?xml version="1.0" encoding="UTF-8"?>
+                const infoPlist = createInfoPlist(projectName);
+                const currentVersionContent = createCurrentVersionPlist();
+                const settingsPlist = createSettingsPlist();
+                
+                // إضافة الملفات إلى Bundle
+                zip.file("Info.plist", infoPlist);
+                zip.file("CurrentVersion.flexolibrary", currentVersionContent);
+                zip.file("Settings.plist", settingsPlist);
+                
+                // إضافة ملف الـ XML الرئيسي
+                zip.file(`${projectName}.fcpxml`, xmlContent);
+                
+                // إنشاء بنية المجلدات المطلوبة
+                zip.folder("Analysis Files");
+                zip.folder("Proxies");
+                zip.folder("Transcoding Data");
+                zip.folder("Render Files");
+                zip.folder("Motion Templates");
+                
+                // إضافة ملف ClickToViewInFinalCutPro في كل مجلد
+                const readmeContent = `This is a Final Cut Pro Project Bundle.
+Double-click the .fcpbundle file to open in Final Cut Pro.
+
+Created by: FCP Audio Converter
+Date: ${new Date().toLocaleDateString()}
+Audio File: ${audioFileName}
+
+Instructions:
+1. Place your audio file (${audioFileName}) in the same folder as this bundle
+2. Double-click this .fcpbundle file to open in Final Cut Pro
+3. Final Cut Pro will import the project with audio and titles ready`;
+
+                zip.file("README.txt", readmeContent);
+                
+                // توليد Bundle مع ضغط محسن
+                const content = await zip.generateAsync({
+                    type: "blob",
+                    compression: "DEFLATE",
+                    compressionOptions: {
+                        level: 6
+                    },
+                    comment: `FCP Bundle created by FCP Audio Converter on ${new Date().toISOString()}`
+                });
+                
+                // تحميل Bundle
+                downloadBlob(content, `${projectName}.fcpbundle`);
+                
+            } catch (error) {
+                console.error('Error creating FCP Bundle:', error);
+                showNotification('Error creating bundle. Downloading XML instead.', 'warning');
+                // Fallback لـ XML عادي
+                downloadXMLFallback(xmlContent, audioFileName);
+            }
+        }
+
+        // إنشاء Info.plist مُحسن
+        function createInfoPlist(projectName) {
+            return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
@@ -1286,33 +1365,43 @@
                 <string>fcpbundle</string>
             </array>
             <key>CFBundleTypeIconFile</key>
-            <string>Final Cut Pro</string>
+            <string>Final Cut Pro Document.icns</string>
             <key>CFBundleTypeName</key>
-            <string>Final Cut Pro Project Bundle</string>
+            <string>Final Cut Pro Project</string>
             <key>CFBundleTypeRole</key>
             <string>Editor</string>
             <key>LSHandlerRank</key>
             <string>Owner</string>
-            <key>LSItemContentTypes</key>
-            <array>
-                <string>com.apple.finalcutpro.project</string>
-            </array>
+            <key>LSTypeIsPackage</key>
+            <true/>
+            <key>NSDocumentClass</key>
+            <string>FFDocument</string>
         </dict>
     </array>
     <key>CFBundleExecutable</key>
     <string>Final Cut Pro</string>
+    <key>CFBundleGetInfoString</key>
+    <string>Final Cut Pro Project Bundle</string>
+    <key>CFBundleIconFile</key>
+    <string>Final Cut Pro Document.icns</string>
     <key>CFBundleIdentifier</key>
-    <string>com.apple.FinalCutPro</string>
+    <string>com.apple.FinalCutPro.UserGeneratedBundle</string>
     <key>CFBundleName</key>
-    <string>${projectName}</string>
+    <string>${escapeXML(projectName)}</string>
     <key>CFBundleDisplayName</key>
-    <string>${projectName}</string>
+    <string>${escapeXML(projectName)}</string>
     <key>CFBundlePackageType</key>
     <string>BNDL</string>
     <key>CFBundleShortVersionString</key>
-    <string>10.6.5</string>
+    <string>10.6.8</string>
     <key>CFBundleVersion</key>
-    <string>10.6.5</string>
+    <string>10.6.8</string>
+    <key>CFBundleSignature</key>
+    <string>FCPX</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>10.15.6</string>
+    <key>NSRequiresAquaSystemAppearance</key>
+    <false/>
     <key>UTExportedTypeDeclarations</key>
     <array>
         <dict>
@@ -1324,7 +1413,7 @@
             <key>UTTypeDescription</key>
             <string>Final Cut Pro Project</string>
             <key>UTTypeIconFile</key>
-            <string>Final Cut Pro Project</string>
+            <string>Final Cut Pro Document.icns</string>
             <key>UTTypeIdentifier</key>
             <string>com.apple.finalcutpro.project</string>
             <key>UTTypeTagSpecification</key>
@@ -1333,41 +1422,16 @@
                 <array>
                     <string>fcpbundle</string>
                 </array>
-                <key>public.mime-type</key>
-                <array>
-                    <string>application/vnd.apple.finalcutpro</string>
-                </array>
-            </dict>
-        </dict>
-    </array>
-    <key>UTImportedTypeDeclarations</key>
-    <array>
-        <dict>
-            <key>UTTypeConformsTo</key>
-            <array>
-                <string>public.xml</string>
-            </array>
-            <key>UTTypeDescription</key>
-            <string>Final Cut Pro XML</string>
-            <key>UTTypeIdentifier</key>
-            <string>com.apple.finalcutpro.xml</string>
-            <key>UTTypeTagSpecification</key>
-            <dict>
-                <key>public.filename-extension</key>
-                <array>
-                    <string>fcpxml</string>
-                </array>
             </dict>
         </dict>
     </array>
 </dict>
 </plist>`;
+        }
 
-                // إضافة الملفات إلى Bundle
-                zip.file("Info.plist", infoPlist);
-                
-                // إضافة ملف CurrentVersion.flexolibrary (مطلوب لـ FCP)
-                const currentVersionContent = `<?xml version="1.0" encoding="UTF-8"?>
+        // إنشاء CurrentVersion.flexolibrary مُحسن
+        function createCurrentVersionPlist() {
+            return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
@@ -1377,26 +1441,26 @@
     <date>${new Date().toISOString()}</date>
     <key>Creator</key>
     <string>Final Cut Pro</string>
+    <key>CreatorVersion</key>
+    <string>10.6.8</string>
     <key>MinVersion</key>
     <string>10.6</string>
     <key>Version</key>
-    <string>10.6.5</string>
+    <string>10.6.8</string>
+    <key>CreatedBy</key>
+    <string>FCP Audio Converter</string>
+    <key>ProjectType</key>
+    <string>Audio with Subtitles</string>
 </dict>
 </plist>`;
-                
-                zip.file("CurrentVersion.flexolibrary", currentVersionContent);
-                
-                // إضافة ملف الـ XML الرئيسي
-                zip.file(`${projectName}.fcpxml`, xmlContent);
-                
-                // إنشاء بنية المجلدات المطلوبة
-                zip.folder("Analysis Files");
-                zip.folder("Proxies");
-                zip.folder("Transcoding Data");
-                zip.folder("Render Files");
-                
-                // إضافة ملف Settings.plist للمشروع
-                const settingsPlist = `<?xml version="1.0" encoding="UTF-8"?>
+        }
+
+        // إنشاء Settings.plist مُحسن
+        function createSettingsPlist() {
+            const resolution = '1920x1080';
+            const [width, height] = resolution.split('x').map(Number);
+            
+            return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
@@ -1417,67 +1481,107 @@
             <key>FFVideoFormatRateDenominator</key>
             <integer>1</integer>
             <key>FFVideoFormatFrameWidth</key>
-            <integer>1920</integer>
+            <integer>${width}</integer>
             <key>FFVideoFormatFrameHeight</key>
-            <integer>1080</integer>
+            <integer>${height}</integer>
+            <key>FFVideoFormatPixelAspectRatio</key>
+            <string>1:1</string>
+        </dict>
+        <key>FFAudioProperties</key>
+        <dict>
+            <key>FFAudioRateSampleRate</key>
+            <real>48000</real>
+            <key>FFAudioRateSampleSize</key>
+            <integer>24</integer>
+        </dict>
+        <key>FFRenderProperties</key>
+        <dict>
+            <key>FFRenderQuality</key>
+            <string>Normal</string>
+            <key>FFRenderFrameRate</key>
+            <string>25p</string>
         </dict>
     </dict>
+    <key>FFCreatedBy</key>
+    <string>FCP Audio Converter</string>
+    <key>FFCreationDate</key>
+    <date>${new Date().toISOString()}</date>
 </dict>
 </plist>`;
-                
-                zip.file("Settings.plist", settingsPlist);
-                
-                // توليد Bundle
-                const content = await zip.generateAsync({
-                    type: "blob",
-                    compression: "DEFLATE",
-                    compressionOptions: {
-                        level: 6
-                    }
-                });
-                
-                // تحميل Bundle
-                const url = URL.createObjectURL(content);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${projectName}.fcpbundle`;
-                a.style.display = 'none';
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 100);
-                
-            } catch (error) {
-                console.error('Error creating FCP Bundle:', error);
-                // Fallback لـ XML عادي
-                downloadXMLFallback(xmlContent, audioFileName);
-            }
         }
 
-        // Fallback لتحميل XML عادي
-        function downloadXMLFallback(xmlContent, audioFileName) {
-            const fileName = `${audioFileName.replace(/\.[^/.]+$/, '') || 'project'}.fcpxml`;
-            const blob = new Blob([xmlContent], { 
-                type: 'application/xml; charset=utf-8',
-                endings: 'native'
-            });
+        // تنظيف أسماء الملفات
+        function sanitizeFileName(filename) {
+            return filename
+                .replace(/[^\w\s\-\.\u0600-\u06FF]/g, '') // السماح بالأحرف العربية
+                .replace(/\s+/g, '_')
+                .substring(0, 50); // تحديد الطول
+        }
+
+        // تحميل Blob بطريقة محسنة
+        function downloadBlob(blob, filename) {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = fileName;
-            a.setAttribute('type', 'application/xml');
+            a.download = filename;
             a.style.display = 'none';
+            
+            // إضافة معلومات MIME type للتعرف على نوع الملف
+            a.setAttribute('type', 'application/octet-stream');
+            
             document.body.appendChild(a);
             a.click();
+            
+            // تنظيف مع تأخير أكبر للتأكد من اكتمال التحميل
             setTimeout(() => {
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-            }, 100);
+            }, 1000);
         }
 
-        // تحميل JSZip library
+        // Fallback لتحميل XML عادي مع تحسينات
+        function downloadXMLFallback(xmlContent, audioFileName) {
+            const fileName = sanitizeFileName(`${audioFileName.replace(/\.[^/.]+$/, '') || 'Audio_Project'}.fcpxml`);
+            
+            // تحسين XML للتوافق مع FCP
+            const improvedXML = validateAndFixXML(xmlContent);
+            
+            const blob = new Blob([improvedXML], { 
+                type: 'application/xml; charset=utf-8',
+                endings: 'native'
+            });
+            
+            downloadBlob(blob, fileName);
+        }
+
+        // التحقق من صحة وإصلاح XML
+        function validateAndFixXML(xmlContent) {
+            try {
+                // تحسينات XML للتأكد من التوافق مع FCP
+                let fixedXML = xmlContent;
+                
+                // التأكد من وجود encoding صحيح
+                if (!fixedXML.includes('encoding="UTF-8"')) {
+                    fixedXML = fixedXML.replace('<?xml version="1.0"', '<?xml version="1.0" encoding="UTF-8"');
+                }
+                
+                // إضافة البيانات الوصفية المطلوبة
+                if (!fixedXML.includes('modDate=')) {
+                    const now = new Date().toISOString();
+                    fixedXML = fixedXML.replace(
+                        /<project([^>]*)>/g, 
+                        `<project$1 modDate="${now}">`
+                    );
+                }
+                
+                return fixedXML;
+            } catch (error) {
+                console.warn('XML validation warning:', error);
+                return xmlContent; // إرجاع النص الأصلي في حالة وجود خطأ
+            }
+        }
+
+        // تحميل JSZip library مع معالجة أفضل للأخطاء
         async function loadJSZip() {
             return new Promise((resolve, reject) => {
                 if (window.JSZip) {
@@ -1485,12 +1589,51 @@
                     return;
                 }
                 
-                const script = document.createElement('script');
-                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
-                script.onload = () => resolve(window.JSZip);
-                script.onerror = reject;
-                document.head.appendChild(script);
+                // محاولة تحميل من CDN متعدد
+                const cdnUrls = [
+                    'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
+                    'https://unpkg.com/jszip@3.10.1/dist/jszip.min.js',
+                    'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js'
+                ];
+                
+                let currentCDN = 0;
+                
+                function tryLoadFromCDN() {
+                    if (currentCDN >= cdnUrls.length) {
+                        reject(new Error('Could not load JSZip from any CDN'));
+                        return;
+                    }
+                    
+                    const script = document.createElement('script');
+                    script.src = cdnUrls[currentCDN];
+                    script.onload = () => {
+                        if (window.JSZip) {
+                            resolve(window.JSZip);
+                        } else {
+                            currentCDN++;
+                            tryLoadFromCDN();
+                        }
+                    };
+                    script.onerror = () => {
+                        currentCDN++;
+                        tryLoadFromCDN();
+                    };
+                    document.head.appendChild(script);
+                }
+                
+                tryLoadFromCDN();
             });
+        }
+
+        // إضافة دالة للتحقق من توافق المتصفح
+        function checkBrowserCompatibility() {
+            const compatibility = {
+                jszip: typeof Promise !== 'undefined' && typeof Blob !== 'undefined',
+                download: typeof document.createElement('a').download !== 'undefined',
+                fileapi: typeof FileReader !== 'undefined' && typeof File !== 'undefined'
+            };
+            
+            return compatibility;
         }
 
         // Download XML file
@@ -1516,49 +1659,156 @@
             showNotification('xmlDownloaded', 'success');
         }
 
-        // Load settings function
+        // Load settings function مع إعدادات محسنة
         function loadSettings() {
             const defaultSettings = {
-                duration: 5,
+                duration: 300, // مدة افتراضية 5 دقائق
                 startTime: 0,
                 displayMode: 'arabic',
                 skipPoetryIntros: true,
-                poetryIntroPatterns: ['مستهل', 'يا حسين', 'لبيك يا حسين', 'السلام عليك', 'صلى الله عليه وآله'],
+                poetryIntroPatterns: [
+                    'مستهل', 'يا حسين', 'لبيك يا حسين', 'السلام عليك', 'صلى الله عليه وآله',
+                    'بسم الله', 'الحمد لله', 'اللهم صل', 'وبعد', 'أما بعد',
+                    'مقدمة:', 'خاتمة:', 'انتهى'
+                ],
                 skipBeginningIntros: true,
                 skipEndingIntros: true,
-                customSkipPatterns: []
+                customSkipPatterns: [],
+                textPosition: 'center', // center, bottom, top
+                fontSize: 48,
+                fontColor: 'white',
+                strokeEnabled: true,
+                strokeColor: 'black',
+                strokeWidth: 2
             };
             
             try {
                 const saved = localStorage.getItem('converterSettings');
                 return saved ? { ...defaultSettings, ...JSON.parse(saved) } : defaultSettings;
-            } catch {
+            } catch (error) {
+                console.warn('Error loading settings:', error);
                 return defaultSettings;
             }
         }
 
-        // Generate UID function
+        // Generate UID function محسن
         function generateUID() {
-            return 'xxxx-xxxx-4xxx-yxxx'.replace(/[xy]/g, function(c) {
-                const r = Math.random() * 16 | 0;
-                const v = c === 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
+            // إنشاء UID فريد متوافق مع FCP
+            const chars = '0123456789ABCDEF';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += chars[Math.floor(Math.random() * 16)];
+            }
+            result += '-';
+            for (let i = 0; i < 4; i++) {
+                result += chars[Math.floor(Math.random() * 16)];
+            }
+            result += '-4'; // إصدار UUID 4
+            for (let i = 0; i < 3; i++) {
+                result += chars[Math.floor(Math.random() * 16)];
+            }
+            result += '-';
+            result += chars[8 + Math.floor(Math.random() * 4)]; // صحيح رقمياً
+            for (let i = 0; i < 3; i++) {
+                result += chars[Math.floor(Math.random() * 16)];
+            }
+            result += '-';
+            for (let i = 0; i < 12; i++) {
+                result += chars[Math.floor(Math.random() * 16)];
+            }
+            return result;
         }
 
-        // Escape XML function
+        // Escape XML function محسن لدعم النصوص العربية
         function escapeXML(text) {
             if (!text) return '';
-            return text
+            
+            // تحويل النص إلى string إذا لم يكن كذلك
+            const str = String(text);
+            
+            return str
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
+                .replace(/'/g, '&#39;')
+                .replace(/\r\n/g, '\n') // تطبيع نهايات السطور
+                .replace(/\r/g, '\n')
+                .trim(); // إزالة المسافات الزائدة
+        }
+
+        // إضافة دالة للحصول على الوقت المناسب للنص
+        function getOptimalTextTiming(audioFile, textLength) {
+            if (!audioFile) return { start: 0, duration: 300 };
+            
+            // تقدير الوقت المناسب بناءً على طول النص
+            const wordsCount = textLength.split(/\s+/).length;
+            const readingSpeed = 2; // كلمات في الثانية
+            const minDuration = Math.max(60, wordsCount / readingSpeed); // دقيقة واحدة كحد أدنى
+            
+            return {
+                start: 2, // بداية بعد ثانيتين
+                duration: Math.min(minDuration, 600) // حد أقصى 10 دقائق
+            };
+        }
+
+        // معلومات مساعدة للمستخدم
+        function showXMLHelp() {
+            const t = translations[currentLanguage];
+            const helpMessage = currentLanguage === 'ar' ? 
+                `نصائح لحل مشاكل XML في Final Cut Pro:
+
+1. تأكد من وضع الملف الصوتي في نفس مجلد ملف .fcpbundle
+2. افتح Final Cut Pro قبل فتح الملف
+3. انقر مرتين على ملف .fcpbundle أو اسحبه إلى Final Cut Pro
+4. إذا لم يعمل Bundle، استخدم خيار "تحميل XML فقط"
+5. تأكد من أن اسم الملف الصوتي يطابق المرجع في XML
+
+للمساعدة التقنية:
+- إصدار Final Cut Pro: 10.6 أو أحدث
+- تنسيقات الصوت المدعومة: MP3, WAV, M4A, AAC
+- الترميز: UTF-8
+- إصدار XML: 1.10` :
+                `Tips for solving XML issues in Final Cut Pro:
+
+1. Make sure audio file is in same folder as .fcpbundle file
+2. Open Final Cut Pro before opening the file
+3. Double-click .fcpbundle file or drag to Final Cut Pro
+4. If bundle doesn't work, use "Download XML Only" option
+5. Ensure audio filename matches reference in XML
+
+Technical support:
+- Final Cut Pro version: 10.6 or newer
+- Supported audio formats: MP3, WAV, M4A, AAC
+- Encoding: UTF-8
+- XML version: 1.10`;
+            
+            alert(helpMessage);
+        }
+
+        // إضافة زر مساعدة (سيتم إضافته في HTML لاحقاً)
+        function addHelpButton() {
+            const helpBtn = document.createElement('button');
+            helpBtn.className = 'btn btn-primary';
+            helpBtn.innerHTML = '<i class="fas fa-question-circle"></i> ' + 
+                (currentLanguage === 'ar' ? 'مساعدة' : 'Help');
+            helpBtn.onclick = showXMLHelp;
+            helpBtn.style.marginTop = '1rem';
+            
+            const actionButtons = document.querySelector('.action-buttons');
+            if (actionButtons) {
+                actionButtons.appendChild(helpBtn);
+            }
         }
 
         // Initialize on page load with enhanced features
         document.addEventListener('DOMContentLoaded', function() {
+            // التحقق من توافق المتصفح
+            const compatibility = checkBrowserCompatibility();
+            if (!compatibility.jszip || !compatibility.download) {
+                console.warn('Browser compatibility issues detected. Some features may not work properly.');
+            }
+            
             // Initialize drag and drop functionality
             initializeDragAndDrop();
             
@@ -1633,6 +1883,15 @@
                     }
                 }
             });
+
+            // إضافة رسالة ترحيب مع معلومات التوافق
+            if (savedLanguage === 'ar') {
+                console.log('محول الصوت إلى Final Cut Pro - جاهز للاستخدام');
+                console.log('Browser compatibility:', compatibility);
+            } else {
+                console.log('FCP Audio Converter - Ready to use');
+                console.log('Browser compatibility:', compatibility);
+            }
         });
     </script>
 </body>
