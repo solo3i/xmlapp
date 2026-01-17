@@ -623,13 +623,13 @@
                 poetryFilterLabel: 'تنقية نصوص القصائد:',
                 skipIntrosText: 'تجاهل المستهلات',
                 poetryFilterDescription: 'سيتم تجاهل العبارات الافتتاحية والختامية في القصائد',
-                generateBtnText: 'توليد Final Cut Pro fcpxmld',
+                generateBtnText: 'توليد Final Cut Pro Bundle',
                 settingsLinkText: 'يمكنك تخصيص الإعدادات المتقدمة من صفحة',
                 settingsLink: 'الإعدادات',
-                xmlTitle: 'تم إنشاء ملف fcpxmld بنجاح!',
-                successTitle: 'ملف fcpxmld جاهز للتحميل',
-                successDescription: 'سيتم تحميل الملف تلقائياً، أو يمكنك الضغط على زر التحميل أدناه',
-                downloadBtnText: 'تحميل ملف fcpxmld',
+                xmlTitle: 'تم إنشاء Bundle لبرنامج Final Cut Pro بنجاح!',
+                successTitle: 'Bundle جاهز للتحميل',
+                successDescription: 'سيتم تحميل bundle تلقائياً، أو يمكنك الضغط على زر التحميل أدناه',
+                downloadBtnText: 'تحميل Bundle',
                 downloadXmlOnlyText: 'تحميل XML فقط',
                 xmlOnlyDescription: 'إذا لم يعمل الملف، جرب ملف XML منفرد',
                 // Notifications
@@ -637,8 +637,8 @@
                 invalidFileType: 'يرجى اختيار ملف صوتي أو فيديو',
                 noAudioFile: 'يرجى رفع ملف صوتي أولاً',
                 noTextContent: 'يرجى إدخال نص عربي أو نص متكرر',
-                xmlGenerated: 'تم توليد ملف fcpxmld بنجاح!',
-                xmlDownloaded: 'تم تحميل ملف fcpxmld بنجاح!',
+                xmlGenerated: 'تم توليد Bundle بنجاح!',
+                xmlDownloaded: 'تم تحميل Bundle بنجاح!',
                 noXmlToDownload: 'لا يوجد ملف للتحميل',
                 libraryComingSoon: 'ميزة مكتبة الفيديو ستكون متاحة قريباً',
                 // Audio info
@@ -674,13 +674,13 @@
                 poetryFilterLabel: 'Poetry Text Filtering:',
                 skipIntrosText: 'Skip Introductory Phrases',
                 poetryFilterDescription: 'Will ignore introductory and concluding phrases in poems',
-                generateBtnText: 'Generate Final Cut Pro fcpxmld',
+                generateBtnText: 'Generate Final Cut Pro Bundle',
                 settingsLinkText: 'You can customize advanced settings from the',
                 settingsLink: 'Settings',
-                xmlTitle: 'fcpxmld File Created Successfully!',
-                successTitle: 'fcpxmld File Ready for Download',
-                successDescription: 'The file will download automatically, or you can click the download button below',
-                downloadBtnText: 'Download fcpxmld File',
+                xmlTitle: 'Final Cut Pro Bundle Created Successfully!',
+                successTitle: 'Final Cut Pro Bundle Ready for Download',
+                successDescription: 'The bundle will download automatically, or you can click the download button below',
+                downloadBtnText: 'Download FCP Bundle',
                 downloadXmlOnlyText: 'Download XML Only',
                 xmlOnlyDescription: 'If file doesn\'t work, try XML file only',
                 // Notifications
@@ -688,8 +688,8 @@
                 invalidFileType: 'Please select an audio or video file',
                 noAudioFile: 'Please upload an audio file first',
                 noTextContent: 'Please enter Arabic text or repetitive text',
-                xmlGenerated: 'fcpxmld file generated successfully!',
-                xmlDownloaded: 'fcpxmld file downloaded successfully!',
+                xmlGenerated: 'FCP bundle generated successfully!',
+                xmlDownloaded: 'FCP bundle downloaded successfully!',
                 noXmlToDownload: 'No file to download',
                 libraryComingSoon: 'Video library feature will be available soon',
                 // Audio info
@@ -935,9 +935,9 @@
   <resources>
     <format id="r1" name="FFVideoFormat1080p25" frameDuration="1/25s" width="1920" height="1080" colorSpace="1-1-1 (Rec. 709)"/>
     <effect id="r2" name="Basic Title" uid=".../Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"/>
-    <asset id="r3" name="${escape(audioName)}" uid="${uid}" start="0s" duration="300s" hasVideo="0" hasAudio="1" audioSources="1" audioChannels="2" audioRate="48k">
-      <media-rep kind="original-media" src="file:///${escape(audioName)}"/>
-    </asset>
+        <asset id="r3" name="${escape(audioName)}" uid="${uid}" start="0s" duration="300s" hasVideo="0" hasAudio="1" audioSources="1" audioChannels="2" audioRate="48k">
+            <media-rep kind="original-media" src="file://./${escape(audioName)}"/>
+        </asset>
   </resources>
   <library location="file:///Users/Shared/FCP%20Audio%20Projects/">
     <event name="Audio Project ${new Date().toLocaleDateString()}" uid="${generateUID()}">
@@ -983,35 +983,37 @@
             showNotification('xmlGenerated', 'success');
         }
 
-        // Create fcpxmld file (specialized format)
+        // Create Final Cut Pro bundle (zip) containing .fcpxml and media
         async function createFCPMLD(xmlContent, audioFileName) {
             try {
                 const projectName = audioFileName.replace(/\.[^/.]+$/, '') || 'project';
-                
-                // Create fcpxmld content structure
-                const fcpxmldContent = {
-                    version: "1.0",
-                    type: "fcpxmld",
-                    metadata: {
-                        creator: "FCP Audio Converter",
-                        created: new Date().toISOString(),
-                        audioFile: audioFileName,
-                        projectName: projectName
-                    },
-                    fcpxml: xmlContent,
-                    resources: {
-                        audio: audioFileName
-                    }
-                };
-                
-                const blob = new Blob([JSON.stringify(fcpxmldContent, null, 2)], { 
-                    type: 'application/json; charset=utf-8'
-                });
-                
-                const url = URL.createObjectURL(blob);
+
+                if (typeof JSZip === 'undefined') {
+                    // If JSZip not available, fallback to XML only
+                    console.warn('JSZip not found, falling back to XML only.');
+                    downloadXMLFallback(xmlContent, audioFileName);
+                    return;
+                }
+
+                const zip = new JSZip();
+
+                // Add the fcpxml file
+                zip.file(`${projectName}.fcpxml`, xmlContent);
+
+                // Add the original audio file if available
+                if (audioFile && audioFile.name) {
+                    // Put the media at the root of the bundle so the XML can reference it relatively
+                    zip.file(audioFile.name, audioFile);
+                }
+
+                // Generate the zip (bundle)
+                const content = await zip.generateAsync({ type: 'blob' });
+
+                const url = URL.createObjectURL(content);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `${projectName}.fcpxmld`;
+                // Use .fcpbundle extension which is essentially a zip for user convenience
+                a.download = `${projectName}.fcpbundle`;
                 a.style.display = 'none';
                 document.body.appendChild(a);
                 a.click();
@@ -1019,9 +1021,9 @@
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
                 }, 100);
-                
+
             } catch (error) {
-                console.error('Error creating fcpxmld file:', error);
+                console.error('Error creating FCP bundle:', error);
                 downloadXMLFallback(xmlContent, audioFileName);
             }
         }
