@@ -1,1676 +1,208 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SubEdit Studio</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg:       #09090E;
-  --s0:       #0F0F16;
-  --s1:       #15151E;
-  --s2:       #1C1C27;
-  --s3:       #232330;
-  --s4:       #2A2A3A;
-  --bd:       #2E2E42;
-  --bd2:      #3A3A52;
-  --t0:       #EAEAF5;
-  --t1:       #9898B8;
-  --t2:       #5C5C7A;
-  --acc:      #5C6CF0;
-  --acc-d:    #4A58D8;
-  --acc-l:    #7F8EF8;
-  --acc-bg:   rgba(92,108,240,.12);
-  --ar:       #F59E0B;
-  --ar-bg:    rgba(245,158,11,.1);
-  --en:       #60A5FA;
-  --en-bg:    rgba(96,165,250,.1);
-  --green:    #22C55E;
-  --red:      #EF4444;
-  --amber:    #F59E0B;
-  --r:        7px;
-  --font:     'Outfit', sans-serif;
-  --mono:     'JetBrains Mono', monospace;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;overflow:hidden;}
-body{font-family:var(--font);background:var(--bg);color:var(--t0);font-size:13px;display:flex;flex-direction:column;}
-::-webkit-scrollbar{width:4px;height:4px;}
-::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px;}
-::-webkit-scrollbar-track{background:transparent;}
- 
-/* ─── Header ─── */
-header{
-  height:48px;background:var(--s0);border-bottom:1px solid var(--bd);
-  display:flex;align-items:center;gap:10px;padding:0 14px;flex-shrink:0;
-}
-.logo{display:flex;align-items:center;gap:8px;margin-right:6px;}
-.logo-mark{
-  width:28px;height:28px;border-radius:8px;
-  background:linear-gradient(135deg,#5C6CF0,#818CF8);
-  display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:800;color:#fff;
-}
-.logo-txt{font-size:14px;font-weight:700;letter-spacing:-.3px;}
-.logo-sub{font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.8px;font-weight:500;}
-.hdr-sep{width:1px;height:24px;background:var(--bd);flex-shrink:0;}
-.playback{display:flex;align-items:center;gap:7px;}
-.pb-btn{
-  width:30px;height:30px;border-radius:50%;border:none;
-  background:var(--s3);color:var(--t0);cursor:pointer;
-  font-size:12px;display:flex;align-items:center;justify-content:center;
-  transition:.15s;
-}
-.pb-btn:hover{background:var(--acc);color:#fff;}
-.pb-btn.big{width:34px;height:34px;background:var(--acc);color:#fff;font-size:14px;}
-.pb-btn.big:hover{background:var(--acc-d);}
-.time-display{font-family:var(--mono);font-size:11px;color:var(--t1);white-space:nowrap;}
-.progress-wrap{flex:1;height:3px;background:var(--s3);border-radius:2px;cursor:pointer;position:relative;}
-.progress-fill{height:100%;background:var(--acc);border-radius:2px;pointer-events:none;}
-.progress-wrap:hover{height:5px;}
-.lang-toggles{display:flex;gap:4px;flex-shrink:0;}
-.lt-btn{
-  display:flex;align-items:center;gap:4px;padding:0 9px;height:26px;
-  border-radius:5px;border:1px solid var(--bd);background:transparent;
-  font-family:var(--font);font-size:11px;font-weight:600;cursor:pointer;
-  transition:.15s;
-}
-.lt-btn.ar-on{background:var(--ar-bg);border-color:var(--ar);color:var(--ar);}
-.lt-btn.en-on{background:var(--en-bg);border-color:var(--en);color:var(--en);}
-.lt-btn:not(.ar-on):not(.en-on){color:var(--t2);}
-.hdr-right{display:flex;align-items:center;gap:5px;margin-left:auto;}
-.btn{
-  display:inline-flex;align-items:center;gap:5px;height:28px;
-  padding:0 11px;border-radius:var(--r);font-family:var(--font);
-  font-size:11px;font-weight:600;cursor:pointer;border:none;transition:.15s;
-}
-.btn-ghost{background:var(--s2);color:var(--t1);border:1px solid var(--bd);}
-.btn-ghost:hover{background:var(--s3);color:var(--t0);}
-.btn-acc{background:var(--acc);color:#fff;}
-.btn-acc:hover{background:var(--acc-d);}
-.btn-sm{height:24px;padding:0 8px;font-size:10px;}
-.btn-icon{width:28px;padding:0;justify-content:center;}
-.btn:disabled{opacity:.35;cursor:not-allowed;}
- 
-/* ─── Body Layout ─── */
-.app-body{flex:1;display:flex;overflow:hidden;}
- 
-/* ─── Left Panel (subtitle list) ─── */
-.panel-left{
-  width:310px;flex-shrink:0;border-right:1px solid var(--bd);
-  background:var(--s1);display:flex;flex-direction:column;overflow:hidden;
-}
-.ph{
-  height:40px;display:flex;align-items:center;justify-content:space-between;
-  padding:0 12px;border-bottom:1px solid var(--bd);background:var(--s0);flex-shrink:0;
-}
-.ph-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t2);}
-.seg-list{flex:1;overflow-y:auto;padding:8px;}
- 
-/* Subtitle Card */
-.seg-card{
-  background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);
-  margin-bottom:6px;overflow:hidden;transition:.15s;
-}
-.seg-card.selected{border-color:var(--acc);}
-.seg-card:hover{border-color:var(--bd2);}
-.sc-head{
-  display:flex;align-items:center;gap:6px;
-  padding:6px 8px;background:var(--s3);border-bottom:1px solid var(--bd);
-}
-.sc-num{
-  font-family:var(--mono);font-size:10px;color:var(--t2);
-  background:var(--s4);padding:2px 6px;border-radius:4px;flex-shrink:0;
-}
-.sc-times{display:flex;align-items:center;gap:4px;flex:1;font-family:var(--mono);}
-.t-in{
-  width:66px;height:22px;background:var(--bg);border:1px solid var(--bd);
-  border-radius:4px;color:var(--t0);font-family:var(--mono);font-size:10px;
-  padding:0 5px;outline:none;text-align:center;
-}
-.t-in:focus{border-color:var(--acc);}
-.t-sep{color:var(--t2);font-size:10px;}
-.dur-in{width:46px;}
-.sc-acts{display:flex;gap:2px;margin-left:auto;}
-.sc-act{
-  width:22px;height:22px;border-radius:4px;border:none;background:transparent;
-  color:var(--t2);cursor:pointer;font-size:11px;display:flex;align-items:center;
-  justify-content:center;transition:.15s;
-}
-.sc-act:hover{background:var(--s4);color:var(--t0);}
-.sc-act.del:hover{color:var(--red);background:rgba(239,68,68,.1);}
-.sc-body{padding:6px 8px 8px;}
-.text-block{margin-bottom:5px;}
-.text-block:last-child{margin-bottom:0;}
-.tb-label{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:3px;
-}
-.tb-tag{
-  font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;
-  text-transform:uppercase;letter-spacing:.5px;
-}
-.tb-tag.ar{background:var(--ar-bg);color:var(--ar);}
-.tb-tag.en{background:var(--en-bg);color:var(--en);}
-.tb-actions{display:flex;gap:3px;}
-.imp-btn{
-  height:18px;padding:0 6px;border-radius:4px;border:none;background:var(--acc-bg);
-  color:var(--acc-l);font-family:var(--font);font-size:9px;font-weight:600;
-  cursor:pointer;transition:.15s;
-}
-.imp-btn:hover{background:var(--acc);color:#fff;}
-.imp-btn.active{background:rgba(34,197,94,.15);color:var(--green);}
-.toggle-improved{
-  height:18px;padding:0 6px;border-radius:4px;border:1px solid var(--bd);
-  background:transparent;color:var(--t2);font-family:var(--font);font-size:9px;
-  cursor:pointer;transition:.15s;
-}
-.toggle-improved:hover{border-color:var(--acc-l);color:var(--acc-l);}
-.toggle-improved.on{background:var(--acc-bg);border-color:var(--acc);color:var(--acc-l);}
-.text-area{
-  width:100%;min-height:40px;background:var(--bg);border:1px solid var(--bd);
-  border-radius:5px;color:var(--t0);font-family:var(--font);font-size:12px;
-  padding:6px 8px;resize:none;outline:none;line-height:1.5;transition:.15s;
-}
-.text-area:focus{border-color:var(--acc);}
-.text-area.ar-txt{direction:rtl;text-align:right;}
-.text-area.improved{background:rgba(34,197,94,.04);border-color:rgba(34,197,94,.2);}
-.sc-footer{
-  display:flex;gap:4px;padding:0 8px 7px;
-}
-.sc-foot-btn{
-  flex:1;height:22px;border:1px solid var(--bd);border-radius:4px;
-  background:transparent;color:var(--t2);font-family:var(--font);font-size:9px;
-  font-weight:600;cursor:pointer;transition:.15s;
-}
-.sc-foot-btn:hover{background:var(--s4);color:var(--t0);border-color:var(--bd2);}
-.empty-list{text-align:center;padding:60px 20px;color:var(--t2);}
-.empty-ico{font-size:36px;margin-bottom:12px;opacity:.4;}
-.empty-txt{font-size:12px;line-height:1.8;}
-.add-seg-btn{
-  width:100%;height:34px;border:1.5px dashed var(--bd);border-radius:var(--r);
-  background:none;color:var(--t2);font-family:var(--font);font-size:12px;
-  cursor:pointer;transition:.15s;margin-top:4px;
-}
-.add-seg-btn:hover{border-color:var(--acc);color:var(--acc-l);background:var(--acc-bg);}
- 
-/* ─── Center Panel ─── */
-.panel-center{
-  flex:1;display:flex;flex-direction:column;background:var(--bg);overflow:hidden;
-}
- 
-/* Drop zone */
-.drop-zone{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:14px;cursor:pointer;
-  border:2px dashed var(--bd);border-radius:10px;margin:20px;transition:.2s;
-}
-.drop-zone:hover,.drop-zone.dragover{border-color:var(--acc);background:var(--acc-bg);}
-.dz-icon{font-size:48px;opacity:.3;}
-.dz-title{font-size:15px;font-weight:600;color:var(--t1);}
-.dz-sub{font-size:11px;color:var(--t2);text-align:center;line-height:1.8;}
-.dz-types{
-  display:flex;gap:6px;flex-wrap:wrap;justify-content:center;
-}
-.dz-type{
-  padding:3px 9px;border-radius:10px;border:1px solid var(--bd);
-  font-size:10px;font-weight:600;font-family:var(--mono);color:var(--t2);
-}
-.dz-btn{
-  margin-top:4px;padding:8px 20px;border-radius:var(--r);
-  background:var(--acc);color:#fff;font-family:var(--font);font-size:12px;
-  font-weight:600;border:none;cursor:pointer;transition:.15s;
-}
-.dz-btn:hover{background:var(--acc-d);}
- 
-/* Media area */
-.media-area{flex:1;position:relative;overflow:hidden;background:#000;display:none;}
-.media-area.visible{display:block;}
-.media-area video,.media-area canvas.overlay{
-  position:absolute;inset:0;width:100%;height:100%;
-}
-.media-area video{object-fit:contain;background:#000;}
-.media-area canvas.overlay{pointer-events:none;z-index:2;}
-/* audio view */
-.audio-bg{
-  position:absolute;inset:0;z-index:1;
-  background:linear-gradient(135deg, #0F0F20 0%, #0A1020 100%);
-}
-canvas.viz{position:absolute;inset:0;width:100%;height:100%;z-index:1;}
- 
-/* ─── Timeline ─── */
-.timeline{
-  height:88px;border-top:1px solid var(--bd);background:var(--s0);
-  display:flex;flex-direction:column;flex-shrink:0;
-}
-.tl-ruler{
-  height:24px;border-bottom:1px solid var(--bd);position:relative;overflow:hidden;
-  background:var(--s0);
-}
-.tl-track-wrap{
-  flex:1;position:relative;overflow-x:auto;overflow-y:hidden;cursor:crosshair;
-}
-.tl-track{position:absolute;height:100%;min-width:100%;}
-.tl-block{
-  position:absolute;height:calc(100% - 8px);top:4px;
-  border-radius:4px;display:flex;align-items:center;
-  padding:0 5px;font-size:9px;font-weight:600;color:#fff;
-  cursor:grab;overflow:hidden;white-space:nowrap;
-  border:1px solid rgba(255,255,255,.15);
-  user-select:none;transition:filter .1s;
-}
-.tl-block:hover{filter:brightness(1.2);}
-.tl-block:active{cursor:grabbing;}
-.tl-block.selected{box-shadow:0 0 0 2px #fff;}
-.tl-block-txt{overflow:hidden;text-overflow:ellipsis;pointer-events:none;}
-.tl-resize{
-  position:absolute;right:0;top:0;width:6px;height:100%;
-  cursor:col-resize;background:rgba(255,255,255,.25);
-}
-.tl-playhead{
-  position:absolute;top:0;width:2px;background:var(--red);z-index:10;
-  pointer-events:none;height:100%;
-}
-.tl-playhead::before{
-  content:'';position:absolute;top:0;left:-4px;
-  width:10px;height:10px;background:var(--red);border-radius:50%;
-}
- 
-/* ─── Right Panel (style) ─── */
-.panel-right{
-  width:290px;flex-shrink:0;border-left:1px solid var(--bd);
-  background:var(--s1);display:flex;flex-direction:column;overflow:hidden;
-}
-.tab-nav{
-  display:flex;background:var(--s0);border-bottom:1px solid var(--bd);flex-shrink:0;
-}
-.tab-btn{
-  flex:1;height:38px;border:none;background:transparent;cursor:pointer;
-  font-family:var(--font);font-size:10px;font-weight:700;text-transform:uppercase;
-  letter-spacing:.5px;color:var(--t2);transition:.15s;
-  border-bottom:2px solid transparent;
-}
-.tab-btn.on{color:var(--acc-l);border-bottom-color:var(--acc);}
-.tab-btn:hover:not(.on){color:var(--t1);}
-.tab-pane{display:none;flex:1;overflow-y:auto;padding:12px;}
-.tab-pane.on{display:block;}
- 
-/* Style tab */
-.s-row{margin-bottom:12px;}
-.s-lbl{
-  display:block;font-size:9px;font-weight:700;text-transform:uppercase;
-  letter-spacing:.8px;color:var(--t2);margin-bottom:5px;
-}
-.s-sel,.s-nin{
-  width:100%;height:30px;background:var(--s2);border:1px solid var(--bd);
-  border-radius:6px;color:var(--t0);font-family:var(--font);font-size:12px;
-  padding:0 9px;outline:none;transition:.15s;
-}
-.s-sel:focus,.s-nin:focus{border-color:var(--acc);}
-.range-wrap{display:flex;align-items:center;gap:8px;}
-.range-wrap input[type=range]{flex:1;accent-color:var(--acc);}
-.range-v{font-family:var(--mono);font-size:11px;color:var(--t1);min-width:26px;text-align:right;}
-.tog-row{display:flex;gap:4px;}
-.tog{
-  flex:1;height:28px;border:1px solid var(--bd);border-radius:5px;
-  background:var(--s2);color:var(--t2);font-family:var(--font);font-size:11px;
-  font-weight:600;cursor:pointer;transition:.15s;
-}
-.tog.on{background:var(--acc-bg);border-color:var(--acc);color:var(--acc-l);}
-.color-row{display:flex;gap:6px;align-items:center;}
-input[type=color]{
-  width:30px;height:30px;border:1px solid var(--bd);border-radius:5px;
-  padding:3px;background:var(--s2);cursor:pointer;flex-shrink:0;
-}
-.hex{
-  flex:1;height:30px;background:var(--s2);border:1px solid var(--bd);
-  border-radius:5px;color:var(--t0);font-family:var(--mono);font-size:11px;
-  padding:0 8px;outline:none;
-}
-.hex:focus{border-color:var(--acc);}
-.check-row{display:flex;align-items:center;gap:7px;margin-bottom:6px;}
-.check-row input[type=checkbox]{accent-color:var(--acc);width:13px;height:13px;}
-.check-lbl{font-size:12px;color:var(--t1);}
-.xy-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-.xy-unit label{font-size:9px;color:var(--t2);display:block;margin-bottom:3px;}
-.xy-unit input{
-  width:100%;height:28px;background:var(--s2);border:1px solid var(--bd);
-  border-radius:5px;color:var(--t0);font-family:var(--mono);font-size:11px;
-  padding:0 7px;outline:none;
-}
-.xy-unit input:focus{border-color:var(--acc);}
-.sub-preview{
-  border-radius:8px;overflow:hidden;aspect-ratio:16/9;
-  margin-bottom:12px;position:relative;background:#000;
-}
-.sub-preview canvas{width:100%;height:100%;display:block;}
- 
-/* Presets tab */
-.preset-card{
-  background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);
-  padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:.15s;
-  display:flex;align-items:center;gap:10px;
-}
-.preset-card:hover{border-color:var(--bd2);background:var(--s3);}
-.preset-card.on{border-color:var(--acc);background:var(--acc-bg);}
-.preset-preview{
-  width:48px;height:30px;border-radius:4px;background:#000;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  font-size:7px;font-weight:700;text-align:center;padding:2px;
-}
-.preset-info{flex:1;}
-.preset-name{font-size:12px;font-weight:600;color:var(--t0);margin-bottom:2px;}
-.preset-desc{font-size:10px;color:var(--t2);}
-.preset-del{
-  background:none;border:none;color:var(--t2);cursor:pointer;
-  font-size:12px;opacity:.4;transition:.15s;padding:4px;border-radius:3px;
-}
-.preset-del:hover{opacity:1;color:var(--red);}
-.save-preset-row{
-  display:flex;gap:5px;margin-top:8px;
-}
-.preset-name-in{
-  flex:1;height:28px;background:var(--s2);border:1px solid var(--bd);
-  border-radius:5px;color:var(--t0);font-family:var(--font);font-size:11px;
-  padding:0 8px;outline:none;
-}
-.preset-name-in:focus{border-color:var(--acc);}
- 
-/* Toast */
-.toast{
-  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(8px);
-  background:var(--s4);border:1px solid var(--bd2);color:var(--t0);
-  padding:9px 16px;border-radius:8px;font-size:12px;font-weight:500;
-  z-index:9999;opacity:0;transition:.2s;pointer-events:none;white-space:nowrap;
-  box-shadow:0 4px 24px rgba(0,0,0,.5);
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
- 
-/* AI loading spinner */
-.spin{
-  display:inline-block;width:12px;height:12px;border:2px solid var(--bd2);
-  border-top-color:var(--acc-l);border-radius:50%;animation:spin .6s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg);}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SubEdit Pro | محرر الترجمة الاحترافي</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@6.5.1/dist/framer-motion.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Cairo:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080810; --p1: #0e0e18; --p2: #12121e;
+            --acc: #6366f1; --t0: #e4e4f4; --t1: #7878a0;
+            --bd: rgba(255,255,255,0.06);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Inter', 'Cairo', sans-serif; 
+            background: var(--bg); color: var(--t0); 
+            height: 100vh; overflow: hidden; font-size: 13px;
+        }
+        #root { height: 100%; display: flex; flex-direction: column; }
+        .app-container { display: flex; flex: 1; overflow: hidden; }
+        
+        /* Sidebar Styles */
+        .sidebar { 
+            width: 320px; background: var(--p1); 
+            border-left: 1px solid var(--bd); 
+            display: flex; flex-direction: column; 
+        }
+        .seg-card {
+            background: var(--p2); border: 1px solid var(--bd);
+            border-radius: 8px; padding: 10px; margin-bottom: 8px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .seg-card.active { border-color: var(--acc); box-shadow: 0 0 10px rgba(99,102,241,0.2); }
+        
+        /* Video Area */
+        .main-view { flex: 1; display: flex; flex-direction: column; background: #000; position: relative; }
+        .video-wrapper { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; }
+        video, canvas { position: absolute; max-width: 100%; max-height: 100%; }
+        
+        /* Controls */
+        .toolbar { 
+            height: 50px; background: var(--p1); 
+            border-top: 1px solid var(--bd); 
+            display: flex; align-items: center; padding: 0 20px; gap: 15px;
+        }
+        button {
+            background: var(--acc); color: white; border: none;
+            padding: 6px 12px; border-radius: 4px; cursor: pointer;
+            font-weight: bold; font-family: inherit;
+        }
+        input[type="text"] {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--bd);
+            color: white; padding: 5px; border-radius: 4px; width: 100%;
+        }
+        .time-label { font-family: 'JetBrains Mono'; color: var(--t1); font-size: 11px; }
+    </style>
 </head>
 <body>
- 
-<!-- ════════════ HEADER ════════════ -->
-<header>
-  <div class="logo">
-    <div class="logo-mark">SE</div>
-    <div>
-      <div class="logo-txt">SubEdit Studio</div>
-      <div class="logo-sub">Subtitle Editor</div>
-    </div>
-  </div>
- 
-  <div class="hdr-sep"></div>
- 
-  <!-- Playback controls -->
-  <div class="playback">
-    <button class="pb-btn" onclick="skipTime(-5)" title="−5s">«</button>
-    <button class="pb-btn big" id="play-btn" onclick="togglePlay()">▶</button>
-    <button class="pb-btn" onclick="skipTime(5)" title="+5s">»</button>
-  </div>
- 
-  <span class="time-display" id="time-disp">0:00.0 / 0:00.0</span>
- 
-  <div class="progress-wrap" id="prog-wrap" onclick="seekFromBar(event)">
-    <div class="progress-fill" id="prog-fill" style="width:0%"></div>
-  </div>
- 
-  <div class="hdr-sep"></div>
- 
-  <div class="lang-toggles">
-    <button class="lt-btn ar-on" id="lt-ar" onclick="toggleLang('ar')">🔤 AR</button>
-    <button class="lt-btn en-on" id="lt-en" onclick="toggleLang('en')">🔤 EN</button>
-  </div>
- 
-  <div class="hdr-sep"></div>
- 
-  <div class="hdr-right">
-    <button class="btn btn-ghost" onclick="exportSRT()">↓ SRT</button>
-    <button class="btn btn-acc" onclick="exportFCPXML()">↓ FCPXML</button>
-  </div>
-</header>
- 
-<!-- ════════════ BODY ════════════ -->
-<div class="app-body">
- 
-  <!-- ══ LEFT: Subtitle List ══ -->
-  <div class="panel-left">
-    <div class="ph">
-      <span class="ph-title">Subtitles <span id="seg-count" style="color:var(--t1);font-family:var(--mono);font-size:11px;">0</span></span>
-      <div style="display:flex;gap:4px;">
-        <button class="btn btn-ghost btn-sm" onclick="addSeg()">+ Add</button>
-        <button class="btn btn-ghost btn-sm btn-icon" onclick="clearAll()" title="Clear all">🗑</button>
-      </div>
-    </div>
-    <div class="seg-list" id="seg-list">
-      <div class="empty-list" id="empty-state">
-        <div class="empty-ico">📝</div>
-        <div class="empty-txt">Load a video or audio file,<br>then add subtitles here.<br><br>Use <strong>+ Add</strong> to create your first subtitle.</div>
-      </div>
-    </div>
-  </div>
- 
-  <!-- ══ CENTER: Video + Timeline ══ -->
-  <div class="panel-center">
- 
-    <!-- Drop zone -->
-    <div class="drop-zone" id="drop-zone"
-      onclick="document.getElementById('file-in').click()"
-      ondragover="ev.preventDefault();this.classList.add('dragover')"
-      ondragleave="this.classList.remove('dragover')"
-      ondrop="handleDrop(event)">
-      <div class="dz-icon">🎬</div>
-      <div class="dz-title">Drop media file here</div>
-      <div class="dz-sub">Subtitles render live on top of your video<br>Audio files show a waveform visualizer</div>
-      <div class="dz-types">
-        <span class="dz-type">MP4</span>
-        <span class="dz-type">MOV</span>
-        <span class="dz-type">MP3</span>
-        <span class="dz-type">WAV</span>
-      </div>
-      <button class="dz-btn">Browse File</button>
-    </div>
-    <input type="file" id="file-in" accept="video/mp4,video/quicktime,video/webm,audio/mpeg,audio/wav,audio/*" style="display:none;" onchange="loadFile(this.files[0])">
- 
-    <!-- Media Area -->
-    <div class="media-area" id="media-area">
-      <div class="audio-bg" id="audio-bg" style="display:none;"></div>
-      <canvas class="viz" id="viz-canvas" style="display:none;"></canvas>
-      <video id="vid-el" style="display:none;" onloadedmetadata="onMediaLoaded()" ontimeupdate="onTimeUpdate()"></video>
-      <audio id="aud-el" style="display:none;" onloadedmetadata="onMediaLoaded()" ontimeupdate="onTimeUpdate()"></audio>
-      <canvas class="overlay" id="sub-canvas"></canvas>
-    </div>
- 
-    <!-- Timeline -->
-    <div class="timeline" id="timeline" style="display:none;">
-      <div class="tl-ruler" id="tl-ruler"></div>
-      <div class="tl-track-wrap" id="tl-track-wrap" onclick="seekFromTimeline(event)">
-        <div class="tl-track" id="tl-track">
-          <div class="tl-playhead" id="tl-playhead"></div>
-        </div>
-      </div>
-    </div>
-  </div>
- 
-  <!-- ══ RIGHT: Style / Presets ══ -->
-  <div class="panel-right">
-    <div class="tab-nav">
-      <button class="tab-btn on" onclick="switchTab('style',this)">Style</button>
-      <button class="tab-btn" onclick="switchTab('presets',this)">Presets</button>
-    </div>
- 
-    <!-- ── Style Tab ── -->
-    <div class="tab-pane on" id="tab-style">
-      <div class="sub-preview"><canvas id="prev-canvas"></canvas></div>
- 
-      <div class="s-row">
-        <label class="s-lbl">Font Family</label>
-        <select class="s-sel" id="st-font" onchange="styleChanged()">
-          <option>Helvetica Neue</option>
-          <option>Helvetica</option>
-          <option>Arial</option>
-          <option>Futura</option>
-          <option>Impact</option>
-          <option>Gill Sans</option>
-          <option>Optima</option>
-          <option>Georgia</option>
-          <option>Palatino</option>
-          <option>Verdana</option>
-          <option>Trebuchet MS</option>
-          <option>Courier New</option>
-        </select>
-      </div>
- 
-      <div class="s-row">
-        <label class="s-lbl">Font Size</label>
-        <div class="range-wrap">
-          <input type="range" id="st-size" min="14" max="120" value="52" oninput="styleChanged()">
-          <span class="range-v" id="st-size-v">52</span>
-        </div>
-      </div>
- 
-      <div class="s-row">
-        <label class="s-lbl">Font Style</label>
-        <div class="tog-row">
-          <button class="tog" id="tog-b" onclick="toggleFmt('b')"><b>Bold</b></button>
-          <button class="tog" id="tog-i" onclick="toggleFmt('i')"><i>Italic</i></button>
-        </div>
-      </div>
- 
-      <div class="s-row">
-        <label class="s-lbl">Text Color (EN)</label>
-        <div class="color-row">
-          <input type="color" id="st-ce" value="#FFFFFF" oninput="syncColor('e')">
-          <input type="text" class="hex" id="st-he" value="#FFFFFF" maxlength="7" oninput="syncHex('e')">
-        </div>
-      </div>
- 
-      <div class="s-row">
-        <label class="s-lbl">Text Color (AR)</label>
-        <div class="color-row">
-          <input type="color" id="st-ca" value="#FFE600" oninput="syncColor('a')">
-          <input type="text" class="hex" id="st-ha" value="#FFE600" maxlength="7" oninput="syncHex('a')">
-        </div>
-      </div>
- 
-      <div class="s-row">
-        <label class="s-lbl">Outline / Stroke</label>
-        <div class="check-row">
-          <input type="checkbox" id="st-stk-on" onchange="styleChanged()" checked>
-          <span class="check-lbl">Enable</span>
-          <select id="st-stk-w" style="height:24px;padding:0 6px;border:1px solid var(--bd);border-radius:4px;background:var(--s2);color:var(--t0);font-size:11px;margin-left:auto;" onchange="styleChanged()">
-            <option value="1">1px</option><option value="2" selected>2px</option>
-            <option value="3">3px</option><option value="4">4px</option><option value="5">5px</option>
-          </select>
-        </div>
-        <div class="color-row">
-          <input type="color" id="st-csk" value="#000000" oninput="syncColor('sk')">
-          <input type="text" class="hex" id="st-hsk" value="#000000" maxlength="7" oninput="syncHex('sk')">
-        </div>
-      </div>
- 
-      <div class="s-row">
-        <label class="s-lbl">Drop Shadow</label>
-        <div class="check-row">
-          <input type="checkbox" id="st-shd" onchange="styleChanged()" checked>
-          <span class="check-lbl">Enable shadow</span>
-        </div>
-      </div>
- 
-      <div class="s-row">
-        <label class="s-lbl">Background Box</label>
-        <div class="check-row">
-          <input type="checkbox" id="st-bg-on" onchange="styleChanged()">
-          <span class="check-lbl">Enable</span>
-          <select id="st-bg-op" style="height:24px;padding:0 6px;border:1px solid var(--bd);border-radius:4px;background:var(--s2);color:var(--t0);font-size:11px;margin-left:auto;" onchange="styleChanged()">
-            <option value="0.4">40%</option><option value="0.6" selected>60%</option>
-            <option value="0.8">80%</option><option value="1">100%</option>
-          </select>
-        </div>
-        <div class="color-row">
-          <input type="color" id="st-cbg" value="#000000" oninput="syncColor('bg')">
-          <input type="text" class="hex" id="st-hbg" value="#000000" maxlength="7" oninput="syncHex('bg')">
-        </div>
-      </div>
- 
-      <div class="s-row">
-        <label class="s-lbl">Text Alignment</label>
-        <div class="tog-row">
-          <button class="tog" id="al-left" onclick="setAlign('left')">Left</button>
-          <button class="tog on" id="al-center" onclick="setAlign('center')">Center</button>
-          <button class="tog" id="al-right" onclick="setAlign('right')">Right</button>
-        </div>
-      </div>
- 
-      <div class="s-row">
-        <label class="s-lbl">Vertical Position</label>
-        <div class="tog-row">
-          <button class="tog" id="vp-top" onclick="setVPos('top',400)">Top</button>
-          <button class="tog" id="vp-mid" onclick="setVPos('mid',0)">Middle</button>
-          <button class="tog on" id="vp-bot" onclick="setVPos('bot',-400)">Bottom</button>
-        </div>
-      </div>
- 
-      <div class="s-row">
-        <label class="s-lbl">Position (FCP Coords)</label>
-        <div class="xy-grid">
-          <div class="xy-unit"><label>X (–960 to 960)</label><input type="number" id="st-px" value="0" oninput="styleChanged()"></div>
-          <div class="xy-unit"><label>Y (–540 to 540)</label><input type="number" id="st-py" value="-400" oninput="styleChanged()"></div>
-        </div>
-      </div>
-    </div>
- 
-    <!-- ── Presets Tab ── -->
-    <div class="tab-pane" id="tab-presets">
-      <div id="builtin-presets"></div>
-      <hr style="border:none;border-top:1px solid var(--bd);margin:10px 0;">
-      <label class="s-lbl" style="margin-bottom:8px;">Custom Presets</label>
-      <div id="custom-presets"></div>
-      <div class="save-preset-row">
-        <input type="text" class="preset-name-in" id="preset-name-in" placeholder="Preset name…">
-        <button class="btn btn-acc btn-sm" onclick="savePreset()">Save</button>
-      </div>
-    </div>
-  </div>
- 
-</div>
- 
-<div class="toast" id="toast"></div>
- 
-<script>
-// ════════════════════════════════════════════════════
-// CONSTANTS
-// ════════════════════════════════════════════════════
-const BUILTIN = [
-  {
-    name: 'YouTube',
-    desc: 'White + stroke, centered bottom',
-    preview: { bg:'#000', color:'#fff', font:'Helvetica Neue' },
-    style: { font:'Helvetica Neue', size:52, colorEn:'#FFFFFF', colorAr:'#FFFFFF', bold:false, italic:false, strokeOn:true, strokeColor:'#000000', strokeW:2, shadowOn:true, bgOn:false, bgColor:'#000000', bgOp:0.6, align:'center', py:-400 }
-  },
-  {
-    name: 'TikTok Bold',
-    desc: 'Impact yellow, high contrast',
-    preview: { bg:'#000', color:'#FFE600', font:'Impact' },
-    style: { font:'Impact', size:68, colorEn:'#FFE600', colorAr:'#FFFFFF', bold:false, italic:false, strokeOn:true, strokeColor:'#000000', strokeW:4, shadowOn:false, bgOn:false, bgColor:'#000000', bgOp:0.6, align:'center', py:-60 }
-  },
-  {
-    name: 'Cinematic',
-    desc: 'Georgia italic, semi-transparent box',
-    preview: { bg:'rgba(0,0,0,.6)', color:'#F5F5F0', font:'Georgia' },
-    style: { font:'Georgia', size:44, colorEn:'#F5F5F0', colorAr:'#F5F5F0', bold:false, italic:true, strokeOn:false, strokeColor:'#000000', strokeW:1, shadowOn:false, bgOn:true, bgColor:'#000000', bgOp:0.55, align:'center', py:-100 }
-  },
-  {
-    name: 'Clean',
-    desc: 'Minimal white, no effects',
-    preview: { bg:'transparent', color:'#FFFFFF', font:'Helvetica Neue' },
-    style: { font:'Helvetica Neue', size:44, colorEn:'#FFFFFF', colorAr:'#FFFFFF', bold:false, italic:false, strokeOn:false, strokeColor:'#000000', strokeW:0, shadowOn:false, bgOn:false, bgColor:'#000000', bgOp:0.5, align:'center', py:-80 }
-  },
-];
- 
-const COLORS = [
-  '#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6',
-  '#06B6D4','#F97316','#EC4899','#84CC16','#6366F1',
-];
- 
-// ════════════════════════════════════════════════════
-// STATE
-// ════════════════════════════════════════════════════
-let segs = [];
-let showAr = true, showEn = true;
-let isBold = false, isItalic = false;
-let textAlign = 'center';
-let vpos = 'bot';
-let customPresets = [];
-let mediaEl = null;
-let isAudio = false;
-let mediaDuration = 0;
-let rafId = null;
-let vizRafId = null;
-let audioCtx = null, analyser = null, source = null;
-let dragging = null; // { id, mode:'move'|'resize', startX, startTime, startDur }
-let selectedId = null;
-let previewSegIdx = 0;
- 
-// ════════════════════════════════════════════════════
-// LOCAL STORAGE
-// ════════════════════════════════════════════════════
-function saveState() {
-  try {
-    localStorage.setItem('se-style', JSON.stringify(getStyle()));
-    localStorage.setItem('se-presets', JSON.stringify(customPresets));
-    localStorage.setItem('se-segs', JSON.stringify(segs));
-    localStorage.setItem('se-lang', JSON.stringify({ ar: showAr, en: showEn }));
-  } catch(e) {}
-}
- 
-function loadState() {
-  try {
-    const style = localStorage.getItem('se-style');
-    if (style) applyStyleObj(JSON.parse(style));
- 
-    const presets = localStorage.getItem('se-presets');
-    if (presets) customPresets = JSON.parse(presets);
- 
-    const savedSegs = localStorage.getItem('se-segs');
-    if (savedSegs) {
-      segs = JSON.parse(savedSegs);
-      renderList();
-      renderTimeline();
-    }
- 
-    const lang = localStorage.getItem('se-lang');
-    if (lang) {
-      const l = JSON.parse(lang);
-      showAr = l.ar; showEn = l.en;
-      document.getElementById('lt-ar').classList.toggle('ar-on', showAr);
-      document.getElementById('lt-en').classList.toggle('en-on', showEn);
-    }
-  } catch(e) {}
-}
- 
-// ════════════════════════════════════════════════════
-// UTILS
-// ════════════════════════════════════════════════════
-let toastTimer;
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
-}
- 
-function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
- 
-function fmtTime(s) {
-  const m = Math.floor(s/60), sc = (s%60).toFixed(1);
-  return `${m}:${sc.padStart(4,'0')}`;
-}
- 
-function srtFmt(s) {
-  const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=Math.floor(s%60),ms=Math.round((s%1)*1000);
-  return `${pad(h)}:${pad(m)}:${pad(sc)},${pad(ms,3)}`;
-}
-function pad(n,l=2){return String(n).padStart(l,'0');}
- 
-function uid(){return Date.now()+Math.random().toString(36).slice(2,6);}
- 
-function getTotalDur() {
-  return mediaDuration || (segs.length ? Math.max(...segs.map(s=>s.start+s.dur))+1 : 60);
-}
- 
-function hexToRGB(hex) {
-  return [parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)];
-}
- 
-// ════════════════════════════════════════════════════
-// LANGUAGE TOGGLES
-// ════════════════════════════════════════════════════
-function toggleLang(l) {
-  if (l==='ar') { showAr = !showAr; document.getElementById('lt-ar').classList.toggle('ar-on', showAr); }
-  else           { showEn = !showEn; document.getElementById('lt-en').classList.toggle('en-on', showEn); }
-  renderList();
-  drawPreview();
-  saveState();
-}
- 
-// ════════════════════════════════════════════════════
-// FILE LOADING
-// ════════════════════════════════════════════════════
-function loadFile(file) {
-  if (!file) return;
-  const url = URL.createObjectURL(file);
-  const type = file.type;
-  isAudio = type.startsWith('audio/');
- 
-  document.getElementById('drop-zone').style.display = 'none';
-  const ma = document.getElementById('media-area');
-  ma.classList.add('visible');
-  document.getElementById('timeline').style.display = 'flex';
- 
-  const vid = document.getElementById('vid-el');
-  const aud = document.getElementById('aud-el');
- 
-  if (isAudio) {
-    aud.src = url;
-    aud.style.display = 'none';
-    document.getElementById('audio-bg').style.display = 'block';
-    document.getElementById('viz-canvas').style.display = 'block';
-    vid.style.display = 'none';
-    mediaEl = aud;
-    initAudioContext(aud);
-    startVizLoop();
-  } else {
-    vid.src = url;
-    vid.style.display = 'block';
-    document.getElementById('audio-bg').style.display = 'none';
-    document.getElementById('viz-canvas').style.display = 'none';
-    aud.src = '';
-    mediaEl = vid;
-  }
- 
-  if (rafId) cancelAnimationFrame(rafId);
-  startRenderLoop();
-  toast(`✓ Loaded: ${file.name}`);
-}
- 
-function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('drop-zone').classList.remove('dragover');
-  const file = e.dataTransfer.files[0];
-  if (file) loadFile(file);
-}
- 
-function onMediaLoaded() {
-  mediaDuration = mediaEl.duration || 0;
-  document.getElementById('time-disp').textContent = `0:00.0 / ${fmtTime(mediaDuration)}`;
-  renderTimeline();
-}
- 
-function onTimeUpdate() {
-  const t = mediaEl ? mediaEl.currentTime : 0;
-  const d = mediaDuration || 1;
-  document.getElementById('prog-fill').style.width = (t/d*100).toFixed(2)+'%';
-  document.getElementById('time-disp').textContent = `${fmtTime(t)} / ${fmtTime(d)}`;
-  updatePlayhead(t);
-}
- 
-function togglePlay() {
-  if (!mediaEl) return;
-  if (mediaEl.paused) {
-    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-    mediaEl.play();
-    document.getElementById('play-btn').textContent = '⏸';
-  } else {
-    mediaEl.pause();
-    document.getElementById('play-btn').textContent = '▶';
-  }
-}
- 
-function skipTime(dt) {
-  if (!mediaEl) return;
-  mediaEl.currentTime = Math.max(0, Math.min(mediaDuration, mediaEl.currentTime + dt));
-}
- 
-function seekFromBar(e) {
-  if (!mediaEl) return;
-  const bar = document.getElementById('prog-wrap');
-  const pct = (e.clientX - bar.getBoundingClientRect().left) / bar.offsetWidth;
-  mediaEl.currentTime = pct * mediaDuration;
-}
- 
-// ════════════════════════════════════════════════════
-// AUDIO CONTEXT + VISUALIZER
-// ════════════════════════════════════════════════════
-function initAudioContext(el) {
-  try {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 256;
-    source = audioCtx.createMediaElementSource(el);
-    source.connect(analyser);
-    analyser.connect(audioCtx.destination);
-  } catch(e) { console.warn('AudioContext error:', e); }
-}
- 
-function startVizLoop() {
-  const vc = document.getElementById('viz-canvas');
-  const ctx = vc.getContext('2d');
- 
-  function loop() {
-    vizRafId = requestAnimationFrame(loop);
-    const dw = vc.offsetWidth, dh = vc.offsetHeight;
-    if (!dw || !dh) return;
-    const dpr = window.devicePixelRatio || 1;
-    if (vc.width !== dw*dpr || vc.height !== dh*dpr) { vc.width=dw*dpr; vc.height=dh*dpr; ctx.scale(dpr,dpr); }
- 
-    ctx.fillStyle = '#0A0A18';
-    ctx.fillRect(0,0,dw,dh);
- 
-    if (analyser) {
-      const data = new Uint8Array(analyser.frequencyBinCount);
-      analyser.getByteFrequencyData(data);
-      const barW = dw / data.length * 2;
-      data.forEach((v, i) => {
-        const h = (v/255) * dh * 0.7;
-        const hue = 220 + (v/255)*60;
-        ctx.fillStyle = `hsla(${hue},80%,60%,0.7)`;
-        ctx.fillRect(i*(barW+1), dh-h, barW, h);
-      });
-    }
- 
-    // Time progress line
-    if (mediaEl && mediaDuration) {
-      const pct = mediaEl.currentTime / mediaDuration;
-      ctx.fillStyle = 'rgba(255,255,255,0.08)';
-      ctx.fillRect(0, 0, pct*dw, dh);
-    }
-  }
-  loop();
-}
- 
-// ════════════════════════════════════════════════════
-// CANVAS SUBTITLE RENDERING
-// ════════════════════════════════════════════════════
-function getStyle() {
-  return {
-    font:       document.getElementById('st-font').value,
-    size:       +document.getElementById('st-size').value,
-    colorEn:    document.getElementById('st-ce').value,
-    colorAr:    document.getElementById('st-ca').value,
-    bold:       isBold,
-    italic:     isItalic,
-    strokeOn:   document.getElementById('st-stk-on').checked,
-    strokeColor:document.getElementById('st-csk').value,
-    strokeW:    +document.getElementById('st-stk-w').value,
-    shadowOn:   document.getElementById('st-shd').checked,
-    bgOn:       document.getElementById('st-bg-on').checked,
-    bgColor:    document.getElementById('st-cbg').value,
-    bgOp:       +document.getElementById('st-bg-op').value,
-    align:      textAlign,
-    py:         +document.getElementById('st-py').value,
-    px:         +document.getElementById('st-px').value,
-  };
-}
- 
-function startRenderLoop() {
-  const canvas = document.getElementById('sub-canvas');
-  const ctx = canvas.getContext('2d');
- 
-  function loop() {
-    rafId = requestAnimationFrame(loop);
-    const dw = canvas.offsetWidth, dh = canvas.offsetHeight;
-    if (!dw || !dh) return;
-    const dpr = window.devicePixelRatio || 1;
-    if (canvas.width !== dw*dpr || canvas.height !== dh*dpr) {
-      canvas.width = dw*dpr; canvas.height = dh*dpr; ctx.scale(dpr,dpr);
-    }
-    ctx.clearRect(0, 0, dw, dh);
- 
-    const t = mediaEl ? mediaEl.currentTime : 0;
-    const seg = segs.find(s => t >= s.start && t < s.start + s.dur);
-    if (seg) drawSubs(ctx, seg, dw, dh, getStyle());
-  }
-  loop();
-}
- 
-function drawSubs(ctx, seg, cw, ch, st) {
-  const scale = cw / 1920 * 2.5;
-  const sz = Math.max(8, st.size * scale);
-  const face = [st.bold&&'bold', st.italic&&'italic'].filter(Boolean).join(' ') || '';
- 
-  const lines = [];
-  const arText = seg.useImproved && seg.textArImp ? seg.textArImp : seg.textAr;
-  const enText = seg.useImproved && seg.textEnImp ? seg.textEnImp : seg.textEn;
- 
-  if (showAr && arText && arText.trim()) lines.push({ text: arText, dir: 'rtl', color: st.colorAr });
-  if (showEn && enText && enText.trim()) lines.push({ text: enText, dir: 'ltr', color: st.colorEn });
-  if (!lines.length) return;
- 
-  ctx.font = `${face} ${sz}px "${st.font}"`;
-  ctx.textBaseline = 'alphabetic';
- 
-  const lineH = sz * 1.45;
-  const totalH = lines.length * lineH;
-  const yPct = 0.5 - (st.py / 540) * 0.5;
-  let baseY = ch * yPct - totalH / 2;
-  baseY = Math.max(sz, Math.min(ch - totalH - sz * 0.5, baseY));
- 
-  const maxW = cw * 0.9;
- 
-  // Draw bg box
-  if (st.bgOn) {
-    const [r,g,b] = hexToRGB(st.bgColor);
-    ctx.fillStyle = `rgba(${r},${g},${b},${st.bgOp})`;
-    const pad = sz * 0.4;
-    const bw = maxW + pad*2, bh = totalH + pad*1.5;
-    let bx = st.align==='center' ? cw/2-bw/2 : st.align==='right' ? cw-pad-bw : pad;
-    roundRect(ctx, bx, baseY-pad*0.7, bw, bh, 6);
-    ctx.fill();
-  }
- 
-  lines.forEach((line, li) => {
-    ctx.direction = line.dir;
-    const wrappedLines = wrapCtxText(ctx, line.text, maxW);
- 
-    wrappedLines.forEach((wl, wli) => {
-      const lx = st.align==='center' ? cw/2 : st.align==='right' ? cw-(cw-maxW)/2 : (cw-maxW)/2;
-      const ly = baseY + (li * wrappedLines.length + wli) * lineH + sz;
- 
-      if (st.shadowOn) {
-        ctx.shadowColor = 'rgba(0,0,0,0.9)';
-        ctx.shadowBlur = 10; ctx.shadowOffsetX = 1; ctx.shadowOffsetY = 2;
-      }
-      if (st.strokeOn) {
-        ctx.strokeStyle = st.strokeColor;
-        ctx.lineWidth = st.strokeW * (sz/52);
-        ctx.lineJoin = 'round';
-        ctx.strokeText(wl, lx, ly);
-      }
-      ctx.fillStyle = line.color;
-      ctx.fillText(wl, lx, ly);
-      ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
-    });
-  });
-}
- 
-function wrapCtxText(ctx, text, maxW) {
-  const words = text.split(/\s+/);
-  const lines = []; let cur = '';
-  for (const w of words) {
-    const test = cur ? cur + ' ' + w : w;
-    if (ctx.measureText(test).width > maxW && cur) { lines.push(cur); cur = w; }
-    else cur = test;
-  }
-  if (cur) lines.push(cur);
-  return lines;
-}
- 
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
-  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
-  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
-  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
-  ctx.closePath();
-}
- 
-// Mini preview canvas
-function drawPreview() {
-  const pc = document.getElementById('prev-canvas');
-  if (!pc) return;
-  const ctx = pc.getContext('2d');
-  const dpr = window.devicePixelRatio || 1;
-  const dw = pc.offsetWidth, dh = pc.offsetHeight;
-  if (!dw || !dh) return;
-  if (pc.width !== dw*dpr || pc.height !== dh*dpr) { pc.width=dw*dpr; pc.height=dh*dpr; ctx.scale(dpr,dpr); }
- 
-  const grad = ctx.createLinearGradient(0,0,dw,dh);
-  grad.addColorStop(0,'#10101E'); grad.addColorStop(1,'#1A1A30');
-  ctx.fillStyle = grad; ctx.fillRect(0,0,dw,dh);
-  ctx.strokeStyle = 'rgba(255,255,255,0.03)'; ctx.lineWidth = 1;
-  for(let x=0;x<dw;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,dh);ctx.stroke();}
-  for(let y=0;y<dh;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(dw,y);ctx.stroke();}
- 
-  const seg = segs[previewSegIdx] || { textAr:'نص عربي', textEn:'Subtitle Preview Text' };
-  drawSubs(ctx, seg, dw, dh, getStyle());
-}
- 
-// ════════════════════════════════════════════════════
-// SUBTITLE CRUD
-// ════════════════════════════════════════════════════
-function addSeg() {
-  const lastEnd = segs.length ? segs[segs.length-1].start + segs[segs.length-1].dur : 0;
-  const seg = {
-    id: uid(), textAr:'', textEn:'',
-    textArImp:'', textEnImp:'', useImproved: false,
-    start: +lastEnd.toFixed(2), dur: 3.0,
-  };
-  segs.push(seg);
-  renderList();
-  renderTimeline();
-  saveState();
-  // Scroll to bottom
-  setTimeout(() => { const l=document.getElementById('seg-list'); l.scrollTop=l.scrollHeight; }, 60);
-}
- 
-function delSeg(id) {
-  segs = segs.filter(s => s.id !== id);
-  renderList();
-  renderTimeline();
-  saveState();
-}
- 
-function duplicateSeg(id) {
-  const seg = segs.find(s => s.id===id);
-  if (!seg) return;
-  const copy = { ...seg, id: uid(), start: seg.start + seg.dur + 0.1 };
-  const idx = segs.findIndex(s => s.id===id);
-  segs.splice(idx+1, 0, copy);
-  renderList();
-  renderTimeline();
-  saveState();
-  toast('Segment duplicated');
-}
- 
-function splitSeg(id) {
-  const seg = segs.find(s => s.id===id);
-  if (!seg) return;
-  const half = seg.dur / 2;
-  const midAr = seg.textAr ? seg.textAr.slice(0, Math.ceil(seg.textAr.length/2)) : '';
-  const midArR = seg.textAr ? seg.textAr.slice(Math.ceil(seg.textAr.length/2)) : '';
-  const midEn = seg.textEn ? seg.textEn.slice(0, Math.ceil(seg.textEn.length/2)) : '';
-  const midEnR = seg.textEn ? seg.textEn.slice(Math.ceil(seg.textEn.length/2)) : '';
- 
-  const newSeg = { id:uid(), textAr:midArR, textEn:midEnR, textArImp:'', textEnImp:'', useImproved:false, start:seg.start+half, dur:half };
-  seg.textAr = midAr; seg.textEn = midEn; seg.dur = half;
- 
-  const idx = segs.findIndex(s => s.id===id);
-  segs.splice(idx+1, 0, newSeg);
-  renderList(); renderTimeline(); saveState();
-  toast('Segment split');
-}
- 
-function mergeSeg(id) {
-  const idx = segs.findIndex(s => s.id===id);
-  if (idx < 0 || idx >= segs.length-1) { toast('No next segment to merge with'); return; }
-  const a = segs[idx], b = segs[idx+1];
-  a.textAr = [a.textAr, b.textAr].filter(Boolean).join(' ');
-  a.textEn = [a.textEn, b.textEn].filter(Boolean).join(' ');
-  a.dur = (b.start + b.dur) - a.start;
-  a.textArImp = ''; a.textEnImp = ''; a.useImproved = false;
-  segs.splice(idx+1, 1);
-  renderList(); renderTimeline(); saveState();
-  toast('Segments merged');
-}
- 
-function clearAll() {
-  if (!segs.length || confirm('Clear all subtitles?')) {
-    segs = [];
-    renderList(); renderTimeline(); saveState();
-  }
-}
- 
-function editField(id, field, val) {
-  const seg = segs.find(s => s.id===id);
-  if (!seg) return;
-  if (field==='start' || field==='dur') seg[field] = Math.max(0, parseFloat(val)||0);
-  else seg[field] = val;
-  renderTimeline();
-  drawPreview();
-  saveState();
-}
- 
-// ════════════════════════════════════════════════════
-// RENDER SUBTITLE LIST
-// ════════════════════════════════════════════════════
-function renderList() {
-  const list = document.getElementById('seg-list');
-  list.querySelectorAll('.seg-card,.add-seg-btn').forEach(e=>e.remove());
-  document.getElementById('seg-count').textContent = segs.length;
- 
-  if (!segs.length) { document.getElementById('empty-state').style.display='block'; return; }
-  document.getElementById('empty-state').style.display='none';
- 
-  segs.forEach((seg, i) => {
-    const card = document.createElement('div');
-    card.className = 'seg-card' + (seg.id===selectedId?' selected':'');
-    card.dataset.id = seg.id;
-    card.onclick = () => { selectedId=seg.id; previewSegIdx=i; renderList(); drawPreview(); };
- 
-    const showArImp = showAr && seg.textArImp;
-    const showEnImp = showEn && seg.textEnImp;
- 
-    let arBlock='', enBlock='';
- 
-    if (showAr) {
-      const arVal = (seg.useImproved && seg.textArImp) ? seg.textArImp : seg.textAr;
-      const impClass = seg.useImproved && seg.textArImp ? 'improved' : '';
-      arBlock = `
-        <div class="text-block">
-          <div class="tb-label">
-            <span class="tb-tag ar">AR</span>
-            <div class="tb-actions">
-              ${seg.textArImp ? `<button class="toggle-improved ${seg.useImproved?'on':''}" onclick="toggleImproved('${seg.id}',event)" title="Toggle improved">${seg.useImproved?'✓ Improved':'Original'}</button>` : ''}
-              <button class="imp-btn" onclick="aiImprove('${seg.id}','ar',event)" title="AI Improve Arabic">✦ Improve</button>
-            </div>
-          </div>
-          <textarea class="text-area ar-txt ${impClass}" rows="2"
-            placeholder="النص العربي…"
-            oninput="editField('${seg.id}','textAr',this.value)">${esc(arVal)}</textarea>
-        </div>`;
-    }
- 
-    if (showEn) {
-      const enVal = (seg.useImproved && seg.textEnImp) ? seg.textEnImp : seg.textEn;
-      const impClass = seg.useImproved && seg.textEnImp ? 'improved' : '';
-      enBlock = `
-        <div class="text-block">
-          <div class="tb-label">
-            <span class="tb-tag en">EN</span>
-            <div class="tb-actions">
-              ${seg.textEnImp ? `<button class="toggle-improved ${seg.useImproved?'on':''}" onclick="toggleImproved('${seg.id}',event)" title="Toggle improved">${seg.useImproved?'✓ Improved':'Original'}</button>` : ''}
-              <button class="imp-btn" onclick="aiImprove('${seg.id}','en',event)" title="AI Improve English">✦ Improve</button>
-            </div>
-          </div>
-          <textarea class="text-area en-txt ${impClass}" rows="2"
-            placeholder="English text…"
-            oninput="editField('${seg.id}','textEn',this.value)">${esc(enVal)}</textarea>
-        </div>`;
-    }
- 
-    card.innerHTML = `
-      <div class="sc-head">
-        <span class="sc-num">${String(i+1).padStart(2,'0')}</span>
-        <div class="sc-times">
-          <input class="t-in" value="${seg.start.toFixed(2)}" title="Start (s)" onchange="editField('${seg.id}','start',this.value)">
-          <span class="t-sep">+</span>
-          <input class="t-in dur-in" value="${seg.dur.toFixed(1)}" title="Duration (s)" onchange="editField('${seg.id}','dur',this.value)">
-          <span class="t-sep" style="font-size:9px;color:var(--t2);">s</span>
-        </div>
-        <div class="sc-acts">
-          <button class="sc-act" onclick="seekTo(${seg.start},event)" title="Jump to">⏵</button>
-          <button class="sc-act del" onclick="delSeg('${seg.id}',event)" title="Delete">✕</button>
-        </div>
-      </div>
-      <div class="sc-body">${arBlock}${enBlock}</div>
-      <div class="sc-footer">
-        <button class="sc-foot-btn" onclick="splitSeg('${seg.id}',event)">⊂ Split</button>
-        <button class="sc-foot-btn" onclick="mergeSeg('${seg.id}',event)">⊃ Merge ↓</button>
-        <button class="sc-foot-btn" onclick="duplicateSeg('${seg.id}',event)">⧉ Duplicate</button>
-      </div>`;
-    list.appendChild(card);
-  });
- 
-  // Add button
-  const addBtn = document.createElement('button');
-  addBtn.className = 'add-seg-btn';
-  addBtn.textContent = '+ Add subtitle';
-  addBtn.onclick = addSeg;
-  list.appendChild(addBtn);
-}
- 
-function seekTo(t, e) {
-  if(e) e.stopPropagation();
-  if (mediaEl) mediaEl.currentTime = t;
-}
- 
-function toggleImproved(id, e) {
-  if(e) e.stopPropagation();
-  const seg = segs.find(s=>s.id===id);
-  if (!seg) return;
-  seg.useImproved = !seg.useImproved;
-  renderList(); drawPreview(); saveState();
-}
- 
-// ════════════════════════════════════════════════════
-// TIMELINE RENDERING
-// ════════════════════════════════════════════════════
-function renderTimeline() {
-  const track = document.getElementById('tl-track');
-  const ruler = document.getElementById('tl-ruler');
-  const total = getTotalDur();
- 
-  // Clear
-  track.querySelectorAll('.tl-block').forEach(e=>e.remove());
- 
-  // Ruler marks
-  ruler.innerHTML = '';
-  const numMarks = Math.min(20, Math.ceil(total));
-  const step = total / numMarks;
-  for (let i=0; i<=numMarks; i++) {
-    const t = i * step;
-    const el = document.createElement('div');
-    el.style.cssText = `position:absolute;left:${(t/total*100).toFixed(2)}%;top:4px;font-size:9px;color:var(--t2);font-family:var(--mono);transform:translateX(-50%);white-space:nowrap;`;
-    el.textContent = fmtTime(t);
-    ruler.appendChild(el);
-  }
- 
-  const colors = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4','#F97316','#EC4899'];
- 
-  segs.forEach((seg, i) => {
-    const block = document.createElement('div');
-    block.className = 'tl-block' + (seg.id===selectedId?' selected':'');
-    block.style.left = (seg.start/total*100).toFixed(3)+'%';
-    block.style.width = Math.max(0.5, seg.dur/total*100).toFixed(3)+'%';
-    block.style.background = colors[i%colors.length];
- 
-    const txt = seg.textEn || seg.textAr || `Sub ${i+1}`;
-    block.innerHTML = `<span class="tl-block-txt">${txt.substring(0,30)}</span><div class="tl-resize"></div>`;
- 
-    // Move drag
-    block.addEventListener('mousedown', e => {
-      if (e.target.classList.contains('tl-resize')) {
-        e.stopPropagation();
-        dragging = { id:seg.id, mode:'resize', startX:e.clientX, startDur:seg.dur };
-      } else {
-        e.stopPropagation();
-        dragging = { id:seg.id, mode:'move', startX:e.clientX, startTime:seg.start };
-        selectedId = seg.id;
-        previewSegIdx = i;
-        renderList(); drawPreview();
-      }
-      e.preventDefault();
-    });
- 
-    track.appendChild(block);
-  });
- 
-  // Ensure playhead is last child (on top)
-  const ph = document.getElementById('tl-playhead');
-  track.appendChild(ph);
-  updatePlayhead(mediaEl ? mediaEl.currentTime : 0);
-}
- 
-function updatePlayhead(t) {
-  const total = getTotalDur();
-  const ph = document.getElementById('tl-playhead');
-  if (ph) ph.style.left = (t/total*100).toFixed(3)+'%';
-}
- 
-function seekFromTimeline(e) {
-  if (dragging) return;
-  const wrap = document.getElementById('tl-track-wrap');
-  const rect = wrap.getBoundingClientRect();
-  const pct = (e.clientX - rect.left) / rect.width;
-  const t = pct * getTotalDur();
-  if (mediaEl) mediaEl.currentTime = Math.max(0, t);
-}
- 
-// Timeline drag handling
-document.addEventListener('mousemove', e => {
-  if (!dragging) return;
-  const seg = segs.find(s => s.id===dragging.id);
-  if (!seg) return;
-  const wrap = document.getElementById('tl-track-wrap');
-  const rect = wrap.getBoundingClientRect();
-  const total = getTotalDur();
-  const dx = e.clientX - dragging.startX;
-  const dt = (dx / rect.width) * total;
- 
-  if (dragging.mode === 'move') {
-    seg.start = Math.max(0, dragging.startTime + dt);
-  } else {
-    seg.dur = Math.max(0.1, dragging.startDur + dt);
-  }
-  renderTimeline();
-});
- 
-document.addEventListener('mouseup', () => {
-  if (dragging) { dragging = null; saveState(); }
-});
- 
-// ════════════════════════════════════════════════════
-// STYLE CONTROLS
-// ════════════════════════════════════════════════════
-function styleChanged() {
-  document.getElementById('st-size-v').textContent = document.getElementById('st-size').value;
-  drawPreview();
-  saveState();
-}
- 
-function toggleFmt(f) {
-  if(f==='b'){isBold=!isBold; document.getElementById('tog-b').classList.toggle('on',isBold);}
-  else{isItalic=!isItalic; document.getElementById('tog-i').classList.toggle('on',isItalic);}
-  styleChanged();
-}
- 
-function setAlign(a) {
-  textAlign = a;
-  ['left','center','right'].forEach(x => document.getElementById('al-'+x).classList.toggle('on',x===a));
-  styleChanged();
-}
- 
-function setVPos(v, py) {
-  vpos = v;
-  document.getElementById('st-py').value = py;
-  ['top','mid','bot'].forEach(x => document.getElementById('vp-'+x).classList.toggle('on',x===v));
-  styleChanged();
-}
- 
-function syncColor(t) {
-  const m = { e:['st-ce','st-he'], a:['st-ca','st-ha'], sk:['st-csk','st-hsk'], bg:['st-cbg','st-hbg'] };
-  document.getElementById(m[t][1]).value = document.getElementById(m[t][0]).value;
-  styleChanged();
-}
-function syncHex(t) {
-  const m = { e:['st-ce','st-he'], a:['st-ca','st-ha'], sk:['st-csk','st-hsk'], bg:['st-cbg','st-hbg'] };
-  const hex = document.getElementById(m[t][1]).value;
-  if (/^#[0-9A-Fa-f]{6}$/.test(hex)) { document.getElementById(m[t][0]).value = hex; styleChanged(); }
-}
- 
-function applyStyleObj(s) {
-  if (!s) return;
-  document.getElementById('st-font').value   = s.font      || 'Helvetica Neue';
-  document.getElementById('st-size').value   = s.size      || 52;
-  document.getElementById('st-ce').value     = s.colorEn   || '#FFFFFF';
-  document.getElementById('st-he').value     = s.colorEn   || '#FFFFFF';
-  document.getElementById('st-ca').value     = s.colorAr   || '#FFE600';
-  document.getElementById('st-ha').value     = s.colorAr   || '#FFE600';
-  document.getElementById('st-csk').value    = s.strokeColor|| '#000000';
-  document.getElementById('st-hsk').value    = s.strokeColor|| '#000000';
-  document.getElementById('st-cbg').value    = s.bgColor   || '#000000';
-  document.getElementById('st-hbg').value    = s.bgColor   || '#000000';
-  document.getElementById('st-stk-on').checked = !!s.strokeOn;
-  document.getElementById('st-stk-w').value  = s.strokeW   || 2;
-  document.getElementById('st-shd').checked  = !!s.shadowOn;
-  document.getElementById('st-bg-on').checked= !!s.bgOn;
-  document.getElementById('st-bg-op').value  = s.bgOp      || 0.6;
-  document.getElementById('st-py').value     = s.py        ?? -400;
-  document.getElementById('st-px').value     = s.px        ?? 0;
-  isBold   = !!s.bold;   document.getElementById('tog-b').classList.toggle('on',isBold);
-  isItalic = !!s.italic; document.getElementById('tog-i').classList.toggle('on',isItalic);
-  if (s.align) setAlign(s.align);
-  styleChanged();
-}
- 
-// ════════════════════════════════════════════════════
-// TABS
-// ════════════════════════════════════════════════════
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
-  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));
-  btn.classList.add('on');
-  document.getElementById('tab-'+name).classList.add('on');
-  if (name==='presets') renderPresets();
-  if (name==='style') setTimeout(drawPreview,50);
-}
- 
-// ════════════════════════════════════════════════════
-// PRESETS
-// ════════════════════════════════════════════════════
-function renderPresets() {
-  const cont = document.getElementById('builtin-presets');
-  cont.innerHTML = '<div class="s-lbl" style="margin-bottom:8px;">Built-in Presets</div>';
-  BUILTIN.forEach(p => {
-    const card = document.createElement('div');
-    card.className = 'preset-card';
-    card.innerHTML = `
-      <div class="preset-preview" style="background:${p.preview.bg||'#000'};color:${p.preview.color};font-family:${p.preview.font};">
-        Aa
-      </div>
-      <div class="preset-info">
-        <div class="preset-name">${p.name}</div>
-        <div class="preset-desc">${p.desc}</div>
-      </div>`;
-    card.onclick = () => { applyStyleObj(p.style); toast(`✓ "${p.name}" preset applied`); };
-    cont.appendChild(card);
-  });
- 
-  const cCont = document.getElementById('custom-presets');
-  cCont.innerHTML = '';
-  if (!customPresets.length) {
-    cCont.innerHTML = '<div style="font-size:11px;color:var(--t2);margin-bottom:8px;">No custom presets saved yet.</div>';
-  } else {
-    customPresets.forEach((p, i) => {
-      const card = document.createElement('div');
-      card.className = 'preset-card';
-      card.innerHTML = `
-        <div class="preset-preview" style="background:#111;color:${p.style.colorEn||'#fff'};font-family:${p.style.font};">Aa</div>
-        <div class="preset-info">
-          <div class="preset-name">${esc(p.name)}</div>
-          <div class="preset-desc">Custom preset</div>
-        </div>
-        <button class="preset-del" onclick="deletePreset(${i},event)" title="Delete">✕</button>`;
-      card.onclick = () => { applyStyleObj(p.style); toast(`✓ "${p.name}" applied`); };
-      cCont.appendChild(card);
-    });
-  }
-}
- 
-function savePreset() {
-  const name = document.getElementById('preset-name-in').value.trim();
-  if (!name) { toast('Enter a preset name'); return; }
-  customPresets.push({ name, style: getStyle() });
-  document.getElementById('preset-name-in').value = '';
-  saveState();
-  renderPresets();
-  toast(`✓ Preset "${name}" saved`);
-}
- 
-function deletePreset(i, e) {
-  if(e) e.stopPropagation();
-  customPresets.splice(i,1);
-  saveState();
-  renderPresets();
-}
- 
-// ════════════════════════════════════════════════════
-// AI FEATURES (Claude API)
-// ════════════════════════════════════════════════════
-async function aiImprove(id, lang, e) {
-  if(e) e.stopPropagation();
-  const seg = segs.find(s=>s.id===id);
-  if (!seg) return;
- 
-  const text = lang==='ar' ? seg.textAr : seg.textEn;
-  if (!text || !text.trim()) { toast(`No ${lang.toUpperCase()} text to improve`); return; }
- 
-  // Find the button to show loading
-  const card = document.querySelector(`.seg-card[data-id="${id}"]`);
-  const btn = card ? card.querySelector(`.tb-tag.${lang} ~ div button.imp-btn`) : null;
-  const originalBtnText = btn ? btn.textContent : '';
-  if (btn) { btn.innerHTML = '<span class="spin"></span>'; btn.disabled = true; }
- 
-  try {
-    const langName = lang==='ar' ? 'Arabic' : 'English';
-    const instructions = lang==='ar'
-      ? 'Fix grammar and shorten this Arabic subtitle text for readability. Return only the improved text, no explanation.'
-      : 'Fix grammar and shorten this English subtitle text for readability. Keep it concise. Return only the improved text, no explanation.';
- 
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 200,
-        system: `You are a professional subtitle editor for ${langName}. Improve subtitle text: fix grammar, shorten sentences, optimize for reading speed. Return ONLY the improved text. No explanation, no quotes, no extra formatting.`,
-        messages: [{ role:'user', content: text }]
-      })
-    });
-    const data = await resp.json();
-    if (data.error) throw new Error(data.error.message);
-    const improved = data.content[0].text.trim();
- 
-    if (lang==='ar') seg.textArImp = improved;
-    else seg.textEnImp = improved;
-    seg.useImproved = true;
- 
-    renderList();
-    drawPreview();
-    saveState();
-    toast(`✦ ${lang.toUpperCase()} text improved`);
-  } catch(err) {
-    toast('AI error: ' + err.message);
-    if (btn) { btn.innerHTML = originalBtnText; btn.disabled = false; }
-  }
-}
- 
-// ════════════════════════════════════════════════════
-// EXPORT
-// ════════════════════════════════════════════════════
-function exportSRT() {
-  if (!segs.length) { toast('No subtitles to export'); return; }
-  const lines = segs.map((seg, i) => {
-    const ar = (seg.useImproved && seg.textArImp ? seg.textArImp : seg.textAr) || '';
-    const en = (seg.useImproved && seg.textEnImp ? seg.textEnImp : seg.textEn) || '';
-    const texts = [showAr && ar, showEn && en].filter(Boolean);
-    return `${i+1}\n${srtFmt(seg.start)} --> ${srtFmt(seg.start+seg.dur)}\n${texts.join('\n')}`;
-  });
-  dl('subtitles.srt', lines.join('\n\n'), 'text/plain');
-  toast('✓ SRT exported');
-}
- 
-function exportFCPXML() {
-  if (!segs.length) { toast('No subtitles to export'); return; }
-  const st = getStyle();
-  const face = [st.bold&&'Bold', st.italic&&'Italic'].filter(Boolean).join(' ') || 'Regular';
-  const totalEnd = Math.max(...segs.map(s => s.start + s.dur));
- 
-  function toFCPT(s) { return `${Math.round(s*90000)}/90000s`; }
-  function toFCPColor(hex) {
-    const [r,g,b] = hexToRGB(hex);
-    return `${(r/255).toFixed(6)} ${(g/255).toFixed(6)} ${(b/255).toFixed(6)} 1`;
-  }
-  function escX(s) {
-    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
-  }
- 
-  const titles = segs.map((seg, i) => {
-    const ar = (seg.useImproved && seg.textArImp ? seg.textArImp : seg.textAr) || '';
-    const en = (seg.useImproved && seg.textEnImp ? seg.textEnImp : seg.textEn) || '';
- 
-    let strokeAttr = st.strokeOn ? ` strokeColor="${toFCPColor(st.strokeColor)}" strokeWidth="${st.strokeW}"` : '';
-    let shadowAttr = st.shadowOn ? ` shadowColor="0 0 0 0.85" shadowOffset="4 315" shadowBlurRadius="5"` : '';
-    let bgAttr = '';
-    if (st.bgOn) {
-      const [r,g,b] = hexToRGB(st.bgColor);
-      bgAttr = ` backgroundColor="${(r/255).toFixed(4)} ${(g/255).toFixed(4)} ${(b/255).toFixed(4)} ${st.bgOp}"`;
-    }
- 
-    const arDefId = `ts${i+1}ar`, enDefId = `ts${i+1}en`;
-    let textContent = '';
-    let styleDefs = '';
- 
-    if (showAr && ar) {
-      textContent += `\n            <text baseWritingDirection="rightToLeft">\n              <text-style ref="${arDefId}">${escX(ar)}</text-style>\n            </text>`;
-      styleDefs += `\n          <text-style-def id="${arDefId}"><text-style font="${escX(st.font)}" fontSize="${st.size}" fontFace="${face}" fontColor="${toFCPColor(st.colorAr)}"${strokeAttr}${shadowAttr}${bgAttr} alignment="${st.align}"/></text-style-def>`;
-    }
-    if (showEn && en) {
-      textContent += `\n            <text baseWritingDirection="leftToRight">\n              <text-style ref="${enDefId}">${escX(en)}</text-style>\n            </text>`;
-      styleDefs += `\n          <text-style-def id="${enDefId}"><text-style font="${escX(st.font)}" fontSize="${st.size}" fontFace="${face}" fontColor="${toFCPColor(st.colorEn)}"${strokeAttr}${shadowAttr}${bgAttr} alignment="${st.align}"/></text-style-def>`;
-    }
- 
-    return `
-        <title name="Sub ${i+1}" lane="1" offset="${toFCPT(seg.start)}" ref="r2" duration="${toFCPT(seg.dur)}" start="0s">
-          <param name="Position" key="9999/999166631/999166633/1/100/101" value="${st.px} ${st.py}"/>${textContent}${styleDefs}
-        </title>`;
-  }).join('');
- 
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE fcpxml>
-<fcpxml version="1.10">
-  <resources>
-    <format id="r1" name="FFVideoFormat1080p2997" frameDuration="1001/30000s" width="1920" height="1080"/>
-    <effect id="r2" name="Basic Title" uid=".../Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"/>
-  </resources>
-  <library>
-    <event name="SubEdit Export">
-      <project name="Subtitle Project">
-        <sequence format="r1" duration="${toFCPT(totalEnd)}" tcStart="0s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
-          <spine>
-            <gap name="Gap" offset="0s" duration="${toFCPT(totalEnd)}" start="0s">${titles}
-            </gap>
-          </spine>
-        </sequence>
-      </project>
-    </event>
-  </library>
-</fcpxml>`;
- 
-  dl('subtitles.fcpxml', xml, 'text/xml');
-  toast('✓ FCPXML exported — ready for Final Cut Pro');
-}
- 
-function dl(name, content, type) {
-  const a = Object.assign(document.createElement('a'), {
-    href: URL.createObjectURL(new Blob([content], {type:`${type};charset=utf-8`})),
-    download: name,
-  });
-  a.click();
-}
- 
-// ════════════════════════════════════════════════════
-// KEYBOARD SHORTCUTS
-// ════════════════════════════════════════════════════
-document.addEventListener('keydown', e => {
-  if (e.target.tagName==='INPUT' || e.target.tagName==='TEXTAREA') return;
-  if (e.code==='Space') { e.preventDefault(); togglePlay(); }
-  if (e.code==='ArrowLeft')  { e.preventDefault(); skipTime(-5); }
-  if (e.code==='ArrowRight') { e.preventDefault(); skipTime(5); }
-  if (e.code==='KeyN' && (e.ctrlKey||e.metaKey)) { e.preventDefault(); addSeg(); }
-});
- 
-// ════════════════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════════════════
-(function init() {
-  // Load saved state
-  loadState();
- 
-  // Render built-in presets structure
-  renderPresets();
- 
-  // Set default vpos active
-  document.getElementById('vp-bot').classList.add('on');
- 
-  // Preview canvas draw (delayed for layout)
-  setTimeout(() => drawPreview(), 150);
-  setInterval(() => drawPreview(), 1500);
-  window.addEventListener('resize', drawPreview);
- 
-  // Drop zone drag events
-  document.getElementById('drop-zone').addEventListener('dragover', e => {
-    e.preventDefault();
-    document.getElementById('drop-zone').classList.add('dragover');
-  });
-  document.getElementById('drop-zone').addEventListener('dragleave', () => {
-    document.getElementById('drop-zone').classList.remove('dragover');
-  });
-  document.getElementById('drop-zone').addEventListener('drop', handleDrop);
- 
-  toast('👋 SubEdit Studio ready — drop a video or audio file to begin');
-})();
-</script>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useCallback, useMemo } = React;
+
+        // --- Constants & Utils ---
+        const FPS = 30;
+        const DEFAULT_STYLE = {
+            font: 'Cairo', size: 50, colorAr: '#FFFFFF', colorEn: '#FFFFFF',
+            strokeOn: true, strokeColor: '#000000', strokeW: 2,
+            posY: -400, fadeIn: 200, fadeOut: 200
+        };
+
+        const msToSRT = (ms) => {
+            const date = new Date(ms);
+            const h = String(Math.floor(ms / 3600000)).padStart(2, '0');
+            const m = String(date.getUTCMinutes()).padStart(2, '0');
+            const s = String(date.getUTCSeconds()).padStart(2, '0');
+            const mm = String(date.getUTCMilliseconds()).padStart(3, '0');
+            return `${h}:${m}:${s},${mm}`;
+        };
+
+        // --- Main App Component ---
+        const App = () => {
+            const [segments, setSegments] = useState([]);
+            const [currentTime, setCurrentTime] = useState(0);
+            const [duration, setDuration] = useState(0);
+            const [isPlaying, setIsPlaying] = useState(false);
+            const [mediaUrl, setMediaUrl] = useState(null);
+            const [selectedId, setSelectedId] = useState(null);
+            
+            const videoRef = useRef(null);
+            const canvasRef = useRef(null);
+
+            // إضافة مقطع جديد
+            const addSegment = () => {
+                const newSeg = {
+                    id: Date.now(),
+                    start: currentTime,
+                    dur: 3000,
+                    textAr: 'نص جديد',
+                    textEn: 'New Subtitle'
+                };
+                setSegments([...segments, newSeg].sort((a,b) => a.start - b.start));
+                setSelectedId(newSeg.id);
+            };
+
+            // رسم الترجمة على الـ Canvas
+            const draw = useCallback(() => {
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                const activeSegs = segments.filter(s => currentTime >= s.start && currentTime <= (s.start + s.dur));
+                
+                activeSegs.forEach(seg => {
+                    const opacity = 1; // يمكن إضافة فكرة الـ Fade هنا
+                    ctx.font = `${DEFAULT_STYLE.size}px Cairo`;
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+                    
+                    // رسم النص العربي
+                    ctx.fillText(seg.textAr, canvas.width / 2, canvas.height + (DEFAULT_STYLE.posY / 1080 * canvas.height));
+                    // رسم النص الإنجليزي أسفله
+                    ctx.font = `${DEFAULT_STYLE.size * 0.7}px Inter`;
+                    ctx.fillText(seg.textEn, canvas.width / 2, canvas.height + (DEFAULT_STYLE.posY / 1080 * canvas.height) + 50);
+                });
+            }, [segments, currentTime]);
+
+            useEffect(() => {
+                const interval = setInterval(() => {
+                    if (videoRef.current && !videoRef.current.paused) {
+                        setCurrentTime(videoRef.current.currentTime * 1000);
+                        draw();
+                    }
+                }, 1000 / FPS);
+                return () => clearInterval(interval);
+            }, [draw]);
+
+            // تصدير الملفات
+            const exportSRT = () => {
+                const content = segments.map((s, i) => 
+                    `${i+1}\n${msToSRT(s.start)} --> ${msToSRT(s.start + s.dur)}\n${s.textAr}\n${s.textEn}\n`
+                ).join('\n');
+                const blob = new Blob([content], { type: 'text/srt' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = 'subtitles.srt'; a.click();
+            };
+
+            return (
+                <div id="root">
+                    <div className="toolbar">
+                        <h2 style={{fontSize: '16px', color: 'var(--acc)'}}>SubEdit Pro</h2>
+                        <button onClick={() => document.getElementById('file-upload').click()}>تحميل فيديو</button>
+                        <input id="file-upload" type="file" hidden onChange={(e) => setMediaUrl(URL.createObjectURL(e.target.files[0]))} />
+                        <button onClick={addSegment}>+ إضافة ترجمة</button>
+                        <button onClick={exportSRT} style={{background: '#22c55e'}}>تصدير SRT</button>
+                        <div className="time-label">Time: {Math.floor(currentTime/1000)}s / {Math.floor(duration/1000)}s</div>
+                    </div>
+
+                    <div className="app-container">
+                        <div className="main-view">
+                            <div className="video-wrapper">
+                                {mediaUrl && (
+                                    <video 
+                                        ref={videoRef} 
+                                        src={mediaUrl} 
+                                        onLoadedMetadata={() => setDuration(videoRef.current.duration * 1000)}
+                                        onClick={() => videoRef.current.paused ? videoRef.current.play() : videoRef.current.pause()}
+                                    />
+                                )}
+                                <canvas ref={canvasRef} width="1920" height="1080" />
+                            </div>
+                        </div>
+
+                        <div className="sidebar">
+                            <div style={{padding: '10px', borderBottom: '1px solid var(--bd)'}}>قائمة المقاطع</div>
+                            <div style={{flex: 1, overflowY: 'auto', padding: '10px'}}>
+                                {segments.map(seg => (
+                                    <div key={seg.id} className={`seg-card ${selectedId === seg.id ? 'active' : ''}`} onClick={() => setSelectedId(seg.id)}>
+                                        <div style={{fontSize: '10px', marginBottom: '5px'}}>{msToSRT(seg.start)}</div>
+                                        <input type="text" value={seg.textAr} onChange={(e) => {
+                                            const newSegs = segments.map(s => s.id === seg.id ? {...s, textAr: e.target.value} : s);
+                                            setSegments(newSegs);
+                                        }} style={{marginBottom: '5px', direction: 'rtl'}} />
+                                        <input type="text" value={seg.textEn} onChange={(e) => {
+                                            const newSegs = segments.map(s => s.id === seg.id ? {...s, textEn: e.target.value} : s);
+                                            setSegments(newSegs);
+                                        }} />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
 </body>
 </html>
